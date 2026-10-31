@@ -1,0 +1,458 @@
+# Project: Delhi Metro 2D & 3D Interactive Visualization
+
+Act as a **Senior GIS Engineer, 3D Visualization Engineer, and Full-Stack Architect**. We are going to build an interactive Delhi Metro visualization platform using **Three.js and Leaflet**.
+
+The goal is to create a geographically accurate representation of the complete Delhi Metro network, including all metro lines, stations, tracks, elevated routes, underground routes, and 3D metro assets.
+
+Do not start coding the complete 3D implementation immediately. We will follow a structured, research-first development approach.
+
+# 1. Project Vision
+
+Build an interactive Delhi Metro visualization application with two visualization modes:
+
+**Mode 1: 2D Map (Leaflet)**
+- Display the complete Delhi Metro network on a real geographical map.
+- Show all metro lines using their official colors.
+- Display all metro stations with accurate geographical coordinates.
+- Differentiate elevated, underground, and at-grade metro routes.
+- Show station names and line information.
+- Display metro interchange stations.
+- Support zooming, panning, and selecting individual stations.
+- Validate route connectivity, station ordering, and geographical accuracy.
+
+**Mode 2: 3D Visualization (Three.js)**
+- Convert the validated 2D metro network into a 3D geographical visualization.
+- Render metro tracks and routes in 3D.
+- Render elevated metro tracks on pillars and viaduct structures.
+- Render underground metro tracks below the ground surface.
+- Render metro stations with appropriate 3D structures.
+- Display moving metro trains along their respective routes.
+- Represent different metro lines using their official colors.
+- Support camera controls, zooming, rotation, and navigation.
+- Provide a realistic yet optimized 3D city/metro visualization.
+
+The 2D Leaflet implementation must be treated as the geographical validation layer before building the 3D environment.
+
+# 2. Phase 1 — Research and Dataset Collection
+
+First, conduct comprehensive research on the Delhi Metro network.
+
+Find reliable and publicly accessible datasets from sources such as:
+- Delhi Metro Rail Corporation (DMRC).
+- Government open data portals.
+- OpenStreetMap (OSM).
+- Geofabrik.
+- Overpass API.
+- Open-source GIS repositories.
+- Official metro route maps and documentation.
+
+Research and collect the following information:
+
+### A. Metro Lines
+For every metro line, collect:
+- Official line name.
+- Official line color and HEX/RGB color code.
+- Starting station.
+- Ending station.
+- Total number of stations.
+- Total route length, where available.
+- Route geometry (LineString or MultiLineString).
+- Operational status.
+- Interchange connections.
+
+Include all operational Delhi Metro corridors and separately identify any under-construction or proposed corridors.
+
+Do not assume the network contains only the commonly known lines. Research the complete network as of the latest available data.
+
+### B. Metro Stations
+
+For every station, collect:
+- Station ID.
+- Official station name.
+- Latitude.
+- Longitude.
+- Associated metro lines.
+- Station type:
+  - Elevated.
+  - Underground.
+  - At-grade.
+- Interchange status.
+- Connected lines.
+- Available station elevation or underground depth, if reliable data exists.
+
+### C. Metro Routes and Tracks
+
+For every route segment, collect:
+- Source station.
+- Destination station.
+- Line ID.
+- Ordered geographical coordinates.
+- Track geometry.
+- Track type (elevated, underground, at-grade).
+- Segment distance, if available.
+
+Important: Do not create straight lines between stations when actual route geometry is available. Prefer actual track alignment from GIS data.
+
+### D. Data Sources and Accuracy
+
+For every dataset:
+- Record its source URL.
+- Record its license.
+- Record its last updated date, if available.
+- Explain its geographical accuracy.
+- Identify missing information.
+- Identify conflicting information between sources.
+
+Never fabricate coordinates, station names, route geometry, or station classifications.
+
+If information cannot be verified, mark it as unknown and document the limitation.
+
+# 3. Phase 2 — Dataset Processing and Architecture
+
+After collecting the data, design a normalized dataset structure.
+
+We should maintain separate datasets for:
+
+1. Metro lines.
+2. Metro stations.
+3. Metro route geometries.
+4. Track segments.
+5. Station interchange relationships.
+6. Station and route infrastructure classifications.
+
+Suggested project data structure:
+
+```text
+data/
+├── raw/
+│   ├── osm/
+│   ├── dmrc/
+│   └── other_sources/
+│
+├── processed/
+│   ├── metro_lines.geojson
+│   ├── metro_stations.geojson
+│   ├── metro_routes.geojson
+│   ├── metro_segments.geojson
+│   └── interchange_stations.geojson
+│
+├── metadata/
+│   ├── sources.json
+│   ├── data_quality_report.json
+│   └── validation_report.json
+```
+
+Use GeoJSON as the primary geographical data format.
+
+Create a consistent data schema that can be consumed by both Leaflet and Three.js.
+
+Example metro station:
+
+```json
+{
+  "id": "station_001",
+  "name": "Example Station",
+  "coordinates": {
+    "lat": 28.0000,
+    "lng": 77.0000
+  },
+  "stationType": "elevated",
+  "lines": ["yellow_line"],
+  "isInterchange": false
+}
+```
+
+Example metro line:
+
+```json
+{
+  "id": "yellow_line",
+  "name": "Yellow Line",
+  "color": "#FFD700",
+  "stations": [],
+  "geometry": [],
+  "status": "operational"
+}
+```
+
+These are schema examples only. Use verified real-world data for actual records.
+
+# 4. Phase 3 — Data Validation Using Leaflet
+
+Before starting Three.js, build a complete 2D geographical visualization using Leaflet.
+
+Requirements:
+
+### Map Implementation
+- Use OpenStreetMap as the base map.
+- Render each metro line using its official color.
+- Render all stations as markers.
+- Show station names on click or hover.
+- Differentiate interchange stations visually.
+- Display underground, elevated, and at-grade sections using different line styles or visual indicators.
+- Allow individual metro lines to be enabled/disabled through a layer control.
+- Add filters for station type and metro line.
+- Show station details in a popup.
+
+### Route Validation
+
+This phase is extremely important.
+
+We need to verify:
+- Whether stations appear in the correct geographical locations.
+- Whether stations are connected in the correct order.
+- Whether metro routes follow actual geographical alignments.
+- Whether interchange stations are correctly identified.
+- Whether metro lines connect correctly.
+- Whether route geometries contain gaps or disconnected segments.
+- Whether overlapping corridors are represented correctly.
+
+Create an automated validation script that checks:
+- Missing station coordinates.
+- Duplicate station IDs.
+- Duplicate or inconsistent station names.
+- Missing route geometries.
+- Invalid GeoJSON.
+- Disconnected route segments.
+- Incorrect station ordering.
+- Interchange relationship inconsistencies.
+
+Generate a validation report with errors, warnings, and statistics.
+
+Do not proceed to 3D development until the major geographical and connectivity issues have been resolved or explicitly documented.
+
+# 5. Phase 4 — 3D Asset Research and Collection
+
+In parallel with dataset research, investigate the availability of 3D metro assets.
+
+We need the following assets:
+
+### A. Metro Train
+- Delhi Metro train model.
+- Generic metro train model if an exact Delhi Metro model is unavailable.
+- Train front, side, and carriage geometry.
+- Wheels and bogies, where practical.
+- Doors and windows.
+
+### B. Elevated Metro Infrastructure
+- Elevated metro station.
+- Metro viaduct.
+- Concrete pillars.
+- Elevated track structures.
+- Track rails.
+- Station platforms.
+- Platform roofs.
+- Staircases and entry/exit structures.
+
+### C. Underground Metro Infrastructure
+- Underground metro station.
+- Underground platform.
+- Subway tunnel.
+- Tunnel walls.
+- Tunnel track.
+- Escalators and entry/exit structures.
+- Underground station lighting.
+
+### D. At-grade Infrastructure
+- Ground-level tracks.
+- Ground-level platforms.
+- Trackside infrastructure.
+
+### E. Additional Assets
+- Metro signals.
+- Overhead electrification equipment.
+- Station signs.
+- Platform indicators.
+- Track switches.
+- Benches and other station elements.
+
+### Asset Sources
+
+Investigate:
+- Sketchfab.
+- CGTrader.
+- TurboSquid.
+- BlenderKit.
+- Poly Haven.
+- GitHub.
+- Other open-source 3D asset repositories.
+
+For each asset, document:
+- Asset name.
+- Preview image.
+- Source URL.
+- File format (GLB, GLTF, OBJ, FBX, etc.).
+- License.
+- Whether commercial use is permitted.
+- Polygon count, if available.
+- Texture information.
+- Whether it is suitable for real-time Three.js rendering.
+
+Prefer GLB/GLTF assets.
+
+If an exact Delhi Metro asset is unavailable, recommend creating optimized modular assets in Blender.
+
+Do not download or use copyrighted assets without verifying their licensing conditions.
+
+# 6. Phase 5 — Three.js Architecture
+
+Once the Leaflet map has been validated, begin planning the 3D architecture.
+
+Recommended technology stack:
+
+- React + Vite.
+- Three.js.
+- React Three Fiber (optional).
+- @react-three/drei (optional).
+- Leaflet / React Leaflet.
+- GeoJSON.
+- Turf.js for geographical calculations.
+- Zustand  for shared application state.
+
+### 3D Rendering Requirements
+
+**Geographical Mapping**
+
+Convert geographical coordinates (latitude/longitude) into a local 3D coordinate system.
+
+Use a suitable projection such as Web Mercator or a local projected coordinate system.
+
+Do not directly use latitude and longitude as Three.js world coordinates.
+
+**Track Rendering**
+
+- Generate 3D tracks from validated GeoJSON geometries.
+- Maintain the official metro line colors.
+- Create separate elevated, underground, and ground-level track representations.
+- Use curves and optimized geometry for smooth tracks.
+
+**Elevated Metro**
+
+- Generate elevated track geometry.
+- Place pillars at appropriate intervals.
+- Render elevated stations.
+- Ensure tracks connect continuously through stations.
+
+**Underground Metro**
+
+- Generate underground tunnels.
+- Place underground stations below the ground plane.
+- Render tunnel sections and underground platforms.
+- Make underground routes visually understandable.
+
+**Metro Trains**
+
+- Load GLB/GLTF train models.
+- Animate trains along their respective route geometries.
+- Maintain train orientation along the direction of travel.
+- Support multiple trains.
+- Provide configurable train speed.
+- Avoid unnecessary geometry and animation overhead.
+
+**Metro Stations**
+
+- Load appropriate station models based on station type.
+- Support interchange stations with multiple metro lines.
+- Connect platform structures to the corresponding track geometries.
+
+# 7. Phase 6 — User Interface and Interaction
+
+The final application should support:
+
+- 2D / 3D visualization toggle.
+- Metro line visibility controls.
+- Station visibility controls.
+- Elevated / underground / at-grade filters.
+- Station search.
+- Station information panel.
+- Interchange station highlighting.
+- Metro train animation controls.
+- Camera zoom and rotation.
+- Reset camera position.
+- Route highlighting between selected stations.
+
+Future functionality:
+- Select source and destination stations.
+- Calculate the metro journey.
+- Highlight the complete route.
+- Show interchange stations.
+- Display the number of stops and estimated journey distance.
+
+# 8. Development Workflow
+
+Follow this order strictly:
+
+**Step 1:** Research the complete Delhi Metro network.
+
+**Step 2:** Collect datasets and record their sources and licenses.
+
+**Step 3:** Collect and normalize metro lines, stations, and route geometries.
+
+**Step 4:** Research and document available 3D assets.
+
+**Step 5:** Create the Leaflet application.
+
+**Step 6:** Display all metro lines and stations on the geographical map.
+
+**Step 7:** Validate geographical accuracy, station order, route connectivity, and interchange relationships.
+
+**Step 8:** Fix major dataset issues and produce a validation report.
+
+**Step 9:** Design the Three.js geographical coordinate system.
+
+**Step 10:** Build modular 3D metro assets and infrastructure.
+
+**Step 11:** Render elevated, underground, and at-grade routes.
+
+**Step 12:** Integrate stations and metro trains.
+
+**Step 13:** Implement train animations and interactive controls.
+
+**Step 14:** Optimize rendering and complete the final visualization.
+
+# 9. Important Engineering Rules
+
+1. Research before implementation.
+2. Never invent metro stations, routes, coordinates, or infrastructure types.
+3. Maintain a clear distinction between verified and unverified data.
+4. Keep raw datasets separate from processed datasets.
+5. Keep data independent of the rendering engine.
+6. The same GeoJSON data should power both Leaflet and Three.js.
+7. Use reusable and modular 3D components.
+8. Avoid manually hardcoding geographical coordinates in frontend components.
+9. Maintain source attribution and license information.
+10. Optimize 3D assets for browser performance.
+11. Document all assumptions and limitations.
+12. Do not build the complete application in one step.
+
+# 10. Your First Task — Research and Planning Only
+
+For now, do not start the complete implementation.
+
+Start with the following deliverables:
+
+1. Complete Delhi Metro network research.
+2. List of all metro lines and their official colors.
+3. List of metro stations and their geographical data sources.
+4. Available route geometry datasets.
+5. Classification of elevated, underground, and at-grade sections.
+6. List of reliable data sources with URLs and licenses.
+7. List of available 3D metro assets with preview links and licenses.
+8. Recommended project architecture and folder structure.
+9. Data normalization strategy.
+10. Data validation strategy.
+11. A phased development roadmap.
+
+Present your findings in structured Markdown tables.
+
+For each dataset, clearly state:
+- Available.
+- Partially available.
+- Not available.
+- Requires extraction or manual verification.
+
+**Stop after completing the research and planning phase.**
+
+Wait for my approval before proceeding to dataset processing and Leaflet implementation.
+
+Our priority is geographical accuracy first, 2D validation second, and high-quality 3D visualization third.
