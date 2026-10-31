@@ -1,0 +1,68 @@
+{
+  "_doc": "Hand-maintained line config. colour: Wikidata P465 (DECISIONS.md #2); no DMRC-published HEX exists, so official=false. branches[].osmRoute = canonical-direction OSM route relation; osmReverse = opposite direction, used to cross-check stop order.",
+  "lines": [
+    {
+      "id": "red", "name": "Red Line", "osmRef": "1", "osmRouteMaster": 8429148,
+      "color": "#FF2D16", "colorSource": "wikidata:Q3278367#P465", "official": false,
+      "wikipedia": "Red_Line_(Delhi_Metro)",
+      "branches": [{ "id": "red_main", "osmRoute": 447214, "osmReverse": 8037718 }]
+    },
+    {
+      "id": "yellow", "name": "Yellow Line", "osmRef": "2", "osmRouteMaster": 8037713,
+      "color": "#FFEA3D", "colorSource": "wikidata:Q795156#P465", "official": false,
+      "wikipedia": "Yellow_Line_(Delhi_Metro)",
+      "branches": [{ "id": "yellow_main", "osmRoute": 447210, "osmReverse": 8037712 }]
+    },
+    {
+      "id": "blue", "name": "Blue Line", "osmRef": "3;4", "osmRouteMaster": 8037671,
+      "color": "#102694", "colorSource": "wikidata:Q1029921#P465", "official": false,
+      "wikipedia": "Blue_Line_(Delhi_Metro)",
+      "branches": [
+        { "id": "blue_main", "osmRoute": 8037669, "osmReverse": 447209 },
+        { "id": "blue_vaishali", "osmRoute": 2535795, "osmReverse": 8037670 }
+      ]
+    },
+    {
+      "id": "green", "name": "Green Line", "osmRef": "5", "osmRouteMaster": 8037672,
+      "color": "#00AA4F", "colorSource": "wikidata:Q5602820#P465", "official": false,
+      "wikipedia": "Green_Line_(Delhi_Metro)",
+      "branches": [
+        { "id": "green_main", "osmRoute": 8037666, "osmReverse": 8037687 },
+        { "id": "green_kirti_nagar", "osmRoute": 2535796, "osmReverse": 8037675 }
+      ]
+    },
+    {
+      "id": "violet", "name": "Violet Line", "osmRef": "6", "osmRouteMaster": 8037706,
+      "color": "#553592", "colorSource": "wikidata:Q3634451#P465", "official": false,
+      "wikipedia": "Violet_Line_(Delhi_Metro)",
+      "branches": [{ "id": "violet_main", "osmRoute": 2535797, "osmReverse": 8037705 }]
+    },
+    {
+      "id": "pink", "name": "Pink Line", "osmRef": "7", "osmRouteMaster": 8242438,
+      "color": "#FF5872", "colorSource": "wikidata:Q19891094#P465", "official": false,
+      "wikipedia": "Pink_Line_(Delhi_Metro)",
+      "branches": [{ "id": "pink_main", "osmRoute": 8242437, "osmReverse": 8241298 }]
+    },
+    {
+      "id": "magenta", "name": "Magenta Line", "osmRef": "8", "osmRouteMaster": 8051576,
+      "color": "#FB3099", "colorSource": "wikidata:Q19893471#P465", "official": false,
+      "wikipedia": "Magenta_Line_(Delhi_Metro)",
+      "branches": [
+        { "id": "magenta_main", "osmRoute": 8385429, "osmReverse": 8385430 },
+        { "id": "magenta_majlis_park", "osmRoute": 20300114, "osmReverse": 20300115 }
+      ]
+    },
+    {
+      "id": "grey", "name": "Grey Line", "osmRef": "9", "osmRouteMaster": 8051593,
+      "color": "#9A9B9E", "colorSource": "wikidata:Q47100305#P465", "official": false,
+      "wikipedia": "Grey_Line_(Delhi_Metro)",
+      "branches": [{ "id": "grey_main", "osmRoute": 3537978, "osmReverse": 8051592 }]
+    },
+    {
+      "id": "airport_express", "name": "Airport Express Line", "osmRef": "AEx", "osmRouteMaster": 8037716,
+      "color": "#FF8C00", "colorSource": "osm:relation/8037716#colour (no Wikidata P465)", "official": false,
+      "wikipedia": "Airport_Express_Line_(Delhi_Metro)",
+      "branches": [{ "id": "airport_express_main", "osmRoute": 8037715, "osmReverse": 2535798 }]
+    }
+  ]
+}

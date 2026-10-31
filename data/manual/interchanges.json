@@ -1,0 +1,6 @@
+{
+  "_doc": "Interchange corrections. Stations sharing an OSM `ref`, or on different lines within proximityMeters, are merged automatically. merge: [idA, idB, reason] joins two stations; separate: [idA, idB, reason] blocks an automatic proximity merge. Ids are the provisional ids printed in data_quality_report.json.",
+  "proximityMeters": 250,
+  "merge": [],
+  "separate": []
+}

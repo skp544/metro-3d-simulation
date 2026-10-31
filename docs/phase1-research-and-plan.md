@@ -3,7 +3,7 @@
 **Research date:** 2026-10-31
 **OSM snapshot used for the measurements below:** Overpass API, `timestamp_osm_base` 2026-10-31T11:54Z
 
-This document covers research and planning only. No processed dataset or application code exists yet.
+This document is a **frozen research snapshot**. The living versions of its plans are in [ARCHITECTURE.md](ARCHITECTURE.md) and [DECISIONS.md](DECISIONS.md), and they take precedence where they differ (for example, the `src/` folder layout).
 
 ## Legend
 

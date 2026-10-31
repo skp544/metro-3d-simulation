@@ -1,0 +1,139 @@
+# Architecture
+
+Living document. Research behind these choices: `phase1-research-and-plan.md`. Decisions: `DECISIONS.md`.
+
+## Overview
+
+```text
+OSM (Overpass / Geofabrik) ─┐
+Wikipedia / Wikidata ───────┼─► data/raw/ ─► scripts/build-dataset.ts ─► data/processed/*.geojson ─► scripts/validate.ts ─► validation_report.json
+data/manual/ (overrides) ───┘                                                │
+                                                                             ▼ (copied to public/data/ at build)
+                                                          src/data loaders ─► zustand store ─► Leaflet 2D │ Three.js 3D
+```
+
+The data pipeline runs offline in Node. The app is static and only reads processed GeoJSON.
+
+## Folder structure
+
+```text
+metro-route/
+├── data/
+│   ├── raw/osm/                  # dated Overpass JSON snapshots; never edited
+│   ├── raw/wikipedia/            # scraped station layout tables
+│   ├── manual/                   # lines.json (colours, OSM relation per branch), interchanges.json, station_overrides.json
+│   ├── processed/                # GENERATED: metro_lines, metro_stations, metro_routes, metro_segments, interchange_stations, metro_under_construction (.geojson)
+│   └── metadata/                 # sources.json, data_quality_report.json, validation_report.json
+├── scripts/
+│   ├── fetch-osm.ts              # writes data/raw/osm/<date>.json
+│   ├── fetch-wikipedia.ts        # writes data/raw/wikipedia/<date>.json (station tables, for cross-checking)
+│   ├── build-dataset.ts          # raw + manual → processed + metadata
+│   └── validate.ts               # processed → report; exit 1 on errors
+├── public/
+│   ├── data/                     # processed GeoJSON served to the app
+│   └── models/                   # train.glb
+└── src/
+    ├── components/
+    │   ├── map2d/                # Leaflet: MetroMap, LineLayer, StationMarkers, ValidationOverlay
+    │   ├── scene3d/              # R3F: Scene, Track, Viaduct, Tunnel, Station, Train, CameraRig
+    │   └── ui/                   # panels, search, filters, toggles (Tailwind)
+    ├── constants/                # non-geographic constants only: nominal heights/depths, pillar spacing, UI config
+    ├── data/                     # GeoJSON loaders + TypeScript types for the schema
+    ├── pages/                    # top-level views
+    ├── store/                    # zustand: mode (2d|3d), selection, filters, train playback
+    └── utils/                    # projection.ts, geometry helpers
+```
+
+**Rule:** no coordinates, station lists or colours in `src/`. These come from `public/data/`. `src/constants/` holds only rendering constants.
+
+## Data schema
+
+All files are GeoJSON FeatureCollections in WGS84, with coordinates in `[lng, lat]` order and 6 decimal places (about 0.1 m). They are written one feature per line, so diffs stay readable. **The TypeScript types in `src/data/types.ts` are the source of truth for this schema.**
+
+| File | Geometry | Key properties |
+|---|---|---|
+| `metro_lines.geojson` | MultiLineString (one part per branch) | `id`, `name`, `color`, `colorSource`, `colorOfficial`, `status`, `branches[{id, stationIds[]}]` |
+| `metro_routes.geojson` | LineString per branch (full track, including tail tracks) | `id` (e.g. `blue_vaishali`), `lineId`, `stationIds[]` (travel order), `stopKm[]`, `lengthKm` (first to last stop), `geometryLengthKm` |
+| `metro_segments.geojson` | LineString between consecutive stops, split further where the track type changes | `id`, `lineId`, `routeId`, `fromStationId`, `toStationId`, `trackType`, `trackTypeSource`, `lengthKm` |
+| `metro_stations.geojson` | Point (mean of the per-line OSM station objects) | `id`, `name`, `name_hi`, `aliases[]`, `refs[]`, `lines[]`, `isInterchange`, `stationType`, `platforms[{lineId, coordinates, trackType, trackTypeSource, wikipediaName, wikipediaLayout}]`, `status` |
+| `interchange_stations.geojson` | Point | `stationId`, `name`, `lines[]`, `evidence` (`osm-ref` / `proximity` / `manual`) |
+| `metro_under_construction.geojson` | LineString per OSM construction way | `id`, `name`, `lineId` (null; OSM doesn't say which line), `lengthKm` |
+
+Every feature except interchanges also has: `source[]` (e.g. `osm:node/123`, `wikipedia:<article>@<revision>`), `verified`, `estimated`, `conflicts[]`.
+
+- **Stations:** `verified` = every platform matched a Wikipedia row that agrees on the type.
+- **Segments:** `verified` is always false (single source). `estimated` = the track type comes from an untagged OSM way.
+
+**IDs.** Line IDs: `red yellow blue green violet pink magenta grey airport_express`. Route (branch) IDs: `blue_main`, `blue_vaishali`, `green_main`, `green_kirti_nagar`, `magenta_main`, `magenta_majlis_park`, and `<line>_main` for the rest. Station ID: `stn_<ref>` from the OSM `ref` station code (e.g. `stn_kg`). Without a ref it is `stn_osm_<n|w><id>`. When stations merge, a ref-based ID wins. These IDs change if OSM later adds a ref.
+
+`trackType`: `elevated | underground | at_grade | unknown`. `stationType` adds `mixed` for interchanges whose platforms differ (e.g. Kashmere Gate: Red elevated, Yellow/Violet underground). Each platform's own `trackType` is what 3D uses.
+
+**Loop lines.** Pink's `stationIds` lists Maujpur-Babarpur twice (the line passes it twice). Validation must allow this.
+
+## Data pipeline (Phase 2)
+
+Run with `npm run data:fetch` (network) and then `npm run data:build` (offline, deterministic). The build exits 1 on errors.
+
+1. **Fetch:** Overpass returns the `route_master`/`route` relations with `network="Delhi Metro"`, their ways (with geometry) and stop nodes, the stops' `stop_area` relations, `railway=station` objects, and `railway=construction` subway ways. Saved to `data/raw/osm/YYYY-MM-DD.json`. Wikipedia station tables are saved to `data/raw/wikipedia/YYYY-MM-DD.json`. Both fetches retry with backoff.
+2. **Track:** for each branch, chain the canonical-direction relation's ways in order (orienting each way to connect). A break in the chain is a `CHAIN_GAP` error.
+3. **Stops:** snap each stop onto the track, searching forward from the previous stop (needed for the Pink loop). The stop must be within 50 m of the track and after the previous one. The opposite-direction relation must have the reverse stop sequence.
+4. **Stations:** stop → its `stop_area` → station object, falling back to a same-name station object within 400 m. In OSM each line has its own station object; objects sharing a `ref` are one physical station.
+5. **Interchanges:** stations on different lines within 250 m are merged automatically (logged as `PROXIMITY_MERGE`). `interchanges.json` can add merges or block them.
+6. **Segments:** cut at every stop and at every change of track type. Way tags map as follows:
+   - `tunnel` or negative `layer` → underground
+   - `bridge` or positive `layer` → elevated
+   - `cutting` / `embankment` / `covered` → at-grade
+   - no tags → at-grade, marked estimated
+   - `tunnel=building_passage` → unknown
+7. **Station type:** the type of the track at each platform's stop, cross-checked against Wikipedia (matching tolerates spelling drift). An explicit OSM tag outranks Wikipedia (logged as a conflict); an untagged OSM way gives way to Wikipedia. `station_overrides.json` is applied last.
+8. **Metadata:** `sources.json` (snapshot timestamps, Wikipedia revision IDs, licences) and `data_quality_report.json` (counts, km by type per line, every issue with its OSM IDs).
+
+## Validation (Phase 3)
+
+`scripts/validate.ts` runs these checks:
+
+| Check | Severity |
+|---|---|
+| Schema / GeoJSON validity | Error |
+| Missing coordinates, or outside the NCR bounding box (28.2–28.9 N, 76.7–77.6 E) | Error |
+| Duplicate station IDs | Error |
+| Missing line or route geometry | Error |
+| Segment endpoint gap > 1 m | Error |
+| Station order not increasing along the route | Error |
+| `isInterchange` ≠ (`lines.length > 1`), or a manual interchange missing | Error |
+| Same name with different IDs; different names within 300 m | Warning |
+| Station > 150 m from its line | Warning |
+| Station count ≠ Wikipedia; length off by more than ±5% | Warning |
+| Share of km with an unknown track type | Statistic |
+
+## Projection (3D)
+
+Local tangent plane centred on Rajiv Chowk (origin read from the data, not hardcoded):
+`x = R·Δλ·cos φ₀`, `z = −R·Δφ` (metres; Three.js y is up). Under 0.1% error across the network.
+
+Heights are nominal: elevated deck +12 m, underground −15 m, ramps interpolated at type changes. These are marked as estimated in the UI.
+
+## 3D rendering
+
+| Element | Approach |
+|---|---|
+| Track | Extruded ribbon along `CatmullRomCurve3` per segment, in the line colour |
+| Viaduct and pillars | Extruded deck + `InstancedMesh` pillars about every 30 m |
+| Tunnel | Tube geometry below the ground; ground plane can be made translucent or cut away |
+| Stations | Parametric boxes by type, aligned to the track tangent |
+| Trains | One GLB (Draco/Meshopt), instanced; position and tangent from the route curve |
+| Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
+
+## Roadmap
+
+| Phase | Deliverable | Exit criteria | Status |
+|---|---|---|---|
+| 1 | Research and plan | User approval | ✅ Done |
+| 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done (awaiting review) |
+| 3 | Validation script + report | 0 errors; warnings documented | — |
+| 4 | Leaflet 2D map | Every line reviewed against satellite imagery | — |
+| 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | — |
+| 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | — |
+| 7 | Trains | ≥ 50 trains at 60 fps | — |
+| 8 | UI (toggle, search, panels, work-in-progress entries) | — | — |
+| 9 | Journey planner | — | Future |

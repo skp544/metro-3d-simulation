@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-10-31T12:30:55.352Z",
+  "sources": [
+    {
+      "id": "osm",
+      "name": "OpenStreetMap via Overpass API",
+      "url": "https://overpass-api.de/api/interpreter",
+      "licence": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors",
+      "snapshot": "2026-10-31T12:28:36Z",
+      "file": "data/raw/osm/2026-10-31.json",
+      "usedFor": "track geometry, track type (bridge/tunnel/layer tags), stops, stations, station codes, interchanges"
+    },
+    {
+      "id": "wikipedia",
+      "name": "English Wikipedia line articles (station tables)",
+      "licence": "CC BY-SA 4.0",
+      "fetchedAt": "2026-10-31T12:24:33.534Z",
+      "file": "data/raw/wikipedia/2026-10-31.json",
+      "revisions": {
+        "red": "Red Line (Delhi Metro)@1368957245",
+        "yellow": "Yellow Line (Delhi Metro)@1376892425",
+        "blue": "Blue Line (Delhi Metro)@1369212846",
+        "green": "Green Line (Delhi Metro)@1376491990",
+        "violet": "Violet Line (Delhi Metro)@1376890643",
+        "pink": "Pink Line (Delhi Metro)@1377063078",
+        "magenta": "Magenta Line (Delhi Metro)@1371617069",
+        "grey": "Grey Line (Delhi Metro)@1365107030",
+        "airport_express": "Airport Express Line (Delhi Metro)@1376415060"
+      },
+      "usedFor": "cross-check of station layout; overrides only untagged OSM track"
+    },
+    {
+      "id": "wikidata",
+      "name": "Wikidata P465 (sRGB colour)",
+      "licence": "CC0-1.0",
+      "usedFor": "line colours (see colorSource per line)"
+    },
+    {
+      "id": "manual",
+      "files": [
+        "data/manual/lines.json",
+        "data/manual/interchanges.json",
+        "data/manual/station_overrides.json"
+      ],
+      "usedFor": "line config, interchange and station corrections"
+    }
+  ]
+}

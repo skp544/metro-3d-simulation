@@ -1,0 +1,514 @@
+{
+  "generatedAt": "2026-10-31T12:30:55.352Z",
+  "inputs": {
+    "osm": "data/raw/osm/2026-10-31.json",
+    "osmSnapshot": "2026-10-31T12:28:36Z",
+    "wikipedia": "data/raw/wikipedia/2026-10-31.json"
+  },
+  "counts": {
+    "lines": 9,
+    "routes": 12,
+    "stations": 244,
+    "interchanges": 26,
+    "segments": 312,
+    "underConstructionWays": 12,
+    "stationsVerified": 233,
+    "stationsWithConflicts": 4,
+    "stationsByType": {
+      "elevated": 176,
+      "underground": 57,
+      "at_grade": 2,
+      "mixed": 8,
+      "unknown": 1
+    }
+  },
+  "stationsPerLine": {
+    "red": 29,
+    "yellow": 37,
+    "blue": 57,
+    "green": 24,
+    "violet": 34,
+    "pink": 46,
+    "magenta": 33,
+    "grey": 4,
+    "airport_express": 7
+  },
+  "trackKmByType": {
+    "red": {
+      "elevated": 30.079,
+      "underground": 0,
+      "at_grade": 3.102,
+      "unknown": 0.19,
+      "untagged": 3.102
+    },
+    "yellow": {
+      "elevated": 24.319,
+      "underground": 23.189,
+      "at_grade": 0.179,
+      "unknown": 0,
+      "untagged": 0.179
+    },
+    "blue": {
+      "elevated": 58.098,
+      "underground": 3.355,
+      "at_grade": 2.389,
+      "unknown": 0,
+      "untagged": 2.389
+    },
+    "green": {
+      "elevated": 27.68,
+      "underground": 0,
+      "at_grade": 0.169,
+      "unknown": 0,
+      "untagged": 0.169
+    },
+    "violet": {
+      "elevated": 30.778,
+      "underground": 14.082,
+      "at_grade": 0,
+      "unknown": 0,
+      "untagged": 0
+    },
+    "pink": {
+      "elevated": 51.112,
+      "underground": 18.137,
+      "at_grade": 1.402,
+      "unknown": 0,
+      "untagged": 1.402
+    },
+    "magenta": {
+      "elevated": 23.076,
+      "underground": 24.008,
+      "at_grade": 0.361,
+      "unknown": 0,
+      "untagged": 0.214
+    },
+    "grey": {
+      "elevated": 2.583,
+      "underground": 2.075,
+      "at_grade": 0.202,
+      "unknown": 0,
+      "untagged": 0.202
+    },
+    "airport_express": {
+      "elevated": 7.641,
+      "underground": 16.092,
+      "at_grade": 0,
+      "unknown": 0,
+      "untagged": 0
+    }
+  },
+  "issueCounts": {
+    "STOP_AREA_FALLBACK": 8,
+    "PROXIMITY_MERGE": 3,
+    "TYPE_CONFLICT": 4,
+    "WIKI_UNMATCHED": 9,
+    "NAME_VARIANTS": 1,
+    "STATION_NO_REF": 25
+  },
+  "issues": [
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Rohini West\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/1988598418"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Kohat Enclave\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/311963955"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Keshav Puram\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/663762151"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Kanhaiya Nagar\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/663761505"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Shastri Nagar\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/663761411"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Pratap Nagar\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/268381457"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Pul Bangash\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/268381463"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STOP_AREA_FALLBACK",
+      "message": "Stop \"Tis Hazari\" has no stop_area; matched station object by name (0 m)",
+      "ids": [
+        "osm:node/561316983"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "PROXIMITY_MERGE",
+      "message": "Merged stn_knr + stn_krtn as one interchange (150 m apart, different refs)",
+      "ids": [
+        "stn_knr",
+        "stn_krtn"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "PROXIMITY_MERGE",
+      "message": "Merged stn_ndi + stn_ndls as one interchange (117 m apart, different refs)",
+      "ids": [
+        "stn_ndi",
+        "stn_ndls"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "PROXIMITY_MERGE",
+      "message": "Merged stn_osm_n5215706520 + stn_ptp as one interchange (215 m apart, different refs)",
+      "ids": [
+        "stn_osm_n5215706520",
+        "stn_ptp"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "TYPE_CONFLICT",
+      "message": "stn_ahnr (Adarsh Nagar) yellow: OSM at_grade (osm:untagged) vs Wikipedia elevated; using Wikipedia",
+      "ids": [
+        "stn_ahnr"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_bapb (Badarpur) not found in the violet Wikipedia table",
+      "ids": [
+        "stn_bapb"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_gtbr (GTB Nagar) not found in the yellow Wikipedia table",
+      "ids": [
+        "stn_gtbr"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_iit (IIT Delhi) not found in the magenta Wikipedia table",
+      "ids": [
+        "stn_iit"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_jamd (Jama Masjid) not found in the violet Wikipedia table",
+      "ids": [
+        "stn_jamd"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "NAME_VARIANTS",
+      "message": "stn_ndi: OSM uses several names (New Delhi / New Delhi Airport Express Terminal)",
+      "ids": [
+        "stn_ndi"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n13628489714 (Nanaksar - Sonia Vihar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n13628489714"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n13628489720 (Jharoda Majra) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n13628489720"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n4951104873 (Hindon River) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n4951104873"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706475 (Deepali Chowk) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706475"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706476 (Haiderpur Village) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706476"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_osm_n5215706525 (North Pitampura - Prashant Vihar) not found in the magenta Wikipedia table",
+      "ids": [
+        "stn_osm_n5215706525"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706525 (North Pitampura - Prashant Vihar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706525"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706542 (Bhalaswa) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706542"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706767 (Burari) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706767"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706768 (Jagatpur - Wazirabad) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706768"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706769 (Khajuri Khas) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706769"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706770 (Yamuna Vihar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706770"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706782 (Bhajanpura) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706782"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n5215706793 (Soorghat) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n5215706793"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6397652316 (Shaheed Nagar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6397652316"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6397652318 (Mohan Nagar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6397652318"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6397652319 (Shyam Park) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6397652319"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_osm_n6397652320 (Rajendra Nagar) not found in the red Wikipedia table",
+      "ids": [
+        "stn_osm_n6397652320"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6397652320 (Rajendra Nagar) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6397652320"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6397652321 (Raj Bagh) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6397652321"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6539894864 (Noida Sector 59) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6539894864"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6539894865 (Noida Sector 61) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6539894865"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n6539894866 (Noida Sector 52) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n6539894866"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n663759851 (Jhilmil) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n663759851"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n7018886727 (Seva Teerth) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n7018886727"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n9144051094 (Shaheed Sthal) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n9144051094"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_osm_n9597709830 (Govind Puri) has no DMRC station code in OSM",
+      "ids": [
+        "stn_osm_n9597709830"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_pbbga (Punjabi Bagh) not found in the green Wikipedia table",
+      "ids": [
+        "stn_pbbga"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_rhe (Rohini East) not found in the red Wikipedia table",
+      "ids": [
+        "stn_rhe"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_rhw (Rohini West) not found in the red Wikipedia table",
+      "ids": [
+        "stn_rhw"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "TYPE_CONFLICT",
+      "message": "stn_shd (Shahdara) red: OSM elevated (osm:bridge) vs Wikipedia at_grade; keeping OSM",
+      "ids": [
+        "stn_shd"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "TYPE_CONFLICT",
+      "message": "stn_slap (Seelampur) red: OSM elevated (osm:layer) vs Wikipedia at_grade; keeping OSM",
+      "ids": [
+        "stn_slap"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "TYPE_CONFLICT",
+      "message": "stn_tzi (Tis Hazari) red: OSM at_grade (osm:untagged) vs Wikipedia elevated; using Wikipedia",
+      "ids": [
+        "stn_tzi"
+      ]
+    }
+  ]
+}

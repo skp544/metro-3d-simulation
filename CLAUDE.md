@@ -1,0 +1,58 @@
+# Delhi Metro 2D/3D Visualization
+
+Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation layer) and a Three.js 3D view, both driven by the same GeoJSON.
+
+**Priorities, in order:** geographic accuracy → 2D validation → 3D quality.
+
+## Current phase
+
+Phases 1 (research) and 2 (dataset build) are **done**. Phase 3 (validation script and report) has **not started** and is waiting for the user's go-ahead.
+Track progress in `docs/CODE_SUMMARY.md`.
+
+## Workflow rules
+
+- Work phase by phase (roadmap: `docs/ARCHITECTURE.md` §Roadmap). **Stop at the end of each phase and wait for the user's approval** before starting the next.
+- No 3D work until the 2D map passes validation, or its remaining issues are documented.
+- Record every user decision in `docs/DECISIONS.md` (dated). Update `docs/CODE_SUMMARY.md` when code changes.
+- Never build the whole app in one step.
+
+## Data rules
+
+- **Never invent** stations, coordinates, geometry, colours or station types. If something can't be verified, set it to `unknown` and log it in the quality report.
+- Every feature carries provenance: `source[]`, `verified`, `estimated`, `conflicts[]`.
+- `data/raw/` is immutable (dated snapshots). `data/processed/` is generated only, never hand-edited. Hand fixes go in `data/manual/`.
+- No coordinates hardcoded in frontend code. The frontend only reads processed GeoJSON.
+- Both views read the **same** GeoJSON. Never put raw lat/lng into Three.js; project it through `src/utils/projection.ts`.
+- Keep attribution: OSM data is ODbL. Show "© OpenStreetMap contributors" in the app.
+
+## Scope (see `docs/DECISIONS.md`)
+
+- In: DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
+- Phase 4 corridors: a separate "under construction" layer, off by default.
+- Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram, Noida Aqua Line, Namo Bharat/RapidX.
+
+## Stack and commands
+
+Vite 8 · React 19 · TypeScript 7 · Tailwind 4 · oxlint · @turf/turf. Planned additions: leaflet, react-leaflet, three, @react-three/fiber, @react-three/drei, zustand.
+
+```bash
+npm run dev          # dev server
+npm run build        # tsc -b (app + scripts) && vite build
+npm run lint         # oxlint
+npm run data:fetch   # new OSM + Wikipedia snapshots → data/raw/ (network; Overpass may be busy)
+npm run data:build   # data/raw + data/manual → data/processed + data/metadata (offline)
+```
+
+Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema types live in `src/data/types.ts`.
+
+## Docs
+
+| File | Purpose |
+|---|---|
+| `docs/REQUIREMENTS.md` | What the app must do |
+| `docs/ARCHITECTURE.md` | Structure, data schema, pipeline, projection, roadmap |
+| `docs/DECISIONS.md` | Dated decision log |
+| `docs/CODE_SUMMARY.md` | What exists in the code right now |
+| `docs/phase1-research-and-plan.md` | Phase 1 research snapshot (2026-10-31): sources, licences, OSM measurements, 3D assets |
+| `text.txt` | The original project brief |
+| `ref_image.png` | Visual style reference for the UI and the 3D view |

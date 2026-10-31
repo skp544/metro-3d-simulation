@@ -1,0 +1,4 @@
+{
+  "_doc": "Hand corrections applied last by build-dataset.ts. Key = final station id. Every entry needs a reason with its evidence (source URL, imagery check). Example: { \"stn_xx\": { \"name\": \"…\", \"platformTrackType\": { \"red\": \"elevated\" }, \"reason\": \"…\" } }",
+  "overrides": {}
+}

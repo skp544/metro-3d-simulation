@@ -7,15 +7,19 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts",
+    "data:build": "node scripts/build-dataset.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@turf/turf": "^7.4.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

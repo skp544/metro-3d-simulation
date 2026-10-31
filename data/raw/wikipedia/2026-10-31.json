@@ -1,0 +1,1292 @@
+{
+ "fetchedAt": "2026-10-31T12:24:33.534Z",
+ "licence": "CC BY-SA 4.0",
+ "lines": {
+  "red": {
+   "article": "Red Line (Delhi Metro)",
+   "revid": 1368957245,
+   "stations": [
+    {
+     "name": "Shaheed Sthal (New Bus Adda)",
+     "layout": "elevated"
+    },
+    {
+     "name": "Hindon River",
+     "layout": "elevated"
+    },
+    {
+     "name": "Arthala",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mohan Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shyam Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Major Mohit Sharma Rajendra Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Raj Bagh",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shaheed Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dilshad Garden",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jhilmil",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mansarovar Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shahdara",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Welcome",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Seelampur",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Shastri Park",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Kashmere Gate",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tis Hazari",
+     "layout": "elevated"
+    },
+    {
+     "name": "Pulbangash",
+     "layout": "elevated"
+    },
+    {
+     "name": "Pratap Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shastri Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Inderlok",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kanhaiya Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Keshav Puram",
+     "layout": "elevated"
+    },
+    {
+     "name": "Netaji Subhash Place",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kohat Enclave",
+     "layout": "elevated"
+    },
+    {
+     "name": "Madhuban Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rohini",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dr. Baba Saheb Ambedkar Hospital",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rithala",
+     "layout": "elevated"
+    },
+    {
+     "name": "Red Line from Keshav Puram",
+     "layout": "elevated"
+    },
+    {
+     "name": "Yellow Line from Samaypur Badli",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "yellow": {
+   "article": "Yellow Line (Delhi Metro)",
+   "revid": 1376892425,
+   "stations": [
+    {
+     "name": "Samaypur Badli",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rohini Sector 18, 19",
+     "layout": "elevated"
+    },
+    {
+     "name": "Haiderpur Badli Mor",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jahangirpuri",
+     "layout": "elevated"
+    },
+    {
+     "name": "Adarsh Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Azadpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Model Town",
+     "layout": "elevated"
+    },
+    {
+     "name": "Guru Tegh Bahadur Nagar",
+     "layout": "underground"
+    },
+    {
+     "name": "Vishwavidyalaya",
+     "layout": "underground"
+    },
+    {
+     "name": "Vidhan Sabha",
+     "layout": "underground"
+    },
+    {
+     "name": "Civil Lines",
+     "layout": "underground"
+    },
+    {
+     "name": "Kashmere Gate",
+     "layout": "underground"
+    },
+    {
+     "name": "Chandni Chowk",
+     "layout": "underground"
+    },
+    {
+     "name": "Chawri Bazar",
+     "layout": "underground"
+    },
+    {
+     "name": "New Delhi",
+     "layout": "underground"
+    },
+    {
+     "name": "Rajiv Chowk",
+     "layout": "underground"
+    },
+    {
+     "name": "Patel Chowk",
+     "layout": "underground"
+    },
+    {
+     "name": "Central Secretariat",
+     "layout": "underground"
+    },
+    {
+     "name": "Seva Teerth",
+     "layout": "underground"
+    },
+    {
+     "name": "Lok Kalyan Marg",
+     "layout": "underground"
+    },
+    {
+     "name": "Jor Bagh",
+     "layout": "underground"
+    },
+    {
+     "name": "Dilli Haat – INA",
+     "layout": "underground"
+    },
+    {
+     "name": "AIIMS",
+     "layout": "underground"
+    },
+    {
+     "name": "Green Park",
+     "layout": "underground"
+    },
+    {
+     "name": "Hauz Khas",
+     "layout": "underground"
+    },
+    {
+     "name": "Malviya Nagar",
+     "layout": "underground"
+    },
+    {
+     "name": "Saket",
+     "layout": "underground"
+    },
+    {
+     "name": "Qutab Minar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Chhatarpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sultanpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Ghitorni",
+     "layout": "elevated"
+    },
+    {
+     "name": "Arjan Garh",
+     "layout": "elevated"
+    },
+    {
+     "name": "Guru Dronacharya",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sikanderpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "MG Road",
+     "layout": "elevated"
+    },
+    {
+     "name": "IFFCO Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Millennium City Centre Gurugram",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "blue": {
+   "article": "Blue Line (Delhi Metro)",
+   "revid": 1369212846,
+   "stations": [
+    {
+     "name": "Noida Electronic City",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 62",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 59",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 61",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 52",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 34",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida City Centre",
+     "layout": "elevated"
+    },
+    {
+     "name": "Golf Course",
+     "layout": "elevated"
+    },
+    {
+     "name": "Botanical Garden",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 18",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 16",
+     "layout": "elevated"
+    },
+    {
+     "name": "Noida Sector 15",
+     "layout": "elevated"
+    },
+    {
+     "name": "New Ashok Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mayur Vihar Extension",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mayur Vihar-I",
+     "layout": "elevated"
+    },
+    {
+     "name": "Akshardham",
+     "layout": "elevated"
+    },
+    {
+     "name": "Yamuna Bank",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Indraprastha",
+     "layout": "elevated"
+    },
+    {
+     "name": "Supreme Court",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mandi House",
+     "layout": "underground"
+    },
+    {
+     "name": "Barakhamba Road",
+     "layout": "underground"
+    },
+    {
+     "name": "Rajiv Chowk",
+     "layout": "underground"
+    },
+    {
+     "name": "Ramakrishna Ashram Marg",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jhandewalan",
+     "layout": "elevated"
+    },
+    {
+     "name": "Karol Bagh",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rajendra Place",
+     "layout": "elevated"
+    },
+    {
+     "name": "Patel Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shadipur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kirti Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Moti Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Ramesh Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rajouri Garden",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tagore Garden",
+     "layout": "elevated"
+    },
+    {
+     "name": "Subhash Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tilak Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Janakpuri East",
+     "layout": "elevated"
+    },
+    {
+     "name": "Janakpuri West",
+     "layout": "elevated"
+    },
+    {
+     "name": "Uttam Nagar East",
+     "layout": "elevated"
+    },
+    {
+     "name": "Uttam Nagar West",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nawada",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Mor",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka-Kakrola",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 14",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 13",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 12",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 11",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 10",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 9",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 8",
+     "layout": "elevated"
+    },
+    {
+     "name": "Dwarka Sector 21",
+     "layout": "underground"
+    },
+    {
+     "name": "Yamuna Bank",
+     "layout": "at_grade"
+    },
+    {
+     "name": "Laxmi Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nirman Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Preet Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Karkarduma",
+     "layout": "elevated"
+    },
+    {
+     "name": "Anand Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kaushambi",
+     "layout": "elevated"
+    },
+    {
+     "name": "Vaishali",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "green": {
+   "article": "Green Line (Delhi Metro)",
+   "revid": 1376491990,
+   "stations": [
+    {
+     "name": "Inderlok",
+     "layout": "elevated"
+    },
+    {
+     "name": "Ashok Park Main",
+     "layout": "elevated"
+    },
+    {
+     "name": "Punjabi Bagh East",
+     "layout": "elevated"
+    },
+    {
+     "name": "Punjabi Bagh West",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shivaji Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Madipur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Paschim Vihar East",
+     "layout": "elevated"
+    },
+    {
+     "name": "Paschim Vihar West",
+     "layout": "elevated"
+    },
+    {
+     "name": "Peeragarhi",
+     "layout": "elevated"
+    },
+    {
+     "name": "Udyog Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Maharaja Surajmal Stadium",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nangloi",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nangloi Railway Station",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rajdhani Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mundka",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mundka Industrial Area (MIA)",
+     "layout": "elevated"
+    },
+    {
+     "name": "Ghevra Metro Station",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tikri Kalan",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tikri Border",
+     "layout": "elevated"
+    },
+    {
+     "name": "Pandit Shree Ram Sharma (Modern Industrial Estate)",
+     "layout": "elevated"
+    },
+    {
+     "name": "Bahadurgarh City (Bus Stand)",
+     "layout": "elevated"
+    },
+    {
+     "name": "Brigadier Hoshiyar Singh (Bahadurgarh City Park)",
+     "layout": "elevated"
+    },
+    {
+     "name": "Ashok Park Main *",
+     "layout": "elevated"
+    },
+    {
+     "name": "Satguru Ram Singh Marg",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kirti Nagar",
+     "layout": "at_grade"
+    }
+   ]
+  },
+  "violet": {
+   "article": "Violet Line (Delhi Metro)",
+   "revid": 1376890643,
+   "stations": [
+    {
+     "name": "Kashmere Gate",
+     "layout": "underground"
+    },
+    {
+     "name": "Lal Qila",
+     "layout": "underground"
+    },
+    {
+     "name": "Delhi Gate",
+     "layout": "underground"
+    },
+    {
+     "name": "ITO",
+     "layout": "underground"
+    },
+    {
+     "name": "Mandi House",
+     "layout": "underground"
+    },
+    {
+     "name": "Janpath",
+     "layout": "underground"
+    },
+    {
+     "name": "Central Secretariat",
+     "layout": "underground"
+    },
+    {
+     "name": "Khan Market",
+     "layout": "underground"
+    },
+    {
+     "name": "Jawaharlal Nehru Stadium",
+     "layout": "underground"
+    },
+    {
+     "name": "Jangpura",
+     "layout": "underground"
+    },
+    {
+     "name": "Lajpat Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Moolchand",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kailash Colony",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nehru Place",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kalkaji Mandir",
+     "layout": "elevated"
+    },
+    {
+     "name": "Govindpuri",
+     "layout": "elevated"
+    },
+    {
+     "name": "Harkesh Nagar Okhla",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jasola Apollo",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sarita Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mohan Estate",
+     "layout": "elevated"
+    },
+    {
+     "name": "Tughlakabad Station",
+     "layout": "elevated"
+    },
+    {
+     "name": "Badarpur Border",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sarai",
+     "layout": "elevated"
+    },
+    {
+     "name": "NHPC Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mewla Maharajpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sector 28",
+     "layout": "elevated"
+    },
+    {
+     "name": "Badkal Mor",
+     "layout": "elevated"
+    },
+    {
+     "name": "Old Faridabad",
+     "layout": "elevated"
+    },
+    {
+     "name": "Neelam Chowk Ajronda",
+     "layout": "elevated"
+    },
+    {
+     "name": "Bata Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Escorts Mujesar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sant Surdas - Sihi",
+     "layout": "elevated"
+    },
+    {
+     "name": "Raja Nahar Singh",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "pink": {
+   "article": "Pink Line (Delhi Metro)",
+   "revid": 1377063078,
+   "stations": [
+    {
+     "name": "Maujpur - Babarpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Yamuna Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Bhajanpura",
+     "layout": "elevated"
+    },
+    {
+     "name": "Khajuri Khas",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nanaksar - Sonia Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Soorghat",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jagatpur - Wazirabad",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jharoda Majra",
+     "layout": "elevated"
+    },
+    {
+     "name": "Burari",
+     "layout": "elevated"
+    },
+    {
+     "name": "Majlis Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Azadpur",
+     "layout": "underground"
+    },
+    {
+     "name": "Shalimar Bagh",
+     "layout": "underground"
+    },
+    {
+     "name": "Netaji Subhash Place",
+     "layout": "underground"
+    },
+    {
+     "name": "Shakurpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Punjabi Bagh West",
+     "layout": "elevated"
+    },
+    {
+     "name": "ESI - Basaidarapur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Rajouri Garden",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mayapuri",
+     "layout": "elevated"
+    },
+    {
+     "name": "Naraina Vihar",
+     "layout": "underground"
+    },
+    {
+     "name": "Delhi Cantt.",
+     "layout": "elevated"
+    },
+    {
+     "name": "Durgabai Deshmukh South Campus",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sir M. Vishweshwaraiah Moti Bagh",
+     "layout": "elevated"
+    },
+    {
+     "name": "Bhikaji Cama Place",
+     "layout": "underground"
+    },
+    {
+     "name": "Sarojini Nagar",
+     "layout": "underground"
+    },
+    {
+     "name": "Dilli Haat - INA",
+     "layout": "underground"
+    },
+    {
+     "name": "South Extension",
+     "layout": "underground"
+    },
+    {
+     "name": "Lajpat Nagar",
+     "layout": "underground"
+    },
+    {
+     "name": "Vinobapuri",
+     "layout": "underground"
+    },
+    {
+     "name": "Ashram",
+     "layout": "underground"
+    },
+    {
+     "name": "Sarai Kale Khan - Nizamuddin",
+     "layout": "underground"
+    },
+    {
+     "name": "Mayur Vihar-I",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shree Ram Mandir Mayur Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Trilokpuri - Sanjay Lake",
+     "layout": "elevated"
+    },
+    {
+     "name": "East Vinod Nagar - Mayur Vihar II",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mandawali - West Vinod Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "IP Extension",
+     "layout": "elevated"
+    },
+    {
+     "name": "Anand Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Karkarduma",
+     "layout": "elevated"
+    },
+    {
+     "name": "Karkarduma Court",
+     "layout": "elevated"
+    },
+    {
+     "name": "Krishna Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "East Azad Nagar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Welcome",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jaffrabad",
+     "layout": "elevated"
+    },
+    {
+     "name": "Maujpur - Babarpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Maujpur - Babarpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Gokulpuri",
+     "layout": "elevated"
+    },
+    {
+     "name": "Johri Enclave",
+     "layout": "elevated"
+    },
+    {
+     "name": "Shiv Vihar",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "magenta": {
+   "article": "Magenta Line (Delhi Metro)",
+   "revid": 1371617069,
+   "stations": [
+    {
+     "name": "Inderlok",
+     "layout": "underground"
+    },
+    {
+     "name": "Daya Basti",
+     "layout": "underground"
+    },
+    {
+     "name": "Sarai Rohilla",
+     "layout": "underground"
+    },
+    {
+     "name": "Ajmal Khan Park",
+     "layout": "underground"
+    },
+    {
+     "name": "Jhandewalan Mandir",
+     "layout": "underground"
+    },
+    {
+     "name": "Nabi Karim",
+     "layout": "underground"
+    },
+    {
+     "name": "New Delhi",
+     "layout": "underground"
+    },
+    {
+     "name": "Delhi Gate",
+     "layout": "underground"
+    },
+    {
+     "name": "Delhi Sachivalaya–I.G. Stadium",
+     "layout": "underground"
+    },
+    {
+     "name": "Indraprastha",
+     "layout": "underground"
+    },
+    {
+     "name": "Bharat Mandapam",
+     "layout": "underground"
+    },
+    {
+     "name": "Baroda House",
+     "layout": "underground"
+    },
+    {
+     "name": "War Memorial–High Court",
+     "layout": "underground"
+    },
+    {
+     "name": "India Gate",
+     "layout": "underground"
+    },
+    {
+     "name": "CCS Building",
+     "layout": "underground"
+    },
+    {
+     "name": "Central Secretariat",
+     "layout": "underground"
+    },
+    {
+     "name": "Yuge Yugeen Bharat",
+     "layout": "underground"
+    },
+    {
+     "name": "Shivaji Stadium",
+     "layout": "underground"
+    },
+    {
+     "name": "Ramakrishna Ashram Marg",
+     "layout": "underground"
+    },
+    {
+     "name": "Nabi Karim",
+     "layout": "underground"
+    },
+    {
+     "name": "Sadar Bazar",
+     "layout": "underground"
+    },
+    {
+     "name": "Pulbangash",
+     "layout": "underground"
+    },
+    {
+     "name": "Ghanta Ghar",
+     "layout": "underground"
+    },
+    {
+     "name": "Nanak Piao–Derawal Nagar",
+     "layout": "underground"
+    },
+    {
+     "name": "Ashok Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Azadpur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Majlis Park",
+     "layout": "elevated"
+    },
+    {
+     "name": "Bhalaswa",
+     "layout": "elevated"
+    },
+    {
+     "name": "Haiderpur Badli Mor",
+     "layout": "elevated"
+    },
+    {
+     "name": "Haiderpur Village",
+     "layout": "elevated"
+    },
+    {
+     "name": "Uttari Pitampura-Prashant Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Madhuban Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Deepali Chowk",
+     "layout": "elevated"
+    },
+    {
+     "name": "Pushpanjali",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mangolpur Kalan–West Enclave",
+     "layout": "elevated"
+    },
+    {
+     "name": "Mangolpuri",
+     "layout": "elevated"
+    },
+    {
+     "name": "Peeragarhi",
+     "layout": "elevated"
+    },
+    {
+     "name": "Paschim Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Keshopur",
+     "layout": "elevated"
+    },
+    {
+     "name": "Krishna Park Extension",
+     "layout": "underground"
+    },
+    {
+     "name": "Janakpuri West",
+     "layout": "underground"
+    },
+    {
+     "name": "Dabri Mor - Janakpuri South",
+     "layout": "underground"
+    },
+    {
+     "name": "Dashrathpuri",
+     "layout": "underground"
+    },
+    {
+     "name": "Palam",
+     "layout": "underground"
+    },
+    {
+     "name": "Sadar Bazar Cantonment",
+     "layout": "elevated"
+    },
+    {
+     "name": "Terminal 1-IGI Airport",
+     "layout": "underground"
+    },
+    {
+     "name": "Shankar Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Vasant Vihar",
+     "layout": "underground"
+    },
+    {
+     "name": "Munirka",
+     "layout": "underground"
+    },
+    {
+     "name": "R. K. Puram",
+     "layout": "underground"
+    },
+    {
+     "name": "IIT",
+     "layout": "underground"
+    },
+    {
+     "name": "Hauz Khas",
+     "layout": "underground"
+    },
+    {
+     "name": "Panchsheel Park",
+     "layout": "underground"
+    },
+    {
+     "name": "Chirag Delhi",
+     "layout": "underground"
+    },
+    {
+     "name": "Greater Kailash",
+     "layout": "underground"
+    },
+    {
+     "name": "Nehru Enclave",
+     "layout": "underground"
+    },
+    {
+     "name": "Kalkaji Mandir",
+     "layout": "underground"
+    },
+    {
+     "name": "Okhla NSIC",
+     "layout": "elevated"
+    },
+    {
+     "name": "Sukhdev Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jamia Millia Islamia",
+     "layout": "elevated"
+    },
+    {
+     "name": "Okhla Vihar",
+     "layout": "elevated"
+    },
+    {
+     "name": "Jasola Vihar Shaheen Bagh",
+     "layout": "elevated"
+    },
+    {
+     "name": "Kalindi Kunj",
+     "layout": "elevated"
+    },
+    {
+     "name": "Okhla Bird Sanctuary",
+     "layout": "elevated"
+    },
+    {
+     "name": "Botanical Garden",
+     "layout": "elevated"
+    }
+   ]
+  },
+  "grey": {
+   "article": "Grey Line (Delhi Metro)",
+   "revid": 1365107030,
+   "stations": [
+    {
+     "name": "Dwarka-Kakrola",
+     "layout": "elevated"
+    },
+    {
+     "name": "Nangli",
+     "layout": "elevated"
+    },
+    {
+     "name": "Najafgarh",
+     "layout": "underground"
+    },
+    {
+     "name": "Dhansa Bus Stand",
+     "layout": "underground"
+    }
+   ]
+  },
+  "airport_express": {
+   "article": "Airport Express Line (Delhi Metro)",
+   "revid": 1376415060,
+   "stations": [
+    {
+     "name": "New Delhi",
+     "layout": "underground"
+    },
+    {
+     "name": "Shivaji Stadium",
+     "layout": "underground"
+    },
+    {
+     "name": "Dhaula Kuan",
+     "layout": "elevated"
+    },
+    {
+     "name": "Delhi Aerocity",
+     "layout": "underground"
+    },
+    {
+     "name": "IGI Airport",
+     "layout": "underground"
+    },
+    {
+     "name": "Dwarka Sector 21",
+     "layout": "underground"
+    },
+    {
+     "name": "Yashobhoomi Dwarka Sector - 25",
+     "layout": "underground"
+    }
+   ]
+  }
+ }
+}
