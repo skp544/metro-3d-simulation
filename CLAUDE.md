@@ -14,6 +14,7 @@ Track progress in `docs/CODE_SUMMARY.md`.
 - Work phase by phase (roadmap: `docs/ARCHITECTURE.md` §Roadmap). **Stop at the end of each phase and wait for the user's approval** before starting the next.
 - No 3D work until the 2D map passes validation, or its remaining issues are documented.
 - Record every user decision in `docs/DECISIONS.md` (dated). Update `docs/CODE_SUMMARY.md` when code changes.
+- **At the end of every phase, write `docs/phaseN-<topic>.md`**: a frozen summary in the same shape as `phase1-research-and-plan.md` and `phase2-dataset-build.md`. Cover the goal and result, what was built, outputs with real figures, method, open issues, limitations, how to reproduce, and the next phase. Then stop for approval.
 - Never build the whole app in one step.
 
 ## Data rules
@@ -54,5 +55,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/DECISIONS.md` | Dated decision log |
 | `docs/CODE_SUMMARY.md` | What exists in the code right now |
 | `docs/phase1-research-and-plan.md` | Phase 1 research snapshot (2026-10-31): sources, licences, OSM measurements, 3D assets |
+| `docs/phase2-dataset-build.md` | Phase 2 summary: pipeline, outputs, per-line figures, open quality items |
+| `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |
 | `ref_image.png` | Visual style reference for the UI and the 3D view |
