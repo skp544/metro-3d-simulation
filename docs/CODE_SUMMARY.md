@@ -2,21 +2,25 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-10-31 · **Phase:** 2 done (awaiting review), 3 not started
+**Last updated:** 2026-10-31 · **Phase:** 3 done (validation passed), 4 not started
 
 ## Data pipeline
 
 | Path | What it does |
 |---|---|
 | `scripts/fetch-osm.ts` | Downloads the Overpass snapshot → `data/raw/osm/<date>.json` (retries on 429/5xx) |
-| `scripts/fetch-wikipedia.ts` | Downloads station tables for the 9 line articles → `data/raw/wikipedia/<date>.json` |
+| `scripts/fetch-wikipedia.ts` | Downloads station tables and infobox figures (stations, length) for the 9 line articles → `data/raw/wikipedia/<date>.json` |
 | `scripts/build-dataset.ts` | Latest raw snapshots + `data/manual/` → `data/processed/*.geojson`, `data/metadata/{sources,data_quality_report}.json`. Exits 1 on errors |
+| `scripts/validate.ts` | 22 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors |
+| `scripts/validate.test.ts` | 10 tests: the real data passes, and 8 kinds of corruption are caught, plus loop projection |
 | `data/manual/lines.json` | 9 lines: Wikidata colours, OSM route_master, canonical/reverse relation per branch, Wikipedia article |
 | `data/manual/interchanges.json` | Proximity threshold (250 m); `merge`/`separate` lists (empty) |
 | `data/manual/station_overrides.json` | Per-station name/platform type corrections (empty) |
 | `src/data/types.ts` | GeoJSON schema types shared by the scripts and the app |
 
-Commands: `npm run data:fetch`, `npm run data:build`.
+Commands: `npm run data:fetch`, `npm run data:build` (build + validate), `npm run data:validate`, `npm test`.
+
+**Validation (latest):** PASSED: 0 errors, 2 warnings (Magenta −5.5% and Grey −6.4% length vs Wikipedia), 22 info. Network is 1 connected component; all 9 station counts match Wikipedia.
 
 ## Dataset (OSM snapshot 2026-10-31T12:28Z)
 

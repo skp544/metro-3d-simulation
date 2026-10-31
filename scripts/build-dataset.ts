@@ -173,7 +173,9 @@ const partAt = (t: Track, km: number) => t.parts.find((p) => km >= p.fromKm && k
 // Slice by the track's own cumulative distances. turf.lineSliceAlong throws when `to` rounds past the end.
 function slice(t: Track, from: number, to: number): LngLat[] {
   const at = (km: number): LngLat => {
-    const i = Math.max(0, Math.min(t.cum.findIndex((c) => c >= km) - 1, t.cum.length - 2));
+    // km can overshoot the last vertex by float error (turf vs our distances); clamp to the final segment.
+    const j = t.cum.findIndex((c) => c >= km);
+    const i = Math.max(0, Math.min((j === -1 ? t.cum.length : j) - 1, t.cum.length - 2));
     const f = Math.min(1, Math.max(0, (km - t.cum[i]) / (t.cum[i + 1] - t.cum[i] || 1)));
     return [t.coords[i][0] + f * (t.coords[i + 1][0] - t.coords[i][0]), t.coords[i][1] + f * (t.coords[i + 1][1] - t.coords[i][1])];
   };
@@ -392,7 +394,9 @@ for (const [id, es] of [...merged].sort((a, b) => a[0].localeCompare(b[0]))) {
 }
 
 // ---------- routes, segments, lines ----------
-const coords6 = (cs: LngLat[]): LngLat[] => cs.map(([x, y]) => [r6(x), r6(y)]);
+// Rounding can collapse a cut point onto its neighbouring vertex, so drop consecutive repeats.
+const coords6 = (cs: LngLat[]): LngLat[] =>
+  cs.map(([x, y]): LngLat => [r6(x), r6(y)]).filter((p, i, a) => i === 0 || p[0] !== a[i - 1][0] || p[1] !== a[i - 1][1]);
 const routeFeatures: Feature<LineString, RouteProps>[] = [];
 const segmentFeatures: Feature<LineString, SegmentProps>[] = [];
 const lineFeatures: Feature<{ type: "MultiLineString"; coordinates: LngLat[][] }, LineProps>[] = [];

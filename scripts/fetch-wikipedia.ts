@@ -51,6 +51,34 @@ const parseStations = (html: string) =>
     .filter((t) => /Layout/i.test(text(t.slice(0, 3000))))
     .flatMap(parseTable);
 
+// Infobox "Stations" and "Line length": reference figures for validate.ts (warning-level comparison).
+function parseInfobox(html: string) {
+  const box = /<table[^>]*class="[^"]*infobox[\s\S]*?<\/table>/.exec(html)?.[0] ?? "";
+  const field = (label: RegExp) => {
+    for (const row of box.match(/<tr[\s\S]*?<\/tr>/g) ?? []) {
+      const th = /<th[^>]*>([\s\S]*?)<\/th>/.exec(row);
+      const td = /<td[^>]*>([\s\S]*?)<\/td>/.exec(row);
+      if (th && td && label.test(text(th[1]))) return text(td[1]);
+    }
+    return null;
+  };
+  // Blue lists branches separately ("Line 3 (Main Line): 50 Line 4 (Branch): 8"): sum the parts.
+  const num = (s: string | null) => {
+    if (!s) return null;
+    const parts = [...s.matchAll(/:\s*([\d.,]+)/g)].map((m) => Number(m[1].replace(/,/g, "")));
+    if (parts.length > 1) return Math.round(parts.reduce((a, b) => a + b, 0) * 100) / 100;
+    const first = /[\d.,]+/.exec(s);
+    return first ? Number(first[0].replace(/,/g, "")) : null;
+  };
+  const stations = field(/^Stations$/i);
+  return {
+    stations: num(stations),
+    lengthKm: num(field(/^(Line )?length$/i)),
+    // true when branches are counted separately, so an interchange between branches counts twice
+    perBranch: !!stations && [...stations.matchAll(/:\s*[\d.,]+/g)].length > 1,
+  };
+}
+
 async function fetchArticle(title: string) {
   const url = `https://en.wikipedia.org/w/api.php?action=parse&page=${encodeURIComponent(title)}&prop=text|revid&redirects=1&format=json&formatversion=2`;
   for (let attempt = 1; ; attempt++) {
@@ -61,12 +89,13 @@ async function fetchArticle(title: string) {
   }
 }
 
-const result: Record<string, { article: string; revid: number; stations: WikiStation[] }> = {};
+const result: Record<string, { article: string; revid: number; infobox: ReturnType<typeof parseInfobox>; stations: WikiStation[] }> = {};
 for (const line of lines) {
   const parse = await fetchArticle(line.wikipedia);
   const stations = parseStations(parse.text);
-  result[line.id] = { article: parse.title, revid: parse.revid, stations };
-  console.log(`${line.id}: ${stations.length} rows with layout (rev ${parse.revid})`);
+  const infobox = parseInfobox(parse.text);
+  result[line.id] = { article: parse.title, revid: parse.revid, infobox, stations };
+  console.log(`${line.id}: ${stations.length} rows with layout, infobox ${JSON.stringify(infobox)} (rev ${parse.revid})`);
   await sleep(1500);
 }
 

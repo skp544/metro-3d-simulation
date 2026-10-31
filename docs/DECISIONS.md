@@ -2,6 +2,16 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-10-31: Phase 3 (validation)
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 18 | Independence | `validate.ts` shares no code with `build-dataset.ts` and re-derives positions from geometry | A build bug can't validate itself; this caught the segment-slicing bug |
+| 19 | Always validate | `npm run data:build` = build + validate; any error fails the command | Bad data never reaches the app silently |
+| 20 | Reference figures | Wikipedia infobox "Stations" / "Line length" (captured with the revision ID) are warning-level references, ±5% on length | The only cited second source for totals; length conventions differ (§4.2 of the Phase 3 doc) |
+| 21 | Interchange tolerance | Interchange station points may be up to 300 m from a line (others 150 m); every platform must be within 30 m of its track | An interchange point averages stations joined by walkways |
+| 22 | Accepted warnings | Magenta (−5.5%) and Grey (−6.4%) length differences accepted as measurement convention | All station counts match and the geometry checks pass |
+
 ## 2026-10-31: Phase 2 (dataset build)
 
 | # | Topic | Decision | Reason |

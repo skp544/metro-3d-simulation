@@ -1,0 +1,609 @@
+{
+  "generatedAt": "2026-10-31T12:45:14.251Z",
+  "input": "data/processed",
+  "passed": true,
+  "summary": {
+    "errors": 0,
+    "warnings": 2,
+    "info": 22
+  },
+  "checks": [
+    {
+      "code": "GEOJSON_INVALID",
+      "severity": "error",
+      "description": "Each file is a FeatureCollection with the expected geometry type and finite [lng, lat] positions",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "SCHEMA",
+      "severity": "error",
+      "description": "Required properties are present, with valid types and enum values",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "OUT_OF_BOUNDS",
+      "severity": "error",
+      "description": "Every coordinate lies inside the NCR bounding box (28.2–28.9 N, 76.7–77.6 E)",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "DUPLICATE_ID",
+      "severity": "error",
+      "description": "IDs are unique within each file",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "MISSING_GEOMETRY",
+      "severity": "error",
+      "description": "Every line has geometry and every branch has a route",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "BROKEN_REFERENCE",
+      "severity": "error",
+      "description": "Every referenced line/route/station exists, and station ↔ line membership agrees both ways",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "SEGMENT_GAP",
+      "severity": "error",
+      "description": "A route's segments join within 1 m and run from its first to its last station in order",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "LENGTH_INCONSISTENT",
+      "severity": "error",
+      "description": "Stored lengths match the geometry (segment ±1%, route = sum of segments ±0.5%)",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "STATION_ORDER",
+      "severity": "error",
+      "description": "Stations project onto their route in increasing order",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "INTERCHANGE_MISMATCH",
+      "severity": "error",
+      "description": "isInterchange ⇔ more than one line; the interchange file matches the stations; manual merges are applied",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "NETWORK_DISCONNECTED",
+      "severity": "error",
+      "description": "All stations form one connected network",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "DEGENERATE_GEOMETRY",
+      "severity": "warning",
+      "description": "No repeated consecutive positions in lines",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "STOP_KM_DRIFT",
+      "severity": "warning",
+      "description": "A station's projected position agrees with the route's stopKm within 100 m",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "STATION_FAR_FROM_LINE",
+      "severity": "warning",
+      "description": "A station point is within 150 m of each of its lines",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "PLATFORM_FAR_FROM_TRACK",
+      "severity": "warning",
+      "description": "A platform is within 30 m of its line's track",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "DUPLICATE_NAME",
+      "severity": "warning",
+      "description": "No two stations share a name",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "NEARBY_STATIONS",
+      "severity": "warning",
+      "description": "No two separate stations within 300 m (possible missed interchange)",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "REFERENCE_COUNT",
+      "severity": "warning",
+      "description": "Station count per line matches the Wikipedia infobox",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "REFERENCE_LENGTH",
+      "severity": "warning",
+      "description": "Line length is within ±5% of the Wikipedia infobox",
+      "issues": 2,
+      "status": "fail"
+    },
+    {
+      "code": "SOURCE_CONFLICT",
+      "severity": "info",
+      "description": "Features whose sources disagree (recorded in conflicts[])",
+      "issues": 11,
+      "status": "noted"
+    },
+    {
+      "code": "UNVERIFIED_STATION",
+      "severity": "info",
+      "description": "Stations not confirmed by a second source",
+      "issues": 11,
+      "status": "noted"
+    },
+    {
+      "code": "CORRIDOR_OVERLAP",
+      "severity": "info",
+      "description": "Different lines running within 5 m of each other for over 200 m",
+      "issues": 0,
+      "status": "pass"
+    }
+  ],
+  "stats": {
+    "lines": 9,
+    "routes": 12,
+    "stations": 244,
+    "interchanges": 26,
+    "interchangesByEvidence": {
+      "osm-ref": 23,
+      "proximity": 3,
+      "manual": 0
+    },
+    "segments": 312,
+    "underConstructionWays": 12,
+    "trackKm": 364.305,
+    "trackKmByType": {
+      "elevated": 255.373,
+      "underground": 100.938,
+      "at_grade": 7.804,
+      "unknown": 0.19
+    },
+    "trackKmEstimatedPct": 2.2,
+    "trackKmUnknownPct": 0.1,
+    "stationsByType": {
+      "elevated": 176,
+      "underground": 57,
+      "at_grade": 2,
+      "unknown": 1,
+      "mixed": 8
+    },
+    "stationsVerified": 233,
+    "stationsVerifiedPct": 95.5,
+    "networkComponents": 1,
+    "perLine": {
+      "red": {
+        "stations": 29,
+        "km": {
+          "elevated": 30.082,
+          "underground": 0,
+          "at_grade": 3.102,
+          "unknown": 0.19
+        }
+      },
+      "yellow": {
+        "stations": 37,
+        "km": {
+          "elevated": 24.32,
+          "underground": 23.19,
+          "at_grade": 0.179,
+          "unknown": 0
+        }
+      },
+      "blue": {
+        "stations": 57,
+        "km": {
+          "elevated": 58.101,
+          "underground": 3.353,
+          "at_grade": 2.389,
+          "unknown": 0
+        }
+      },
+      "green": {
+        "stations": 24,
+        "km": {
+          "elevated": 27.679,
+          "underground": 0,
+          "at_grade": 0.169,
+          "unknown": 0
+        }
+      },
+      "violet": {
+        "stations": 34,
+        "km": {
+          "elevated": 30.777,
+          "underground": 14.083,
+          "at_grade": 0,
+          "unknown": 0
+        }
+      },
+      "pink": {
+        "stations": 46,
+        "km": {
+          "elevated": 51.114,
+          "underground": 18.138,
+          "at_grade": 1.402,
+          "unknown": 0
+        }
+      },
+      "magenta": {
+        "stations": 33,
+        "km": {
+          "elevated": 23.077,
+          "underground": 24.007,
+          "at_grade": 0.361,
+          "unknown": 0
+        }
+      },
+      "grey": {
+        "stations": 4,
+        "km": {
+          "elevated": 2.582,
+          "underground": 2.076,
+          "at_grade": 0.202,
+          "unknown": 0
+        }
+      },
+      "airport_express": {
+        "stations": 7,
+        "km": {
+          "elevated": 7.641,
+          "underground": 16.091,
+          "at_grade": 0,
+          "unknown": 0
+        }
+      }
+    }
+  },
+  "references": [
+    {
+      "lineId": "red",
+      "stations": 29,
+      "wikipediaStations": 29,
+      "lengthKm": 33.371,
+      "wikipediaLengthKm": 34.55,
+      "lengthDiffPct": -3.4
+    },
+    {
+      "lineId": "yellow",
+      "stations": 37,
+      "wikipediaStations": 37,
+      "lengthKm": 47.687,
+      "wikipediaLengthKm": 49.02,
+      "lengthDiffPct": -2.7
+    },
+    {
+      "lineId": "blue",
+      "stations": 58,
+      "wikipediaStations": 58,
+      "lengthKm": 63.842,
+      "wikipediaLengthKm": 64.62,
+      "lengthDiffPct": -1.2
+    },
+    {
+      "lineId": "green",
+      "stations": 24,
+      "wikipediaStations": 24,
+      "lengthKm": 27.849,
+      "wikipediaLengthKm": 28.79,
+      "lengthDiffPct": -3.3
+    },
+    {
+      "lineId": "violet",
+      "stations": 34,
+      "wikipediaStations": 34,
+      "lengthKm": 44.861,
+      "wikipediaLengthKm": 46.34,
+      "lengthDiffPct": -3.2
+    },
+    {
+      "lineId": "pink",
+      "stations": 46,
+      "wikipediaStations": 46,
+      "lengthKm": 70.651,
+      "wikipediaLengthKm": 73.49,
+      "lengthDiffPct": -3.9
+    },
+    {
+      "lineId": "magenta",
+      "stations": 33,
+      "wikipediaStations": 33,
+      "lengthKm": 47.444,
+      "wikipediaLengthKm": 50.18,
+      "lengthDiffPct": -5.5
+    },
+    {
+      "lineId": "grey",
+      "stations": 4,
+      "wikipediaStations": 4,
+      "lengthKm": 4.86,
+      "wikipediaLengthKm": 5.19,
+      "lengthDiffPct": -6.4
+    },
+    {
+      "lineId": "airport_express",
+      "stations": 7,
+      "wikipediaStations": 7,
+      "lengthKm": 23.733,
+      "wikipediaLengthKm": 22.7,
+      "lengthDiffPct": 4.6
+    }
+  ],
+  "issues": [
+    {
+      "severity": "warning",
+      "code": "REFERENCE_LENGTH",
+      "message": "magenta: 47.444 km vs 50.18 km in Wikipedia (-5.5%)",
+      "featureIds": [
+        "magenta"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "REFERENCE_LENGTH",
+      "message": "grey: 4.86 km vs 5.19 km in Wikipedia (-6.4%)",
+      "featureIds": [
+        "grey"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Red Line: OSM colour #FF4040 differs from wikidata:Q3278367#P465 #FF2D16",
+      "featureIds": [
+        "red"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Yellow Line: OSM colour #FFDF00 differs from wikidata:Q795156#P465 #FFEA3D",
+      "featureIds": [
+        "yellow"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Blue Line: OSM colour #4169E1 differs from wikidata:Q1029921#P465 #102694",
+      "featureIds": [
+        "blue"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Green Line: OSM colour #008000 differs from wikidata:Q5602820#P465 #00AA4F",
+      "featureIds": [
+        "green"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Pink Line: OSM colour #FC8EAC differs from wikidata:Q19891094#P465 #FF5872",
+      "featureIds": [
+        "pink"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Magenta Line: OSM colour #CC338B differs from wikidata:Q19893471#P465 #FB3099",
+      "featureIds": [
+        "magenta"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Grey Line: OSM colour #838996 differs from wikidata:Q47100305#P465 #9A9B9E",
+      "featureIds": [
+        "grey"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Adarsh Nagar: yellow: OSM track at_grade (osm:untagged) vs Wikipedia elevated",
+      "featureIds": [
+        "stn_ahnr"
+      ],
+      "location": [
+        77.170422,
+        28.716581
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Shahdara: red: OSM track elevated (osm:bridge) vs Wikipedia at_grade",
+      "featureIds": [
+        "stn_shd"
+      ],
+      "location": [
+        77.289886,
+        28.67343
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Seelampur: red: OSM track elevated (osm:layer) vs Wikipedia at_grade",
+      "featureIds": [
+        "stn_slap"
+      ],
+      "location": [
+        77.266814,
+        28.669817
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Tis Hazari: red: OSM track at_grade (osm:untagged) vs Wikipedia elevated",
+      "featureIds": [
+        "stn_tzi"
+      ],
+      "location": [
+        77.216631,
+        28.667163
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Badarpur (stn_bapb)",
+      "featureIds": [
+        "stn_bapb"
+      ],
+      "location": [
+        77.30303,
+        28.493258
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "GTB Nagar (stn_gtbr)",
+      "featureIds": [
+        "stn_gtbr"
+      ],
+      "location": [
+        77.2064,
+        28.698133
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "IIT Delhi (stn_iit)",
+      "featureIds": [
+        "stn_iit"
+      ],
+      "location": [
+        77.194555,
+        28.547012
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Jama Masjid (stn_jamd)",
+      "featureIds": [
+        "stn_jamd"
+      ],
+      "location": [
+        77.237676,
+        28.65001
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "North Pitampura - Prashant Vihar (stn_osm_n5215706525)",
+      "featureIds": [
+        "stn_osm_n5215706525"
+      ],
+      "location": [
+        77.138731,
+        28.713074
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Rajendra Nagar (stn_osm_n6397652320)",
+      "featureIds": [
+        "stn_osm_n6397652320"
+      ],
+      "location": [
+        77.358143,
+        28.677611
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Punjabi Bagh (stn_pbbga)",
+      "featureIds": [
+        "stn_pbbga"
+      ],
+      "location": [
+        77.146124,
+        28.672995
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Rohini East (stn_rhe)",
+      "featureIds": [
+        "stn_rhe"
+      ],
+      "location": [
+        77.125997,
+        28.707577
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Rohini West (stn_rhw)",
+      "featureIds": [
+        "stn_rhw"
+      ],
+      "location": [
+        77.115385,
+        28.714957
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Shahdara (stn_shd)",
+      "featureIds": [
+        "stn_shd"
+      ],
+      "location": [
+        77.289886,
+        28.67343
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Seelampur (stn_slap)",
+      "featureIds": [
+        "stn_slap"
+      ],
+      "location": [
+        77.266814,
+        28.669817
+      ]
+    }
+  ]
+}

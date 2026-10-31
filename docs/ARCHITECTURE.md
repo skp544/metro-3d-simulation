@@ -28,7 +28,8 @@ metro-route/
 │   ├── fetch-osm.ts              # writes data/raw/osm/<date>.json
 │   ├── fetch-wikipedia.ts        # writes data/raw/wikipedia/<date>.json (station tables, for cross-checking)
 │   ├── build-dataset.ts          # raw + manual → processed + metadata
-│   └── validate.ts               # processed → report; exit 1 on errors
+│   ├── validate.ts               # processed → validation_report.json; exit 1 on errors
+│   └── validate.test.ts          # node --test: real data passes, corruptions are caught
 ├── public/
 │   ├── data/                     # processed GeoJSON served to the app
 │   └── models/                   # train.glb
@@ -90,21 +91,17 @@ Run with `npm run data:fetch` (network) and then `npm run data:build` (offline, 
 
 ## Validation (Phase 3)
 
-`scripts/validate.ts` runs these checks:
+`scripts/validate.ts` re-checks `data/processed/` **independently of the build** (it shares no code with it) and writes `data/metadata/validation_report.json`. It exits 1 on any error. `npm run data:build` always runs it after the build. `scripts/validate.test.ts` feeds it corrupted copies of the data to prove each check fires.
 
-| Check | Severity |
+| Severity | Checks |
 |---|---|
-| Schema / GeoJSON validity | Error |
-| Missing coordinates, or outside the NCR bounding box (28.2–28.9 N, 76.7–77.6 E) | Error |
-| Duplicate station IDs | Error |
-| Missing line or route geometry | Error |
-| Segment endpoint gap > 1 m | Error |
-| Station order not increasing along the route | Error |
-| `isInterchange` ≠ (`lines.length > 1`), or a manual interchange missing | Error |
-| Same name with different IDs; different names within 300 m | Warning |
-| Station > 150 m from its line | Warning |
-| Station count ≠ Wikipedia; length off by more than ±5% | Warning |
-| Share of km with an unknown track type | Statistic |
+| **Error** (blocks the next phase) | GEOJSON_INVALID, SCHEMA, OUT_OF_BOUNDS (NCR box 28.2–28.9 N, 76.7–77.6 E), DUPLICATE_ID, MISSING_GEOMETRY, BROKEN_REFERENCE, SEGMENT_GAP (> 1 m), LENGTH_INCONSISTENT, STATION_ORDER, INTERCHANGE_MISMATCH, NETWORK_DISCONNECTED |
+| **Warning** (document or fix) | DEGENERATE_GEOMETRY, STOP_KM_DRIFT (> 100 m), STATION_FAR_FROM_LINE (> 150 m; 300 m for interchanges), PLATFORM_FAR_FROM_TRACK (> 30 m), DUPLICATE_NAME, NEARBY_STATIONS (< 300 m), REFERENCE_COUNT and REFERENCE_LENGTH (> ±5%) against the Wikipedia infobox |
+| **Info** | SOURCE_CONFLICT, UNVERIFIED_STATION, CORRIDOR_OVERLAP |
+
+Report shape: `{ passed, summary{errors, warnings, info}, checks[{code, severity, description, issues, status}], stats, references[], issues[{severity, code, message, featureIds, location}] }`. The Leaflet validation overlay draws `issues[].location` on the map.
+
+Station order is checked by projecting each platform onto its route, scanning forward from the previous station and taking the first stretch within 60 m. That way the Pink loop's second pass through Maujpur-Babarpur is matched correctly.
 
 ## Projection (3D)
 
@@ -129,8 +126,8 @@ Heights are nominal: elevated deck +12 m, underground −15 m, ramps interpolate
 | Phase | Deliverable | Exit criteria | Status |
 |---|---|---|---|
 | 1 | Research and plan | User approval | ✅ Done |
-| 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done (awaiting review) |
-| 3 | Validation script + report | 0 errors; warnings documented | — |
+| 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done |
+| 3 | Validation script + report | 0 errors; warnings documented | ✅ Done (0 errors, 2 warnings) |
 | 4 | Leaflet 2D map | Every line reviewed against satellite imagery | — |
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | — |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | — |

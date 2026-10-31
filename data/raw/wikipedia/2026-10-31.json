@@ -1,10 +1,15 @@
 {
- "fetchedAt": "2026-10-31T12:24:33.534Z",
+ "fetchedAt": "2026-10-31T12:41:29.338Z",
  "licence": "CC BY-SA 4.0",
  "lines": {
   "red": {
    "article": "Red Line (Delhi Metro)",
    "revid": 1368957245,
+   "infobox": {
+    "stations": 29,
+    "lengthKm": 34.55,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Shaheed Sthal (New Bus Adda)",
@@ -135,6 +140,11 @@
   "yellow": {
    "article": "Yellow Line (Delhi Metro)",
    "revid": 1376892425,
+   "infobox": {
+    "stations": 37,
+    "lengthKm": 49.02,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Samaypur Badli",
@@ -289,6 +299,11 @@
   "blue": {
    "article": "Blue Line (Delhi Metro)",
    "revid": 1369212846,
+   "infobox": {
+    "stations": 58,
+    "lengthKm": 64.62,
+    "perBranch": true
+   },
    "stations": [
     {
      "name": "Noida Electronic City",
@@ -527,6 +542,11 @@
   "green": {
    "article": "Green Line (Delhi Metro)",
    "revid": 1376491990,
+   "infobox": {
+    "stations": 24,
+    "lengthKm": 28.79,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Inderlok",
@@ -633,6 +653,11 @@
   "violet": {
    "article": "Violet Line (Delhi Metro)",
    "revid": 1376890643,
+   "infobox": {
+    "stations": 34,
+    "lengthKm": 46.34,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Kashmere Gate",
@@ -771,6 +796,11 @@
   "pink": {
    "article": "Pink Line (Delhi Metro)",
    "revid": 1377063078,
+   "infobox": {
+    "stations": 46,
+    "lengthKm": 73.49,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Maujpur - Babarpur",
@@ -969,6 +999,11 @@
   "magenta": {
    "article": "Magenta Line (Delhi Metro)",
    "revid": 1371617069,
+   "infobox": {
+    "stations": 33,
+    "lengthKm": 50.18,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Inderlok",
@@ -1235,6 +1270,11 @@
   "grey": {
    "article": "Grey Line (Delhi Metro)",
    "revid": 1365107030,
+   "infobox": {
+    "stations": 4,
+    "lengthKm": 5.19,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "Dwarka-Kakrola",
@@ -1257,6 +1297,11 @@
   "airport_express": {
    "article": "Airport Express Line (Delhi Metro)",
    "revid": 1376415060,
+   "infobox": {
+    "stations": 7,
+    "lengthKm": 22.7,
+    "perBranch": false
+   },
    "stations": [
     {
      "name": "New Delhi",

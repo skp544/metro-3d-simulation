@@ -9,7 +9,9 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts",
-    "data:build": "node scripts/build-dataset.ts"
+    "data:build": "node scripts/build-dataset.ts && node scripts/validate.ts",
+    "data:validate": "node scripts/validate.ts",
+    "test": "node --test scripts/*.test.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
