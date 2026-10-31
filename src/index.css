@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+body {
+  margin: 0;
+  background: #f8fafc;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+/* Leaflet's popups and controls in the same soft card style as the panels. */
+.leaflet-popup-content-wrapper,
+.leaflet-control-layers {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -10px rgb(15 23 42 / 0.3);
+}
+.leaflet-container {
+  font-family: inherit;
+  background: #e5e7eb;
+}

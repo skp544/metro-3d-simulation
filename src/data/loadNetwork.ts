@@ -1,0 +1,51 @@
+// Loads the processed dataset. `?url` makes Vite serve (dev) or emit (build) the files from data/
+// as-is, so there is one copy of the data and nothing is bundled into the JS.
+import linesUrl from "../../data/processed/metro_lines.geojson?url";
+import routesUrl from "../../data/processed/metro_routes.geojson?url";
+import segmentsUrl from "../../data/processed/metro_segments.geojson?url";
+import stationsUrl from "../../data/processed/metro_stations.geojson?url";
+import interchangesUrl from "../../data/processed/interchange_stations.geojson?url";
+import constructionUrl from "../../data/processed/metro_under_construction.geojson?url";
+import sourcesUrl from "../../data/metadata/sources.json?url";
+import validationUrl from "../../data/metadata/validation_report.json?url";
+import type {
+  ConstructionFC,
+  InterchangesFC,
+  LinesFC,
+  RoutesFC,
+  SegmentsFC,
+  StationsFC,
+  ValidationReport,
+} from "./types";
+
+export interface Network {
+  lines: LinesFC;
+  routes: RoutesFC;
+  segments: SegmentsFC;
+  stations: StationsFC;
+  interchanges: InterchangesFC;
+  construction: ConstructionFC;
+  validation: ValidationReport;
+  osmSnapshot: string;
+}
+
+async function get<T>(url: string): Promise<T> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Failed to load ${url} (HTTP ${res.status})`);
+  return res.json() as Promise<T>;
+}
+
+export async function loadNetwork(): Promise<Network> {
+  const [lines, routes, segments, stations, interchanges, construction, validation, sources] = await Promise.all([
+    get<LinesFC>(linesUrl),
+    get<RoutesFC>(routesUrl),
+    get<SegmentsFC>(segmentsUrl),
+    get<StationsFC>(stationsUrl),
+    get<InterchangesFC>(interchangesUrl),
+    get<ConstructionFC>(constructionUrl),
+    get<ValidationReport>(validationUrl),
+    get<{ sources: { id: string; snapshot?: string }[] }>(sourcesUrl),
+  ]);
+  const osmSnapshot = sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
+  return { lines, routes, segments, stations, interchanges, construction, validation, osmSnapshot };
+}

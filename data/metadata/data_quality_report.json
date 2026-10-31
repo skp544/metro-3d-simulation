@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T12:45:13.886Z",
+  "generatedAt": "2026-10-31T12:54:29.679Z",
   "inputs": {
     "osm": "data/raw/osm/2026-10-31.json",
     "osmSnapshot": "2026-10-31T12:28:36Z",
@@ -35,67 +35,76 @@
   },
   "trackKmByType": {
     "red": {
-      "elevated": 30.079,
+      "elevated": 30.287,
       "underground": 0,
-      "at_grade": 3.102,
+      "at_grade": 2.897,
       "unknown": 0.19,
-      "untagged": 3.102
+      "untagged": 2.897,
+      "inferred": 0.205
     },
     "yellow": {
-      "elevated": 24.319,
-      "underground": 23.189,
-      "at_grade": 0.179,
+      "elevated": 24.409,
+      "underground": 23.19,
+      "at_grade": 0.09,
       "unknown": 0,
-      "untagged": 0.179
+      "untagged": 0.09,
+      "inferred": 0.089
     },
     "blue": {
-      "elevated": 58.098,
-      "underground": 3.355,
+      "elevated": 58.101,
+      "underground": 3.353,
       "at_grade": 2.389,
       "unknown": 0,
-      "untagged": 2.389
+      "untagged": 2.389,
+      "inferred": 0
     },
     "green": {
-      "elevated": 27.68,
+      "elevated": 27.679,
       "underground": 0,
       "at_grade": 0.169,
       "unknown": 0,
-      "untagged": 0.169
+      "untagged": 0.169,
+      "inferred": 0
     },
     "violet": {
-      "elevated": 30.778,
-      "underground": 14.082,
+      "elevated": 30.777,
+      "underground": 14.083,
       "at_grade": 0,
       "unknown": 0,
-      "untagged": 0
+      "untagged": 0,
+      "inferred": 0
     },
     "pink": {
-      "elevated": 51.112,
-      "underground": 18.137,
+      "elevated": 51.114,
+      "underground": 18.138,
       "at_grade": 1.402,
       "unknown": 0,
-      "untagged": 1.402
+      "untagged": 1.402,
+      "inferred": 0
     },
     "magenta": {
-      "elevated": 23.076,
-      "underground": 24.008,
+      "elevated": 23.077,
+      "underground": 24.007,
       "at_grade": 0.361,
       "unknown": 0,
-      "untagged": 0.214
+      "untagged": 0.214,
+      "inferred": 0
     },
     "grey": {
-      "elevated": 2.583,
-      "underground": 2.075,
+      "elevated": 2.582,
+      "underground": 2.076,
       "at_grade": 0.202,
       "unknown": 0,
-      "untagged": 0.202
+      "untagged": 0.202,
+      "inferred": 0
     },
     "airport_express": {
       "elevated": 7.641,
-      "underground": 16.092,
+      "underground": 16.091,
       "at_grade": 0,
       "unknown": 0,
-      "untagged": 0
+      "untagged": 0,
+      "inferred": 0
     }
   },
   "issueCounts": {
@@ -104,7 +113,8 @@
     "TYPE_CONFLICT": 4,
     "WIKI_UNMATCHED": 9,
     "NAME_VARIANTS": 1,
-    "STATION_NO_REF": 25
+    "STATION_NO_REF": 25,
+    "TRACK_TYPE_INFERRED": 3
   },
   "issues": [
     {
@@ -508,6 +518,32 @@
       "message": "stn_tzi (Tis Hazari) red: OSM at_grade (osm:untagged) vs Wikipedia elevated; using Wikipedia",
       "ids": [
         "stn_tzi"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "TRACK_TYPE_INFERRED",
+      "message": "red_main_014…: 0.194 km untagged track set to elevated (both neighbours elevated; Wikipedia agrees at Tis Hazari)",
+      "ids": [
+        "red_main_014",
+        "red_main_015"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "TRACK_TYPE_INFERRED",
+      "message": "red_main_021…: 0.011 km untagged track set to elevated (both neighbours elevated)",
+      "ids": [
+        "red_main_021"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "TRACK_TYPE_INFERRED",
+      "message": "yellow_main_004…: 0.089 km untagged track set to elevated (both neighbours elevated; Wikipedia agrees at Adarsh Nagar)",
+      "ids": [
+        "yellow_main_004",
+        "yellow_main_005"
       ]
     }
   ]

@@ -6,7 +6,7 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 
 ## Current phase
 
-Phases 1 (research), 2 (dataset build) and 3 (validation: 0 errors) are **done**. Phase 4 (Leaflet 2D map) has **not started** and is waiting for the user's go-ahead.
+Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors) and 4 (Leaflet 2D map) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 5 (3D foundations) has **not started** and is waiting for the user's go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Workflow rules
@@ -34,7 +34,7 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Stack and commands
 
-Vite 8 · React 19 · TypeScript 7 · Tailwind 4 · oxlint · @turf/turf. Planned additions: leaflet, react-leaflet, three, @react-three/fiber, @react-three/drei, zustand.
+Vite 8 · React 19 · TypeScript 7 · Tailwind 4 · oxlint · @turf/turf · leaflet + react-leaflet 5 · zustand 5. Planned additions: three, @react-three/fiber, @react-three/drei.
 
 ```bash
 npm run dev          # dev server
@@ -61,6 +61,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/phase1-research-and-plan.md` | Phase 1 research snapshot (2026-10-31): sources, licences, OSM measurements, 3D assets |
 | `docs/phase2-dataset-build.md` | Phase 2 summary: pipeline, outputs, per-line figures, open quality items |
 | `docs/phase3-validation.md` | Phase 3 summary: checks, bugs found, reference comparison, documented warnings |
+| `docs/phase4-leaflet-map.md` | Phase 4 summary: 2D map, review workflow, imagery findings, review checklist |
 | `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |
 | `ref_image.png` | Visual style reference for the UI and the 3D view |

@@ -1,5 +1,5 @@
-const App = () => {
-  return <div>App</div>;
-};
+import { MapPage } from "./pages/MapPage";
+
+const App = () => <MapPage />;
 
 export default App;

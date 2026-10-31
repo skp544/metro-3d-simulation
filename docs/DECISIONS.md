@@ -2,6 +2,16 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-10-31: Phase 4 (Leaflet 2D map)
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 23 | Untagged track inference | An untagged OSM stretch takes its neighbours' type only if both neighbours share an explicit elevated/underground type **and** every station inside agrees on Wikipedia (or none inside and < 300 m). Marked `inferred:neighbours`, still `estimated`. Refines #11 | Imagery showed Tis Hazari and Adarsh Nagar on viaducts with untagged station track; the strict conditions leave real at-grade sections and ramps alone |
+| 24 | Base layers | OpenStreetMap (default, per the brief), CARTO Light, Esri Satellite (review only) | Satellite is needed for the review; check the tile terms before public deployment |
+| 25 | URL state | `#zoom/lat/lng` and `?base=` in the URL | Review spots can be shared and reopened; enables automated screenshots |
+| 26 | Data delivery | Vite `?url` imports from `data/`, fetched at runtime | One copy of the data; keeps ~550 KB of GeoJSON out of the JS bundle |
+| 27 | State | zustand store (`src/store/useMapStore.ts`) for filters, layers and focus | The same filters will drive the 3D view |
+
 ## 2026-10-31: Phase 3 (validation)
 
 | # | Topic | Decision | Reason |

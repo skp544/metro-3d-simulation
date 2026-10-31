@@ -103,6 +103,16 @@ Report shape: `{ passed, summary{errors, warnings, info}, checks[{code, severity
 
 Station order is checked by projecting each platform onto its route, scanning forward from the previous station and taking the first stretch within 60 m. That way the Pink loop's second pass through Maujpur-Babarpur is matched correctly.
 
+## 2D map (Phase 4)
+
+`MapPage` loads the network once (`loadNetwork`) and renders `MetroMap` with two floating cards (`ControlPanel` on the left, `ValidationPanel` bottom right). The map has stacked panes:
+- `construction` (390)
+- `track` (400): segments, sorted underground → elevated
+- `stations` (450): interchanges on top
+- `validation` (460)
+
+All layers read filters from `useMapStore`. The canvas renderer is used throughout. The start view is the URL hash if present, otherwise a fit to the network's bounds (offset 300 px for the desktop panel). Styling lives in `src/constants/map.ts` (`TRACK_STYLE`); no geographic constants live in `src/`.
+
 ## Projection (3D)
 
 Local tangent plane centred on Rajiv Chowk (origin read from the data, not hardcoded):
@@ -128,7 +138,7 @@ Heights are nominal: elevated deck +12 m, underground −15 m, ramps interpolate
 | 1 | Research and plan | User approval | ✅ Done |
 | 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done |
 | 3 | Validation script + report | 0 errors; warnings documented | ✅ Done (0 errors, 2 warnings) |
-| 4 | Leaflet 2D map | Every line reviewed against satellite imagery | — |
+| 4 | Leaflet 2D map | Every line reviewed against satellite imagery | ✅ Built; 4 conflict stations checked; full human review pending |
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | — |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | — |
 | 7 | Trains | ≥ 50 trains at 60 fps | — |

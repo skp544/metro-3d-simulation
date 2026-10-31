@@ -8,12 +8,12 @@ import type {
   LineProps,
   RouteProps,
   SegmentProps,
+  Severity,
   StationProps,
+  ValidationIssue as Issue,
 } from "../src/data/types.ts";
 
 type LngLat = [number, number];
-type Severity = "error" | "warning" | "info";
-export type Issue = { severity: Severity; code: string; message: string; featureIds?: string[]; location?: LngLat };
 type F<P, G = unknown> = { type: "Feature"; geometry: G; properties: P };
 type Pt = { type: "Point"; coordinates: LngLat };
 type Ls = { type: "LineString"; coordinates: LngLat[] };

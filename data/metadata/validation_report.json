@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T12:45:14.251Z",
+  "generatedAt": "2026-10-31T12:54:30.047Z",
   "input": "data/processed",
   "passed": true,
   "summary": {
@@ -177,9 +177,9 @@
     "underConstructionWays": 12,
     "trackKm": 364.305,
     "trackKmByType": {
-      "elevated": 255.373,
+      "elevated": 255.667,
       "underground": 100.938,
-      "at_grade": 7.804,
+      "at_grade": 7.51,
       "unknown": 0.19
     },
     "trackKmEstimatedPct": 2.2,
@@ -198,18 +198,18 @@
       "red": {
         "stations": 29,
         "km": {
-          "elevated": 30.082,
+          "elevated": 30.287,
           "underground": 0,
-          "at_grade": 3.102,
+          "at_grade": 2.897,
           "unknown": 0.19
         }
       },
       "yellow": {
         "stations": 37,
         "km": {
-          "elevated": 24.32,
+          "elevated": 24.409,
           "underground": 23.19,
-          "at_grade": 0.179,
+          "at_grade": 0.09,
           "unknown": 0
         }
       },

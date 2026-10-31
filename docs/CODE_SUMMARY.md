@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-10-31 · **Phase:** 3 done (validation passed), 4 not started
+**Last updated:** 2026-10-31 · **Phase:** 4 done (2D map built; human imagery review pending), 5 not started
 
 ## Data pipeline
 
@@ -49,12 +49,18 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 
 | Path | State |
 |---|---|
-| `src/main.tsx` | Mounts `<App />` in StrictMode |
-| `src/App.tsx` | Placeholder: `<div>App</div>` |
-| `src/components/`, `constants/`, `pages/`, `store/`, `utils/` | Empty |
+| `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network, then renders the map and the two panels; loading and error states |
+| `src/data/loadNetwork.ts` | Fetches the 6 GeoJSON files, the validation report and sources (Vite `?url` from `data/`) |
+| `src/store/useMapStore.ts` | zustand: hidden lines, track types and station types; layer toggles; fly-to focus |
+| `src/constants/map.ts` | Base layers, attribution, track styles, severity colours |
+| `src/components/map2d/` | `MetroMap` (panes, base layers, URL hash, `?base=`), `SegmentLayer`, `StationLayer` (+ popup), `ValidationLayer`, `ConstructionLayer` |
+| `src/components/ui/` | `ControlPanel` (line, track-type, station-type and layer filters), `ValidationPanel` (status and clickable issue list) |
+| `src/utils/` | Empty (projection comes in Phase 5) |
+
+Build: 395 KB JS (120 KB gzip), data loaded at runtime as separate assets.
 
 ## Dependencies
 
 | Installed | Planned |
 |---|---|
-| react 19, react-dom 19, tailwindcss 4, @turf/turf 7.4; dev: @types/geojson, vite 8, typescript 7, oxlint | leaflet, react-leaflet, three, @react-three/fiber, @react-three/drei, zustand |
+| react 19, react-dom 19, tailwindcss 4, @turf/turf 7.4, leaflet 1.9.4, react-leaflet 5, zustand 5; dev: @types/geojson, @types/leaflet, vite 8, typescript 7, oxlint | three, @react-three/fiber, @react-three/drei |

@@ -400,12 +400,35 @@ const coords6 = (cs: LngLat[]): LngLat[] =>
 const routeFeatures: Feature<LineString, RouteProps>[] = [];
 const segmentFeatures: Feature<LineString, SegmentProps>[] = [];
 const lineFeatures: Feature<{ type: "MultiLineString"; coordinates: LngLat[][] }, LineProps>[] = [];
-const kmByType: Record<string, Record<string, number>> = {};
+const stationProps = new Map(stationFeatures.map((f) => [f.properties.id, f.properties]));
+
+// An untagged OSM stretch between two stretches of the same explicit type usually just lacks its
+// bridge/tunnel tag (imagery shows Tis Hazari and Adarsh Nagar on viaducts). Inherit that type only when
+// every station inside the stretch has the same type on Wikipedia, or when no station is inside and it
+// is under 300 m. Ramps between levels and real at-grade sections (Shastri Park) are left alone.
+function inferUntagged(segs: Feature<LineString, SegmentProps>[], lineId: string) {
+  for (let i = 0; i < segs.length; i++) {
+    if (segs[i].properties.trackTypeSource !== "osm:untagged") continue;
+    let j = i;
+    while (segs[j + 1]?.properties.trackTypeSource === "osm:untagged") j++;
+    const [before, after] = [segs[i - 1]?.properties, segs[j + 1]?.properties];
+    const type = before?.trackType;
+    const run = segs.slice(i, j + 1);
+    i = j;
+    if (!before || !after || type !== after.trackType || (type !== "elevated" && type !== "underground")) continue;
+    // A station sits between two segments of the run wherever the station pair advances.
+    const inside = run.slice(1).filter((s, k) => s.properties.fromStationId !== run[k].properties.fromStationId).map((s) => s.properties.fromStationId);
+    const km = run.reduce((a, s) => a + s.properties.lengthKm, 0);
+    const layouts = inside.map((id) => stationProps.get(id)?.platforms.find((p) => p.lineId === lineId)?.wikipediaLayout);
+    if (inside.length ? !layouts.every((l) => l === type) : km >= 0.3) continue;
+    for (const s of run) Object.assign(s.properties, { trackType: type, trackTypeSource: "inferred:neighbours" });
+    issue("info", "TRACK_TYPE_INFERRED", `${run[0].properties.id}…: ${r3(km)} km untagged track set to ${type} (both neighbours ${type}${inside.length ? `; Wikipedia agrees at ${inside.map((id) => stationProps.get(id)?.name).join(", ")}` : ""})`, run.map((s) => s.properties.id));
+  }
+}
 
 for (const line of lineCfgs) {
   const branchesOut: LineProps["branches"] = [];
   const multi: LngLat[][] = [];
-  kmByType[line.id] = { elevated: 0, underground: 0, at_grade: 0, unknown: 0, untagged: 0 };
   for (const b of line.branches) {
     const track = tracks.get(b.id);
     const stops = branchStops.get(b.id);
@@ -432,6 +455,7 @@ for (const line of lineCfgs) {
     });
     // Cut points: every stop, plus every place the infrastructure type changes.
     const typeBreaks = track.parts.slice(1).filter((p, i) => p.type !== track.parts[i].type).map((p) => p.fromKm);
+    const branchStart = segmentFeatures.length;
     let n = 0;
     for (let i = 0; i < stops.length - 1; i++) {
       const [a, z] = [stops[i].km!, stops[i + 1].km!];
@@ -442,8 +466,6 @@ for (const line of lineCfgs) {
         if (to - from < 0.001) continue;
         const part = partAt(track, (from + to) / 2);
         const ways = track.parts.filter((p) => p.toKm > from && p.fromKm < to).map((p) => `osm:way/${p.wayId}`);
-        kmByType[line.id][part.type] += to - from;
-        if (part.src === "osm:untagged") kmByType[line.id].untagged += to - from;
         segmentFeatures.push({
           type: "Feature",
           geometry: { type: "LineString", coordinates: coords6(slice(track, from, to)) },
@@ -464,6 +486,7 @@ for (const line of lineCfgs) {
         });
       }
     }
+    inferUntagged(segmentFeatures.slice(branchStart), line.id);
   }
   const master = get("relation", line.osmRouteMaster);
   const osmColour = master?.tags?.colour;
@@ -578,7 +601,20 @@ const report = {
     ),
   },
   stationsPerLine: Object.fromEntries(lineOrder.map((l) => [l, stationFeatures.filter((f) => f.properties.lines.includes(l)).length])),
-  trackKmByType: Object.fromEntries(Object.entries(kmByType).map(([l, v]) => [l, Object.fromEntries(Object.entries(v).map(([k, n]) => [k, r3(n)]))])),
+  trackKmByType: Object.fromEntries(
+    lineOrder.map((l) => {
+      const segs = segmentFeatures.filter((f) => f.properties.lineId === l).map((f) => f.properties);
+      const km = (pred: (s: SegmentProps) => boolean) => r3(segs.filter(pred).reduce((a, s) => a + s.lengthKm, 0));
+      return [
+        l,
+        {
+          ...Object.fromEntries(["elevated", "underground", "at_grade", "unknown"].map((t) => [t, km((s) => s.trackType === t)])),
+          untagged: km((s) => s.trackTypeSource === "osm:untagged"),
+          inferred: km((s) => s.trackTypeSource === "inferred:neighbours"),
+        },
+      ];
+    }),
+  ),
   issueCounts: Object.fromEntries([...new Set(issues.map((i) => i.code))].map((c) => [c, count(c)])),
   issues,
 };

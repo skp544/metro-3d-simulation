@@ -40,7 +40,7 @@ export interface SegmentProps extends Provenance {
   fromStationId: string;
   toStationId: string;
   trackType: InfraType;
-  trackTypeSource: string; // "osm:tunnel" | "osm:bridge" | "osm:layer" | "osm:cutting" | "osm:untagged" ...
+  trackTypeSource: string; // "osm:tunnel" | "osm:bridge" | "osm:layer" | "osm:cutting" | "osm:untagged" | "inferred:neighbours" ...
   lengthKm: number;
 }
 
@@ -79,6 +79,23 @@ export interface ConstructionProps extends Provenance {
   lineId: string | null;
   status: "under_construction";
   lengthKm: number;
+}
+
+// data/metadata/validation_report.json (written by scripts/validate.ts)
+export type Severity = "error" | "warning" | "info";
+export interface ValidationIssue {
+  severity: Severity;
+  code: string;
+  message: string;
+  featureIds?: string[];
+  location?: [number, number]; // [lng, lat]
+}
+export interface ValidationReport {
+  generatedAt: string;
+  passed: boolean;
+  summary: { errors: number; warnings: number; info: number };
+  checks: { code: string; severity: Severity; description: string; issues: number; status: "pass" | "fail" | "noted" }[];
+  issues: ValidationIssue[];
 }
 
 export type LinesFC = FeatureCollection<MultiLineString, LineProps>;
