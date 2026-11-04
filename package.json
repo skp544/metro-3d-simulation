@@ -11,7 +11,9 @@
     "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts",
     "data:build": "node scripts/build-dataset.ts && node scripts/validate.ts",
     "data:validate": "node scripts/validate.ts",
-    "test": "node --test \"scripts/*.test.ts\" \"src/**/*.test.ts\""
+    "test": "node --test \"scripts/*.test.ts\" \"src/**/*.test.ts\"",
+    "data:fetch-city": "node scripts/fetch-osm-city.ts",
+    "data:city": "node scripts/build-city.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

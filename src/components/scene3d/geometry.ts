@@ -20,6 +20,8 @@ export interface RoutePath3D {
   routeId: string;
   lineId: string;
   points: V3[];
+  /** Distance of each point from the route's first stop (km): the same measure as stopKm and the train simulation. */
+  km: number[];
 }
 
 export interface StationPoint3D {
@@ -74,8 +76,8 @@ export function buildScene3D(network: NetworkGeometry): Scene3DData {
     });
     const heightAt = heightProfile(typeRuns);
 
-    const path: RoutePath3D = { routeId: r.id, lineId: r.lineId, points: [] };
-    const pathKm: number[] = [];
+    const path: RoutePath3D = { routeId: r.id, lineId: r.lineId, points: [], km: [] };
+    const pathKm = path.km;
     let current: TrackRun3D | null = null;
     segs.forEach((s, i) => {
       const xz = s.geometry.coordinates.map((c) => projection.project(c as [number, number]));
@@ -128,10 +130,15 @@ export function buildScene3D(network: NetworkGeometry): Scene3DData {
   return { projection, runs, paths, stations, bounds };
 }
 
-/** Point and heading at distance `km` along a polyline whose vertices sit at `kms`. */
-function pointAt(points: V3[], kms: number[], km: number) {
-  let i = kms.findIndex((k) => k >= km);
-  if (i <= 0) i = i === 0 ? 1 : points.length - 1;
+/** Point and heading at distance `km` along a polyline whose vertices sit at `kms` (ascending). Binary search: trains call this per car per frame. */
+export function pointAt(points: V3[], kms: number[], km: number) {
+  let [lo, hi] = [1, points.length - 1];
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (kms[mid] < km) lo = mid + 1;
+    else hi = mid;
+  }
+  const i = lo;
   const [a, b] = [points[i - 1], points[i]];
   const t = kms[i] > kms[i - 1] ? Math.min(1, Math.max(0, (km - kms[i - 1]) / (kms[i] - kms[i - 1]))) : 0;
   return {

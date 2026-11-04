@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-11-04T16:51:33.963Z",
+  "source": {
+    "file": "data/raw/osm-city/2026-11-04.json",
+    "osmSnapshot": "2026-11-04T16:46:22Z",
+    "radiusM": 300,
+    "licence": "ODbL-1.0",
+    "attribution": "© OpenStreetMap contributors"
+  },
+  "counts": {
+    "buildings": 25197,
+    "roads": 12832,
+    "greenAreas": 860,
+    "trees": 11781
+  },
+  "buildingHeightSources": {
+    "osm:height": 175,
+    "osm:levels": 1697,
+    "nominal": 23325
+  },
+  "notes": [
+    "Context for the 3D view only; not validated network data.",
+    "Untagged building heights are nominal by type ±25% (heightSource: nominal).",
+    "Trees are generated positions inside real OSM green areas (decorative placement, real areas).",
+    "Station buildings (building=transportation/train_station, railway=station) are skipped; the network's station boxes stand in for them."
+  ]
+}
