@@ -11,9 +11,11 @@
     "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts",
     "data:build": "node scripts/build-dataset.ts && node scripts/validate.ts",
     "data:validate": "node scripts/validate.ts",
-    "test": "node --test scripts/*.test.ts"
+    "test": "node --test \"scripts/*.test.ts\" \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.9",
+    "@react-three/fiber": "^9.8.2",
     "@tailwindcss/vite": "^4.3.3",
     "@turf/turf": "^7.4.0",
     "leaflet": "^1.9.4",
@@ -21,6 +23,7 @@
     "react-dom": "^19.3.1",
     "react-leaflet": "^5.0.0",
     "tailwindcss": "^4.3.3",
+    "three": "^0.187.0",
     "zustand": "^5.0.16"
   },
   "devDependencies": {
@@ -29,6 +32,7 @@
     "@types/node": "^24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.187.0",
     "@vitejs/plugin-react": "^6.1.2",
     "oxlint": "^1.89.0",
     "typescript": "~7.0.2",

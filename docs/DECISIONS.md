@@ -2,6 +2,17 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-04: Phase 5 (3D foundations)
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 28 | Projection (revises #8) | Web Mercator scaled by cos φ₀ (≈ metres), origin = centre of the network's bounding box, instead of an equirectangular plane centred on Rajiv Chowk | Same projection as Leaflet, so the 3D shape matches the 2D map exactly and Web Mercator map tiles can later be laid on the ground without warping. The origin comes from the data with no magic station ID. Scale error ≤ 0.5% (tested) |
+| 29 | Heights | Nominal levels (+12 / 0 / −15 m), 400 m half-ramps at type changes, unknown interpolated, drawn ×4 vertically; labelled "nominal" in the view | No per-station height data exists (Phase 1 §5.3); exaggeration keeps levels readable |
+| 30 | Track rendering for Phase 5 | Screen-space fat lines (constant pixel width), underground dashed; ground translucent | Readable at every zoom; Phase 6 replaces them with real viaduct and tunnel geometry |
+| 31 | Loading | The 3D view is lazy-loaded; Three.js is its own chunk | The 2D map's bundle stays at ~120 KB gzip |
+| 32 | View toggle | A minimal 2D/3D switch (`?view=3d`) added now; the full UI work stays in Phase 8 | The 3D view needs an entry point to be reviewed |
+| 33 | 2D-only layers | The under-construction and validation layers are hidden from the panel in 3D (code `shortcut:` comment) | Not drawn in 3D yet |
+
 ## 2026-10-31: Phase 4 (Leaflet 2D map)
 
 | # | Topic | Decision | Reason |

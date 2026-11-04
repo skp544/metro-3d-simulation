@@ -6,7 +6,7 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 
 ## Current phase
 
-Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors) and 4 (Leaflet 2D map) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 5 (3D foundations) has **not started** and is waiting for the user's go-ahead.
+Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map) and 5 (3D foundations) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 6 (3D infrastructure) has **not started** and is waiting for the user's go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Workflow rules
@@ -34,7 +34,7 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Stack and commands
 
-Vite 8 · React 19 · TypeScript 7 · Tailwind 4 · oxlint · @turf/turf · leaflet + react-leaflet 5 · zustand 5. Planned additions: three, @react-three/fiber, @react-three/drei.
+Vite 8 · React 19 · TypeScript 7 · Tailwind 4 · oxlint · @turf/turf · leaflet + react-leaflet 5 · zustand 5 · three + @react-three/fiber 9 + @react-three/drei 10 (3D view lazy-loaded).
 
 ```bash
 npm run dev          # dev server
@@ -43,7 +43,7 @@ npm run lint         # oxlint
 npm run data:fetch   # new OSM + Wikipedia snapshots → data/raw/ (network; Overpass may be busy)
 npm run data:build   # data/raw + data/manual → data/processed + data/metadata, then validates (offline; exit 1 on errors)
 npm run data:validate  # validation only → data/metadata/validation_report.json
-npm test             # validator self-tests
+npm test             # validator + projection/height-profile tests
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.
@@ -62,6 +62,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/phase2-dataset-build.md` | Phase 2 summary: pipeline, outputs, per-line figures, open quality items |
 | `docs/phase3-validation.md` | Phase 3 summary: checks, bugs found, reference comparison, documented warnings |
 | `docs/phase4-leaflet-map.md` | Phase 4 summary: 2D map, review workflow, imagery findings, review checklist |
+| `docs/phase5-3d-foundations.md` | Phase 5 summary: projection, height profile, 3D scene, alignment check |
 | `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |
 | `ref_image.png` | Visual style reference for the UI and the 3D view |

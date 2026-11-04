@@ -115,10 +115,29 @@ All layers read filters from `useMapStore`. The canvas renderer is used througho
 
 ## Projection (3D)
 
-Local tangent plane centred on Rajiv Chowk (origin read from the data, not hardcoded):
-`x = R·Δλ·cos φ₀`, `z = −R·Δφ` (metres; Three.js y is up). Under 0.1% error across the network.
+`src/utils/projection.ts` is the only way geographic data enters the scene (revised in DECISIONS #28):
 
-Heights are nominal: elevated deck +12 m, underground −15 m, ramps interpolated at type changes. These are marked as estimated in the UI.
+- **Projection:** Web Mercator, the same projection as the Leaflet map, so the 3D network has exactly the 2D shape. It is scaled by cos φ₀, so one unit ≈ 1 m near the origin.
+- **Formula:** `x = (X_merc − X₀)·cos φ₀`, `z = −(Y_merc − Y₀)·cos φ₀`. Axes: x = east, y = up, z = south.
+- **Origin:** the centre of the lines' bounding box, read from the data.
+- **Accuracy:** the scale error is ≤ 0.5% across the network (tested; about 0.3% at the edges), and points round-trip to < 1 mm.
+
+Heights (`src/constants/scene.ts`, `src/utils/trackProfile.ts`) are **nominal**: elevated +12 m, at-grade 0, underground −15 m, with no per-station data. Each run of one type holds its level; within 400 m of a type change the track ramps linearly (800 m total, about 3.4% between underground and elevated). A run shorter than 800 m (e.g. an at-grade portal) collapses to its midpoint, so the track passes through ground level. `unknown` runs are interpolated from their neighbours. Heights are drawn ×4 (`VERTICAL_EXAGGERATION`), and the 3D view states "heights nominal".
+
+## 3D scene (Phase 5)
+
+`MetroScene` (lazy-loaded, so Three.js is a separate ~256 KB gzip chunk) builds everything once with `buildScene3D(network)` (`src/components/scene3d/geometry.ts`):
+
+- **Per route:** segments are grouped into same-type runs, the height profile is applied, and the result is a 3D polyline per run.
+- **Per station:** one point per platform, at the track height at that stop, plus an interchange marker.
+
+The scene has:
+- **Ground:** a translucent plane (underground track shows through it) plus a 1 km grid.
+- **Track:** screen-space fat lines (drei `Line`). Underground runs are dashed, as in 2D.
+- **Stations:** screen-size point markers.
+- **Camera:** `MapControls`.
+
+Filters come from the same `useMapStore` as 2D. URL parameters: `?view=3d` opens the 3D view; `?cam=top` looks straight down for comparison with the 2D map.
 
 ## 3D rendering
 
@@ -139,7 +158,7 @@ Heights are nominal: elevated deck +12 m, underground −15 m, ramps interpolate
 | 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done |
 | 3 | Validation script + report | 0 errors; warnings documented | ✅ Done (0 errors, 2 warnings) |
 | 4 | Leaflet 2D map | Every line reviewed against satellite imagery | ✅ Built; 4 conflict stations checked; full human review pending |
-| 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | — |
+| 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | — |
 | 7 | Trains | ≥ 50 trains at 60 fps | — |
 | 8 | UI (toggle, search, panels, work-in-progress entries) | — | — |

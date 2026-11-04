@@ -86,12 +86,22 @@ export function ControlPanel({ network }: { network: Network }) {
             <Row checked={s.showStations} onChange={(v) => s.setLayer("showStations", v)}>
               Stations
             </Row>
-            <Row checked={s.showConstruction} onChange={(v) => s.setLayer("showConstruction", v)} count={network.construction.features.length}>
-              Under construction
-            </Row>
-            <Row checked={s.showValidation} onChange={(v) => s.setLayer("showValidation", v)}>
-              Validation issues
-            </Row>
+            {s.view === "3d" && (
+              <Row checked={s.showGround} onChange={(v) => s.setLayer("showGround", v)}>
+                Ground (hide to see tunnels)
+              </Row>
+            )}
+            {/* shortcut: these two layers exist only on the 2D map; add them to the 3D scene in a later phase. */}
+            {s.view === "2d" && (
+              <>
+                <Row checked={s.showConstruction} onChange={(v) => s.setLayer("showConstruction", v)} count={network.construction.features.length}>
+                  Under construction
+                </Row>
+                <Row checked={s.showValidation} onChange={(v) => s.setLayer("showValidation", v)}>
+                  Validation issues
+                </Row>
+              </>
+            )}
           </Section>
 
           <p className="text-[11px] leading-snug text-slate-500">
