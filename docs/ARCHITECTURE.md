@@ -137,17 +137,22 @@ The scene has:
 - **Stations:** screen-size point markers.
 - **Camera:** `MapControls`.
 
-Filters come from the same `useMapStore` as 2D. URL parameters: `?view=3d` opens the 3D view; `?cam=top` looks straight down for comparison with the 2D map.
+Filters come from the same `useMapStore` as 2D. URL parameters:
+- `?view=3d` opens the 3D view.
+- `?cam=top` looks straight down, for comparison with the 2D map.
+- `?at=lat,lng,distance` aims the camera at a place.
+
+**Phase 6 structures** are built by `buildStructures(scene, colors, filters)` (`src/components/scene3d/buildStructures.ts`, pure, with all sizes from `STRUCTURE` in `src/constants/scene.ts`). They are rebuilt only when the filters change, and drawn by `<Structures>` in about 7 draw calls: one merged mesh each for the deck, tunnel and ribbon (vertex colours), and instanced pillars and station boxes. Structures follow the **height** of the track, not its type label, so viaducts continue down the ramps. Lighting is a hemisphere plus a directional light. The depth buffer is logarithmic, because geometry 1 m apart must not flicker at 1 m–400 km.
 
 ## 3D rendering
 
-| Element | Approach |
-|---|---|
-| Track | Extruded ribbon along `CatmullRomCurve3` per segment, in the line colour |
-| Viaduct and pillars | Extruded deck + `InstancedMesh` pillars about every 30 m |
-| Tunnel | Tube geometry below the ground; ground plane can be made translucent or cut away |
-| Stations | Parametric boxes by type, aligned to the track tangent |
-| Trains | One GLB (Draco/Meshopt), instanced; position and tangent from the route curve |
+| Element | Approach | Status |
+|---|---|---|
+| Track | **Far:** screen-space lines (Phase 5). **Near:** coloured ribbon extruded along each type run (8 m, `extrudeRect`). The switch happens at 3 m per pixel, with hysteresis (`LodWatcher`) | ✅ Phase 6 |
+| Viaduct and pillars | Deck (11 m wide) extruded wherever the track is above +2 m, ramps included. `InstancedMesh` pillars every 30 m, from the ground to under the deck | ✅ Phase 6 |
+| Tunnel | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it | ✅ Phase 6 |
+| Stations | One box per platform (180 m long), centred on the track at the stop and oriented along it. Above ground: white tinted by line; below: translucent slate. Instanced | ✅ Phase 6 |
+| Trains | One GLB (Draco/Meshopt), instanced; position and tangent from the route path | Phase 7 |
 | Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
 
 ## Roadmap
@@ -159,7 +164,7 @@ Filters come from the same `useMapStore` as 2D. URL parameters: `?view=3d` opens
 | 3 | Validation script + report | 0 errors; warnings documented | ✅ Done (0 errors, 2 warnings) |
 | 4 | Leaflet 2D map | Every line reviewed against satellite imagery | ✅ Built; 4 conflict stations checked; full human review pending |
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
-| 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | — |
+| 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | ✅ Done (continuity tested; FPS not measured on a real GPU) |
 | 7 | Trains | ≥ 50 trains at 60 fps | — |
 | 8 | UI (toggle, search, panels, work-in-progress entries) | — | — |
 | 9 | Journey planner | — | Future |

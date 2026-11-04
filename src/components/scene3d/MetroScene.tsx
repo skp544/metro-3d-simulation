@@ -7,7 +7,8 @@ import type { Network } from "../../data/loadNetwork";
 import { useMapStore } from "../../store/useMapStore";
 import { buildScene3D } from "./geometry";
 import { StationPoints } from "./StationPoints";
-import { Structures } from "./Structures";
+// Explicit .tsx: on case-insensitive disks "./Structures" once matched the old structures.ts.
+import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.

@@ -2,6 +2,18 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-04: Phase 6 (3D infrastructure)
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 34 | Level of detail | Far away (≥ 3 m/pixel): Phase 5 lines and dots. Close up: real track ribbon. Structures are always drawn | An 8 m track is under a pixel at city scale; this rule depends on the screen, not on a fixed distance |
+| 35 | Structures follow height | Deck and pillars where the track is above +2 m; tunnel where it is below −2 m; both include ramps | Viaducts must continue down to the portal; type labels end abruptly |
+| 36 | Short runs (revises #29) | A run shorter than a full ramp (800 m) reaches only that fraction of its level | A 48 m OSM "tunnel" between at-grade stretches (near Yamuna Bank) had produced an 8.2% grade; it is now a ~1 m underpass, and the steepest grade on the network is 3.37% |
+| 37 | Nominal structure sizes | Deck 11 m, pillars 2.5 m every 30 m, tunnel 13 m, platform 180 × 26 m (all in `STRUCTURE`); vertical sizes ×4 like heights; the view says "structure sizes nominal" | No per-site data; typical twin-track metro values |
+| 38 | Stations on the track | Each platform box is centred on its route path at the stop and oriented along it (first branch at a shared junction) | Track runs continuously through every station box (tested, < 1 m) |
+| 39 | Draw-call budget | Merged meshes (vertex colours) and instancing: about 7 draw calls and about 151k triangles for the whole network | Mobile-friendly; filters rebuild the merged geometry, which is cheap (a few ms) |
+| 40 | Testable scene code | `geometry.ts` and `buildStructures.ts` use explicit `.ts` imports and minimal input types, so Node tests run them on the real data | The exit criteria are checked automatically, not only by screenshot |
+
 ## 2026-11-04: Phase 5 (3D foundations)
 
 | # | Topic | Decision | Reason |

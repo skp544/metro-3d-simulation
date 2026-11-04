@@ -63,3 +63,15 @@ test("height profile: levels, ramps, short portal through ground, unknown interp
   assert.equal(h(10.1), -15, "unknown between two underground runs stays underground");
   assert.equal(h(12), -15);
 });
+
+test("height profile: a short tunnel between at-grade runs is a shallow underpass", () => {
+  const h = heightProfile(
+    [
+      { type: "at_grade", fromKm: 0, toKm: 1 },
+      { type: "underground", fromKm: 1, toKm: 1.048 },
+      { type: "at_grade", fromKm: 1.048, toKm: 2 },
+    ],
+    0.4,
+  );
+  assert.ok(h(1.024) < 0 && h(1.024) > -1, `48 m of 800 m → ${h(1.024).toFixed(2)} m`);
+});

@@ -12,15 +12,17 @@ export interface Run {
 /**
  * Each run holds its level except near its ends, where the track ramps to the next level. A run
  * shorter than two ramp halves (e.g. a 300 m at-grade portal between viaduct and tunnel) collapses to
- * its midpoint, so the track passes through ground level there. Unknown runs get no level and are
- * interpolated from their neighbours.
+ * its midpoint, so the track passes through ground level there, and only reaches that fraction of its
+ * level: a 48 m "tunnel" between at-grade stretches is an underpass ~1 m down, not a 15 m-deep bore
+ * (keeps grades under ~4%). Unknown runs get no level and are interpolated from their neighbours.
  */
 export function heightProfile(runs: Run[], rampHalfKm = RAMP_HALF_KM): (km: number) => number {
   const anchors: [number, number][] = [];
   runs.forEach((r, i) => {
     if (r.type === "unknown") return;
-    const h = LEVEL_HEIGHT[r.type];
-    const pad = Math.min(rampHalfKm, (r.toKm - r.fromKm) / 2);
+    const len = r.toKm - r.fromKm;
+    const h = LEVEL_HEIGHT[r.type] * Math.min(1, len / (2 * rampHalfKm));
+    const pad = Math.min(rampHalfKm, len / 2);
     anchors.push([i === 0 ? r.fromKm : r.fromKm + pad, h], [i === runs.length - 1 ? r.toKm : r.toKm - pad, h]);
   });
   if (!anchors.length) return () => 0;

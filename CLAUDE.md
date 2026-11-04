@@ -6,7 +6,7 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 
 ## Current phase
 
-Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map) and 5 (3D foundations) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 6 (3D infrastructure) has **not started** and is waiting for the user's go-ahead.
+Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map), 5 (3D foundations) and 6 (3D infrastructure) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 7 (trains) has **not started** and is waiting for the user's go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Workflow rules
@@ -43,7 +43,7 @@ npm run lint         # oxlint
 npm run data:fetch   # new OSM + Wikipedia snapshots → data/raw/ (network; Overpass may be busy)
 npm run data:build   # data/raw + data/manual → data/processed + data/metadata, then validates (offline; exit 1 on errors)
 npm run data:validate  # validation only → data/metadata/validation_report.json
-npm test             # validator + projection/height-profile tests
+npm test             # validator, projection/height-profile and 3D geometry tests (25)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.
@@ -63,6 +63,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/phase3-validation.md` | Phase 3 summary: checks, bugs found, reference comparison, documented warnings |
 | `docs/phase4-leaflet-map.md` | Phase 4 summary: 2D map, review workflow, imagery findings, review checklist |
 | `docs/phase5-3d-foundations.md` | Phase 5 summary: projection, height profile, 3D scene, alignment check |
+| `docs/phase6-3d-infrastructure.md` | Phase 6 summary: viaducts, tunnels, stations, LOD, continuity tests |
 | `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |
 | `ref_image.png` | Visual style reference for the UI and the 3D view |

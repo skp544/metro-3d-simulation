@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-04 · **Phase:** 5 done (3D foundations), 6 not started. Phase 4's human imagery review is still pending
+**Last updated:** 2026-11-04 · **Phase:** 6 done (3D infrastructure), 7 not started. Phase 4's human imagery review is still pending
 
 ## Data pipeline
 
@@ -51,17 +51,20 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 |---|---|
 | `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network; renders the 2D map or the lazy-loaded 3D scene, the panels and the view toggle; loading and error states |
 | `src/data/loadNetwork.ts` | Fetches the 6 GeoJSON files, the validation report and sources (Vite `?url` from `data/`) |
-| `src/store/useMapStore.ts` | zustand: view (`2d`/`3d`, synced to `?view=`), hidden lines, track types and station types; layer toggles; fly-to focus |
+| `src/store/useMapStore.ts` | zustand: view (`2d`/`3d`, synced to `?view=`), hidden lines, track types and station types; layer toggles (incl. 3D ground); fly-to focus |
 | `src/constants/map.ts` | Base layers, attribution, track styles, severity colours |
-| `src/constants/scene.ts` | Nominal track heights, ramp length, vertical exaggeration, 3D colours and sizes |
+| `src/constants/scene.ts` | Nominal track heights, ramp length, vertical exaggeration, `STRUCTURE` sizes, LOD threshold, 3D colours |
 | `src/components/map2d/` | `MetroMap` (panes, base layers, URL hash, `?base=`), `SegmentLayer`, `StationLayer` (+ popup), `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `geometry.ts` (`buildScene3D`: track runs and station points in 3D), `MetroScene` (canvas, ground, grid, MapControls, `?cam=top`), `TrackLines`, `StationPoints` |
+| `src/components/scene3d/` | `geometry.ts` (`buildScene3D`: type runs, continuous route paths, platforms on the track with heading), `buildStructures.ts` (pure: `extrudeRect`, `spansWhere`, `pillarMatrices`, `boxMatrix`, `buildStructures`), `Structures` (deck, pillars, tunnels, ribbon, station boxes), `MetroScene` (canvas, lights, log depth, ground toggle, LOD switch, `?cam=top`, `?at=`), `TrackLines` + `StationPoints` (far view) |
+| `src/components/scene3d/*.test.ts` | `buildStructures.test.ts` (5 builder tests), `geometry.test.ts` (4 network tests: continuity and max grade, platforms on track, platform levels, structure budget) |
 | `src/components/ui/` | `ControlPanel` (line, track-type, station-type and layer filters; 2D-only layers hidden in 3D), `ValidationPanel` (2D only), `ViewToggle` |
 | `src/utils/projection.ts` | Web Mercator → metres from the network centre; `createProjection`, `boundsCentre` |
 | `src/utils/trackProfile.ts` | `heightProfile`: nominal level per run with ramps |
-| `src/utils/projection.test.ts` | 5 tests: origin, round-trip, scale ≤ 0.5%, axes, height profile |
+| `src/utils/projection.test.ts` | 6 tests: origin, round-trip, scale ≤ 0.5%, axes, height profile, short-run underpass |
 
-Build: 2D bundle 399 KB JS (122 KB gzip); 3D chunk 962 KB (256 KB gzip), loaded only when the 3D view opens. Data loaded at runtime as separate assets. `npm test` runs 15 tests.
+Build: 2D bundle 399 KB JS (122 KB gzip); 3D chunk 968 KB (258 KB gzip), loaded only when the 3D view opens. Data loaded at runtime as separate assets. `npm test` runs 25 tests.
+
+3D scene: about 151k triangles; 8,487 pillars and 271 station boxes (200 above ground, 71 below), instanced; about 7 draw calls for the structures.
 
 ## Dependencies
 

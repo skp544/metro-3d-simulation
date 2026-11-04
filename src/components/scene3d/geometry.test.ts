@@ -17,7 +17,7 @@ const network = {
 const scene = buildScene3D(network);
 const planar = (a: V3, b: V3) => Math.hypot(b[0] - a[0], b[2] - a[2]);
 
-test("one continuous path per route, no height jumps (max grade < 8%)", () => {
+test("one continuous path per route, no height jumps (max grade < 5%, real metro ≤ ~4%)", () => {
   assert.equal(scene.paths.length, network.routes.features.length);
   let worst = { grade: 0, at: "" };
   for (const p of scene.paths)
@@ -28,7 +28,7 @@ test("one continuous path per route, no height jumps (max grade < 8%)", () => {
       if (grade > worst.grade) worst = { grade, at: `${p.routeId} #${i}` };
     }
   console.log(`  steepest modelled grade: ${(worst.grade * 100).toFixed(2)}% at ${worst.at}`);
-  assert.ok(worst.grade < 0.08, `grade ${(worst.grade * 100).toFixed(1)}% at ${worst.at}`);
+  assert.ok(worst.grade < 0.05, `grade ${(worst.grade * 100).toFixed(1)}% at ${worst.at}`);
 });
 
 test("every platform sits on its line's track (< 1 m)", () => {
