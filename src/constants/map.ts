@@ -46,3 +46,11 @@ export const STATION_TYPE_LABEL: Record<StationType, string> = {
 };
 
 export const SEVERITY_COLOR: Record<Severity, string> = { error: "#dc2626", warning: "#f59e0b", info: "#2563eb" };
+
+// DECISIONS #1: other rail systems in the Delhi area are out of scope for now and appear in the UI only as
+// "work in progress". Names and search words only: no stations, geometry or colours.
+export const WORK_IN_PROGRESS_SYSTEMS: { name: string; keywords: string[] }[] = [
+  { name: "Rapid Metro Gurugram", keywords: ["rapid metro", "gurugram rapid", "gurgaon rapid"] },
+  { name: "Noida Metro Aqua Line", keywords: ["aqua", "noida metro", "nmrc"] },
+  { name: "Namo Bharat (RapidX)", keywords: ["namo bharat", "rapidx", "rrts"] },
+];

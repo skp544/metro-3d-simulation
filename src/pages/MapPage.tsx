@@ -2,7 +2,9 @@ import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { MetroMap } from "../components/map2d/MetroMap";
 import { BottomDock } from "../components/ui/BottomDock";
 import { ControlPanel } from "../components/ui/ControlPanel";
+import { FollowCard } from "../components/ui/FollowCard";
 import { KpiCards } from "../components/ui/KpiCards";
+import { RoutePanel } from "../components/ui/RoutePanel";
 import { SceneControls } from "../components/ui/SceneControls";
 import { StationPanel } from "../components/ui/StationPanel";
 import { TopBar } from "../components/ui/TopBar";
@@ -40,6 +42,7 @@ export function MapPage() {
         {/* Floating cards over the map, as in ref_image.png. pointer-events pass through the gaps. */}
         <div className="pointer-events-none absolute top-3 left-3 z-[1000] flex max-h-[calc(100%-1.5rem)] flex-col gap-3">
           <KpiCards network={network} service={service} />
+          <RoutePanel network={network} />
           <ControlPanel network={network} />
         </div>
         {/* In 2D, leave room for Leaflet's own controls in the top-right corner. */}
@@ -47,7 +50,18 @@ export function MapPage() {
           <StationPanel network={network} service={service} />
           {view === "3d" && <SceneControls />}
         </div>
-        <div className="pointer-events-none absolute right-3 bottom-8 left-3 z-[1000] flex justify-center md:right-auto">
+        {view === "3d" && (
+          // Desktop: bottom right (the dock sits bottom left). Phones: stacked above the dock, below.
+          <div className="pointer-events-none absolute right-3 bottom-9 z-[1000] hidden md:block">
+            <FollowCard network={network} service={service} />
+          </div>
+        )}
+        <div className="pointer-events-none absolute right-3 bottom-8 left-3 z-[1000] flex flex-col items-center gap-2 md:right-auto">
+          {view === "3d" && (
+            <div className="md:hidden">
+              <FollowCard network={network} service={service} />
+            </div>
+          )}
           <BottomDock network={network} service={service} />
         </div>
       </main>

@@ -43,6 +43,11 @@ export function StationPanel({ network, service }: { network: Network; service: 
         </span>
       </div>
 
+      <div className="flex gap-2 px-4 pt-3">
+        <RouteButton end="from" stationId={station.id} />
+        <RouteButton end="to" stationId={station.id} />
+      </div>
+
       <div className="grid grid-cols-2 gap-2 p-4">
         <Stat label="Type" value={STATION_TYPE_LABEL[station.stationType]} />
         <Stat label="Lines" value={String(station.lines.length)} />
@@ -91,6 +96,23 @@ export function StationPanel({ network, service }: { network: Network; service: 
         </details>
       </section>
     </aside>
+  );
+}
+
+/** Sets this station as the route's start or end; pressed when it already is. */
+function RouteButton({ end, stationId }: { end: "from" | "to"; stationId: string }) {
+  const current = useMapStore((s) => (end === "from" ? s.routeFrom : s.routeTo));
+  const setRouteEnd = useMapStore((s) => s.setRouteEnd);
+  const on = current === stationId;
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={() => setRouteEnd(end, on ? null : stationId)}
+      className={`flex-1 rounded-lg border px-2 py-1.5 text-xs font-medium ${on ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 text-slate-700 hover:bg-slate-50"}`}
+    >
+      {end === "from" ? "Route from here" : "Route to here"}
+    </button>
   );
 }
 

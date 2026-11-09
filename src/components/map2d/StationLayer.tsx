@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { CircleMarker, Tooltip } from "react-leaflet";
 import type { Network } from "../../data/loadNetwork";
+import { useJourney } from "../../store/useJourney";
 import { useMapStore } from "../../store/useMapStore";
 
 export function StationLayer({ network }: { network: Network }) {
@@ -8,6 +9,9 @@ export function StationLayer({ network }: { network: Network }) {
   const hiddenLines = useMapStore((s) => s.hiddenLines);
   const hiddenTypes = useMapStore((s) => s.hiddenStationTypes);
   const selectStation = useMapStore((s) => s.selectStation);
+  // While a route is highlighted, stations off the route step back.
+  const journey = useJourney(network);
+  const onRoute = useMemo(() => (journey ? new Set(journey.legs.flatMap((l) => l.stationIds)) : null), [journey]);
   const lines = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties])), [network.lines]);
   if (!show) return null;
 
@@ -31,6 +35,7 @@ export function StationLayer({ network }: { network: Network }) {
           weight: p.isInterchange ? 3 : 2.5,
           fillColor: "#ffffff",
           fillOpacity: 1,
+          opacity: onRoute && !onRoute.has(p.id) ? 0.3 : 1,
         }}
       >
         <Tooltip direction="top" offset={[0, -6]}>

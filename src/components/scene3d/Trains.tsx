@@ -257,6 +257,7 @@ function TrainLabels({
   near: boolean;
 }) {
   const labels = useMapStore((s) => s.labels);
+  const followTrain = useMapStore((s) => s.followTrain);
   const [shown, setShown] = useState<{ id: string; state: TrainState }[]>([]);
   const groups = useRef(new Map<string, THREE.Group | null>());
   const targetRef = useRef<THREE.Vector3 | null>(null);
@@ -273,8 +274,12 @@ function TrainLabels({
   useEffect(() => {
     const pick = () => {
       const target = targetRef.current;
+      // The followed train always keeps its tag, whatever the label mode.
+      const followed = useMapStore.getState().follow?.trainId;
+      const own = followed && live.current.get(followed);
+      const always = own ? [{ id: followed, state: own.state }] : [];
       if (!near || !target || (labels !== "trains" && labels !== "all"))
-        return setShown([]);
+        return setShown(always);
       const near_ = [...live.current]
         .filter(
           ([, v]) =>
@@ -284,9 +289,10 @@ function TrainLabels({
           (a, b) =>
             a[1].position.distanceTo(target) - b[1].position.distanceTo(target),
         )
+        .filter(([id]) => id !== followed)
         .slice(0, TRAIN.maxLabels)
         .map(([id, v]) => ({ id, state: v.state }));
-      setShown(near_);
+      setShown([...always, ...near_]);
     };
     pick();
     const timer = setInterval(pick, 500);
@@ -296,7 +302,12 @@ function TrainLabels({
   return shown.map(({ id, state }) => (
     <group key={id} ref={(g) => void groups.current.set(id, g)}>
       <Html center zIndexRange={[20, 0]} style={{ pointerEvents: "none" }}>
-        <div className="flex items-center gap-1.5 rounded-full bg-white/95 px-2 py-0.5 text-[11px] whitespace-nowrap text-slate-800 shadow-md">
+        <button
+          type="button"
+          onClick={() => followTrain(id)}
+          title="Follow this train"
+          className="pointer-events-auto flex items-center gap-1.5 rounded-full bg-white/95 px-2 py-0.5 text-[11px] whitespace-nowrap text-slate-800 shadow-md hover:bg-white hover:ring-2 hover:ring-blue-500"
+        >
           <span
             className="h-2 w-2 rounded-full"
             style={{ background: colors.get(state.train.lineId) }}
@@ -311,7 +322,7 @@ function TrainLabels({
               ? `At ${stationNames.get(state.atStationId)}`
               : `→ ${stationNames.get(state.nextStationId)}`}
           </span>
-        </div>
+        </button>
       </Html>
     </group>
   ));

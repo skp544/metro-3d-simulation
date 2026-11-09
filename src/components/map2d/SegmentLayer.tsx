@@ -9,6 +9,8 @@ const latLngs = (cs: number[][]) => cs.map(([lng, lat]) => [lat, lng] as [number
 export function SegmentLayer({ network }: { network: Network }) {
   const hiddenLines = useMapStore((s) => s.hiddenLines);
   const hiddenTypes = useMapStore((s) => s.hiddenTrackTypes);
+  // While a route is highlighted, the rest of the network steps back.
+  const dim = useMapStore((s) => !!(s.routeFrom && s.routeTo));
   const lines = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties])), [network.lines]);
   const stationName = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
 
@@ -24,7 +26,7 @@ export function SegmentLayer({ network }: { network: Network }) {
         key={p.id}
         pane="track"
         positions={latLngs(f.geometry.coordinates)}
-        pathOptions={{ color: lines.get(p.lineId)?.color, weight: style.weight, opacity: style.opacity, dashArray: style.dashArray, lineCap: p.trackType === "at_grade" ? "round" : "butt" }}
+        pathOptions={{ color: lines.get(p.lineId)?.color, weight: style.weight, opacity: style.opacity * (dim ? 0.35 : 1), dashArray: style.dashArray, lineCap: p.trackType === "at_grade" ? "round" : "butt" }}
       >
         <Tooltip sticky>
           <div className="text-xs">

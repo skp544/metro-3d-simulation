@@ -1,29 +1,50 @@
-// Camera animation (fly-to, zoom, network/hub views), the shadow-casting sun that follows the view,
-// and station name labels.
-import { useEffect, useRef, useState } from "react";
+// Camera animation (fly-to, fit, zoom, network/hub views, following a train), the view handoff to 2D,
+// the shadow-casting sun that follows the view, and station name labels.
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE, SHADOW } from "../../constants/scene";
-import { useMapStore } from "../../store/useMapStore";
-import type { Projection } from "../../utils/projection";
-import type { StationPoint3D } from "./geometry";
+import { useCommand } from "../../store/useCommand";
+import { simSeconds, useMapStore, viewHandoff } from "../../store/useMapStore";
+import { metresPerPixelAtDistance, zoomForMetresPerPixel, type Projection } from "../../utils/projection";
+import type { Service } from "../../utils/trainSim";
+import { pointAt, type RoutePath3D, type StationPoint3D } from "./geometry";
 
 export type View3D = { target: THREE.Vector3; position: THREE.Vector3 };
 type Controls = { target: THREE.Vector3; update: () => void };
 const FLY_MS = 900;
 const FOCUS_DISTANCE_M = 950;
+const FOLLOW_DISTANCE_M = 420; // a 6-car train (~130 m) fills a good part of the view
+const PAN_BREAK_M = 3; // the user moved the target this far off the train: they panned, so stop following
+const ZERO = new THREE.Vector3();
 
-export function CameraRig({ projection, hub, network }: { projection: Projection; hub: View3D; network: View3D }) {
+export function CameraRig({ projection, hub, network, service, paths }: { projection: Projection; hub: View3D; network: View3D; service: Service; paths: RoutePath3D[] }) {
   const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
   const controls = useThree((s) => s.controls) as unknown as Controls | null;
   const focus = useMapStore((s) => s.focus);
+  const fit = useMapStore((s) => s.fit);
   const command = useMapStore((s) => s.camera);
-  const anim = useRef<{ from: View3D; to: View3D; t0: number } | null>(null);
+  const follow = useMapStore((s) => s.follow);
+  // `anchor`: the followed train's position when the flight started; the flight's end moves with the train.
+  const anim = useRef<{ from: View3D; to: View3D; t0: number; anchor: THREE.Vector3 | null } | null>(null);
+  const lastFollow = useRef<THREE.Vector3 | null>(null);
+  const lastReport = useRef(0);
+  const pathById = useMemo(() => new Map(paths.map((p) => [p.routeId, p])), [paths]);
+  const trainById = useMemo(() => new Map(service.trains.map((t) => [t.id, t])), [service]);
 
-  const flyTo = (to: View3D) => {
+  /** Where a simulated train is now (null if unknown or its line is hidden). */
+  const trainPosition = (trainId: string) => {
+    const s = useMapStore.getState();
+    const train = trainById.get(trainId);
+    const path = train && pathById.get(train.routeId);
+    if (!train || !path || s.hiddenLines.includes(train.lineId)) return null;
+    return new THREE.Vector3(...pointAt(path.points, path.km, service.stateAt(train, simSeconds(s)).km).position);
+  };
+  const flyTo = (to: View3D, anchor: THREE.Vector3 | null = null) => {
     if (!controls) return;
-    anim.current = { from: { target: controls.target.clone(), position: camera.position.clone() }, to, t0: performance.now() };
+    anim.current = { from: { target: controls.target.clone(), position: camera.position.clone() }, to, t0: performance.now(), anchor };
   };
   // Keep the current viewing angle, at a comfortable distance, around a new target.
   const around = (target: THREE.Vector3, distance: number): View3D => {
@@ -31,32 +52,72 @@ export function CameraRig({ projection, hub, network }: { projection: Projection
     return { target, position: target.clone().add(offset) };
   };
 
-  useEffect(() => {
-    if (!focus || !controls) return;
-    const [x, z] = projection.project(focus.coordinates);
+  useCommand("focus", focus?.key, !!controls, () => {
+    const [x, z] = projection.project(focus!.coordinates);
     flyTo(around(new THREE.Vector3(x, 0, z), FOCUS_DISTANCE_M));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fly only when a new focus arrives
-  }, [focus?.key]);
+  });
 
-  useEffect(() => {
-    if (!command || !controls) return;
-    const d = camera.position.distanceTo(controls.target);
-    if (command.command === "zoomIn") flyTo(around(controls.target.clone(), d * 0.6));
-    if (command.command === "zoomOut") flyTo(around(controls.target.clone(), d / 0.6));
-    if (command.command === "network") flyTo(network);
-    if (command.command === "hub") flyTo(hub);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once per command
-  }, [command?.key]);
+  useCommand("fit", fit?.key, !!controls, () => {
+    const [[x0, z0], [x1, z1]] = fit!.bounds.map((c) => projection.project(c));
+    const centre = new THREE.Vector3((x0 + x1) / 2, 0, (z0 + z1) / 2);
+    const extent = Math.max(Math.abs(x1 - x0), Math.abs(z1 - z0));
+    flyTo(around(centre, Math.max(FOCUS_DISTANCE_M, extent * 1.4)));
+  });
+
+  useCommand("follow", follow?.key, !!controls, () => {
+    const p = trainPosition(follow!.trainId);
+    if (p) flyTo(around(p, FOLLOW_DISTANCE_M), p);
+    else useMapStore.getState().followTrain(null);
+  });
+
+  useCommand("camera", command?.key, !!controls, () => {
+    const d = camera.position.distanceTo(controls!.target);
+    const f = useMapStore.getState().follow;
+    const anchor = f && trainPosition(f.trainId);
+    if (command!.command === "zoomIn") flyTo(around(controls!.target.clone(), d * 0.6), anchor);
+    if (command!.command === "zoomOut") flyTo(around(controls!.target.clone(), d / 0.6), anchor);
+    if (command!.command === "network") flyTo(network);
+    if (command!.command === "hub") flyTo(hub);
+  });
 
   useFrame(() => {
+    if (!controls) return;
+    const store = useMapStore.getState();
+    const followed = store.follow ? trainPosition(store.follow.trainId) : null;
+    if (store.follow && !followed) store.followTrain(null); // its line was hidden
+
     const a = anim.current;
-    if (!a || !controls) return;
-    const t = Math.min(1, (performance.now() - a.t0) / FLY_MS);
-    const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2; // ease in-out
-    controls.target.lerpVectors(a.from.target, a.to.target, e);
-    camera.position.lerpVectors(a.from.position, a.to.position, e);
-    controls.update();
-    if (t === 1) anim.current = null;
+    if (a) {
+      const t = Math.min(1, (performance.now() - a.t0) / FLY_MS);
+      const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2; // ease in-out
+      const shift = followed && a.anchor ? followed.clone().sub(a.anchor) : ZERO;
+      controls.target.lerpVectors(a.from.target, a.to.target.clone().add(shift), e);
+      camera.position.lerpVectors(a.from.position, a.to.position.clone().add(shift), e);
+      controls.update();
+      if (t === 1) {
+        anim.current = null;
+        lastFollow.current = followed;
+      }
+    } else if (!followed) {
+      lastFollow.current = null;
+    } else if (lastFollow.current && controls.target.distanceTo(lastFollow.current) > PAN_BREAK_M) {
+      store.followTrain(null);
+      lastFollow.current = null;
+    } else {
+      // Carry the camera along with the train; the user can still orbit and zoom around it.
+      camera.position.add(followed.clone().sub(controls.target));
+      controls.target.copy(followed);
+      lastFollow.current = followed;
+    }
+
+    // Report the view in 2D terms a few times a second, so switching to 2D opens on the same place.
+    const now = performance.now();
+    if (now - lastReport.current > 400) {
+      lastReport.current = now;
+      const center = projection.unproject([controls.target.x, controls.target.z]);
+      const mpp = metresPerPixelAtDistance(camera.position.distanceTo(controls.target), (camera as THREE.PerspectiveCamera).fov, size.height);
+      viewHandoff.current = { center, zoom: zoomForMetresPerPixel(center[1], mpp), heightPx: size.height };
+    }
   });
   return null;
 }

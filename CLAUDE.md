@@ -6,18 +6,14 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 
 ## Current phase
 
-Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map), 5 (3D foundations), 6 (3D infrastructure) and 7 (3D look, OSM city, simulated trains, reference-style UI) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 8 (remaining UI) has **not started** and is waiting for the user's go-ahead.
+Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map), 5 (3D foundations), 6 (3D infrastructure), 7 (3D look, OSM city, simulated trains, reference-style UI) and 8 (remaining UI: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 9 (journey planner) has **not started** and is waiting for the user's go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-09)
 
-The user approved moving on and will start **Phase 8** in a new session. Read `docs/phase7-3d-look-trains-ui.md` (§6 open issues, §9 next) and `docs/CODE_SUMMARY.md` first.
+Phase 8 is finished and waiting for the user's approval (and their commit). Read `docs/phase8-remaining-ui.md` (§6 open issues, §9 next) and `docs/CODE_SUMMARY.md` first.
 
-**Phase 8 scope** (agreed list, from the Phase 7 doc §9):
-1. "Work in progress" entries in the UI for Rapid Metro Gurugram, Noida Aqua Line and Namo Bharat (no data, label only; DECISIONS #1).
-2. Follow a selected train in 3D. Clicking a dock row today flies once to where the train was (`BottomDock` → `focusOn`); add a follow mode (store + `CameraRig`).
-3. Carry the view across the 2D/3D switch (Leaflet centre/zoom ↔ 3D target/distance via `src/utils/projection.ts`).
-4. Route highlighting between two selected stations (the first step towards the journey planner: a graph from segments plus interchanges).
+**Phase 9 scope** (proposed, Phase 8 doc §9): From/To station fields; per-line speeds only where sourced (Airport Express); better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. The graph already exists: `src/utils/routePlanner.ts` (DECISIONS #52–#53).
 
 **Still open from earlier phases:**
 - The human imagery review (`docs/phase4-leaflet-map.md` §5).
@@ -30,12 +26,16 @@ The user approved moving on and will start **Phase 8** in a new session. Read `d
 - `?view=3d&at=lat,lng,dist` aims at a place.
 - `?view=2d#zoom/lat/lng` opens the 2D map at a spot.
 - `?base=Satellite` opens the 2D map on imagery.
+- `?route=<fromStationId>,<toStationId>` opens with a route highlighted (e.g. `stn_mkpr,stn_necc`).
+- `EVAL='js'` runs page JavaScript before the shot (click a train row, the view toggle, etc.).
 
 **Gotchas:**
 - macOS disks are case-insensitive. Never create files whose names differ only in case (`Structures.tsx` vs the old `structures.ts` broke the dev server).
 - Modules that Node tests import directly (`src/utils/*`, `scene3d/geometry.ts`, `buildStructures.ts`, `buildCity.ts`, `constants/scene.ts`) must use explicit `.ts` import extensions and must not import `src/data/loadNetwork.ts` or `loadCity.ts`, whose Vite `?url` imports break Node and the Node tsconfig.
 - The public Overpass server is often busy (HTTP 429/502/504); the fetch scripts retry with backoff and can take minutes.
-- Trains are a **simulated** service; keep the "simulated" labels.
+- Trains are a **simulated** service; keep the "simulated" labels. Route times are estimates from the same constants; keep "estimated".
+- Two drei `<Html>` mounting in the 3D scene's first render: the first loses its content. Mount such tags a frame later (see `RouteOverlay.tsx`).
+- Focus/fit/follow/camera commands go through `useCommand` so a view switch doesn't replay them; the view itself crosses via `viewHandoff`.
 - The user commits each phase themselves unless they ask otherwise.
 
 ## Workflow rules
@@ -74,7 +74,7 @@ npm run data:build   # data/raw + data/manual → data/processed + data/metadata
 npm run data:validate  # validation only → data/metadata/validation_report.json
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection, height profile, 3D geometry, city and train-simulation tests (30)
+npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (36)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.
@@ -96,6 +96,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/phase5-3d-foundations.md` | Phase 5 summary: projection, height profile, 3D scene, alignment check |
 | `docs/phase6-3d-infrastructure.md` | Phase 6 summary: viaducts, tunnels, stations, LOD, continuity tests |
 | `docs/phase7-3d-look-trains-ui.md` | Phase 7 summary: OSM city, Kenney models, simulated trains, reference-style UI |
+| `docs/phase8-remaining-ui.md` | Phase 8 summary: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting |
 | `docs/ASSETS.md` | Every third-party 3D asset: source, licence, notes, rejected candidates |
 | `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |

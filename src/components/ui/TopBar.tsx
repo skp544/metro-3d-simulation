@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { WORK_IN_PROGRESS_SYSTEMS } from "../../constants/map";
 import type { Network } from "../../data/loadNetwork";
 import { useMapStore, type Speed } from "../../store/useMapStore";
 import { formatIst, useSimNow } from "../../store/useSimNow";
@@ -42,6 +43,11 @@ function StationSearch({ network }: { network: Network }) {
       .sort((a, b) => Number(!norm(a.properties.name).startsWith(k)) - Number(!norm(b.properties.name).startsWith(k)))
       .slice(0, 8);
   }, [q, network.stations]);
+  // Searching for a system that is not on the map yet says so instead of finding nothing.
+  const wip = useMemo(() => {
+    const k = norm(q);
+    return k.length < 3 ? [] : WORK_IN_PROGRESS_SYSTEMS.filter((w) => [w.name, ...w.keywords].some((n) => norm(n).includes(k)));
+  }, [q]);
 
   // "/" focuses the search, as in the reference.
   useEffect(() => {
@@ -72,7 +78,7 @@ function StationSearch({ network }: { network: Network }) {
       <input
         ref={input}
         role="combobox"
-        aria-expanded={open && results.length > 0}
+        aria-expanded={open && results.length + wip.length > 0}
         aria-controls="station-search-results"
         aria-label="Search stations"
         placeholder="Search stations, e.g. Rajiv Chowk or KG"
@@ -95,7 +101,7 @@ function StationSearch({ network }: { network: Network }) {
         className="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 pr-8 pl-8 text-xs text-slate-800 outline-none placeholder:text-slate-400 focus:border-slate-400 focus:bg-white"
       />
       <kbd className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 rounded border border-slate-200 px-1 text-[10px] text-slate-400">/</kbd>
-      {open && results.length > 0 && (
+      {open && results.length + wip.length > 0 && (
         <ul id="station-search-results" role="listbox" className="absolute top-full right-0 left-0 mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
           {results.map((f, i) => (
             <li key={f.properties.id} role="option" aria-selected={i === active}>
@@ -113,6 +119,12 @@ function StationSearch({ network }: { network: Network }) {
                 <span className="font-medium text-slate-800">{f.properties.name}</span>
                 {f.properties.refs[0] && <span className="ml-auto text-[10px] text-slate-400">{f.properties.refs[0]}</span>}
               </button>
+            </li>
+          ))}
+          {wip.map((w) => (
+            <li key={w.name} role="option" aria-selected={false} aria-disabled className="flex items-center gap-2 px-3 py-1.5 text-xs text-slate-500">
+              <span className="font-medium">{w.name}</span>
+              <span className="ml-auto rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">Work in progress · not on this map yet</span>
             </li>
           ))}
         </ul>

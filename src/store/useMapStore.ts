@@ -7,6 +7,13 @@ export type View = "2d" | "3d";
 export type Speed = 1 | 2 | 4 | 8;
 export type LabelMode = "trains" | "stations" | "all" | "off";
 export type CameraCommand = "zoomIn" | "zoomOut" | "network" | "hub";
+/** The view in 2D terms (centre + Leaflet zoom + viewport height): what both views write and read so a switch keeps the place. */
+export type SharedView = { center: LngLat; zoom: number; heightPx: number };
+/**
+ * Last view of whichever map is showing. Deliberately not store state: the 3D view writes it several times a
+ * second and nothing re-renders on it; a view reads it once, when it mounts. Null until a view has reported.
+ */
+export const viewHandoff: { current: SharedView | null } = { current: null };
 
 interface MapState {
   view: View;
@@ -23,6 +30,13 @@ interface MapState {
   selectedStationId: string | null;
   labels: LabelMode;
   camera: { command: CameraCommand; key: number } | null;
+  // Fit both views to a box ([south-west, north-east] as lng/lat), e.g. a planned route.
+  fit: { bounds: [LngLat, LngLat]; key: number } | null;
+  // 3D: keep the camera on this simulated train until the user pans or stops it.
+  follow: { trainId: string; key: number } | null;
+  // Route highlight between two stations (the start of the journey planner).
+  routeFrom: string | null;
+  routeTo: string | null;
   // Simulation clock: sim time = simAtBase + (now − realAtBase) × speed while playing.
   playing: boolean;
   speed: Speed;
@@ -33,6 +47,10 @@ interface MapState {
   toggleStationType: (t: StationType) => void;
   setLayer: (layer: "showStations" | "showConstruction" | "showValidation" | "showGround", on: boolean) => void;
   focusOn: (coordinates: LngLat) => void;
+  fitTo: (bounds: [LngLat, LngLat]) => void;
+  followTrain: (trainId: string | null) => void;
+  setRouteEnd: (end: "from" | "to", stationId: string | null) => void;
+  swapRoute: () => void;
   selectStation: (id: string | null) => void;
   setLabels: (mode: LabelMode) => void;
   cameraDo: (command: CameraCommand) => void;
@@ -46,6 +64,8 @@ const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x
 export const simSeconds = (s: Pick<MapState, "playing" | "speed" | "clock">, now = performance.now()) =>
   s.clock.simAtBase + (s.playing ? ((now - s.clock.realAtBase) / 1000) * s.speed : 0);
 
+const routeParam = (new URLSearchParams(location.search).get("route") ?? "").split(",").filter(Boolean);
+
 export const useMapStore = create<MapState>((set, get) => ({
   // ?view=3d opens (and links to) the 3D view; the #zoom/lat/lng hash belongs to the 2D map.
   view: new URLSearchParams(location.search).get("view") === "3d" ? "3d" : "2d",
@@ -53,7 +73,8 @@ export const useMapStore = create<MapState>((set, get) => ({
     const url = new URL(location.href);
     url.searchParams.set("view", view);
     history.replaceState(null, "", url);
-    set({ view });
+    // Following a train is 3D-only (the 2D map has no trains).
+    set({ view, ...(view === "2d" && { follow: null }) });
   },
   hiddenLines: [],
   hiddenTrackTypes: [],
@@ -66,6 +87,11 @@ export const useMapStore = create<MapState>((set, get) => ({
   selectedStationId: null,
   labels: "trains",
   camera: null,
+  fit: null,
+  follow: null,
+  // ?route=<fromStationId>,<toStationId> opens with a route highlighted (shareable; used for visual checks).
+  routeFrom: routeParam[0] ?? null,
+  routeTo: routeParam[1] ?? null,
   playing: true,
   speed: 1,
   // The simulation starts at the real current time ("LIVE"); trains follow a simulated pattern.
@@ -75,10 +101,18 @@ export const useMapStore = create<MapState>((set, get) => ({
   toggleTrackType: (t) => set((s) => ({ hiddenTrackTypes: toggle(s.hiddenTrackTypes, t) })),
   toggleStationType: (t) => set((s) => ({ hiddenStationTypes: toggle(s.hiddenStationTypes, t) })),
   setLayer: (layer, on) => set({ [layer]: on }),
-  focusOn: (coordinates) => set((s) => ({ focus: { coordinates, key: (s.focus?.key ?? 0) + 1 } })),
+  // Moving the view somewhere else ends a train follow.
+  focusOn: (coordinates) => set((s) => ({ focus: { coordinates, key: (s.focus?.key ?? 0) + 1 }, follow: null })),
+  fitTo: (bounds) => set((s) => ({ fit: { bounds, key: (s.fit?.key ?? 0) + 1 }, follow: null })),
+  followTrain: (trainId) => set((s) => ({ follow: trainId ? { trainId, key: (s.follow?.key ?? 0) + 1 } : null })),
+  setRouteEnd: (end, stationId) => set(end === "from" ? { routeFrom: stationId } : { routeTo: stationId }),
+  swapRoute: () => set((s) => ({ routeFrom: s.routeTo, routeTo: s.routeFrom })),
+
   selectStation: (id) => set({ selectedStationId: id }),
   setLabels: (labels) => set({ labels }),
-  cameraDo: (command) => set((s) => ({ camera: { command, key: (s.camera?.key ?? 0) + 1 } })),
+  // Zooming keeps a follow going; jumping to the hub or the whole network ends it.
+  cameraDo: (command) =>
+    set((s) => ({ camera: { command, key: (s.camera?.key ?? 0) + 1 }, ...((command === "hub" || command === "network") && { follow: null }) })),
   // Re-base the clock on every change so simulated time stays continuous.
   setSpeed: (speed) => set({ speed, clock: { simAtBase: simSeconds(get()), realAtBase: performance.now() } }),
   togglePlay: () => set((s) => ({ playing: !s.playing, clock: { simAtBase: simSeconds(s), realAtBase: performance.now() } })),

@@ -4,10 +4,13 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { LOD_METRES_PER_PIXEL, PALETTE } from "../../constants/scene";
 import type { Network } from "../../data/loadNetwork";
-import { useMapStore } from "../../store/useMapStore";
+import { useJourney } from "../../store/useJourney";
+import { useMapStore, viewHandoff } from "../../store/useMapStore";
+import { distanceForMetresPerPixel, metresPerPixel } from "../../utils/projection";
 import type { Service } from "../../utils/trainSim";
 import { City } from "./City";
 import { buildScene3D } from "./geometry";
+import { RouteOverlay } from "./RouteOverlay";
 import { CameraRig, StationLabels, Sun, type View3D } from "./SceneRig";
 import { StationPoints } from "./StationPoints";
 // Explicit .tsx: on case-insensitive disks "./Structures" once matched the old structures.ts.
@@ -31,12 +34,15 @@ function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
 
 // Isometric-style viewing direction of the reference: from the south-east, about 35° down.
 const HUB_OFFSET = new THREE.Vector3(390, 360, 450); // ≈ 700 m from the hub
+const FOV = 40; // vertical, degrees
+const MIN_DISTANCE_M = 40;
 
 export function MetroScene({ network, service }: { network: Network; service: Service }) {
   const scene = useMemo(() => buildScene3D(network), [network]);
   const colors = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties.color])), [network.lines]);
   const names = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
   const showGround = useMapStore((s) => s.showGround);
+  const journey = useJourney(network);
   const [near, setNear] = useState(false);
   // Close up, the opaque ground hides tunnels; keep underground routes readable as dashed lines on the
   // surface, like a map overlay (the brief: "make underground routes visually understandable").
@@ -59,9 +65,17 @@ export function MetroScene({ network, service }: { network: Network; service: Se
     };
   }, [network.stations, scene, minX, maxX, minZ, maxZ, size]);
 
-  // Start view: ?at=lat,lng,distance aims at a place; ?cam=top looks straight down (to compare with 2D);
-  // ?cam=network shows everything; otherwise the hub, close up like the reference.
+  // Start view: the 2D map's last view when switching from it (same centre and scale, seen from the
+  // reference's angle); else ?at=lat,lng,distance aims at a place; ?cam=top looks straight down (to compare
+  // with 2D); ?cam=network shows everything; otherwise the hub, close up like the reference.
   const start = useMemo(() => {
+    const handoff = viewHandoff.current;
+    if (handoff) {
+      const [x, z] = scene.projection.project(handoff.center);
+      const target = new THREE.Vector3(x, 0, z);
+      const d = distanceForMetresPerPixel(metresPerPixel(handoff.center[1], handoff.zoom), FOV, handoff.heightPx);
+      return { target, position: target.clone().add(HUB_OFFSET.clone().setLength(Math.min(Math.max(d, MIN_DISTANCE_M), size * 3))) };
+    }
     const params = new URLSearchParams(location.search);
     const at = params.get("at")?.split(",").map(Number);
     if (at?.length === 3 && at.every(Number.isFinite)) {
@@ -78,7 +92,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
       <Canvas
         shadows
         flat // no tone mapping: palette colours render as specified, like the reference's flat look
-        camera={{ position: start.position.toArray(), fov: 40, near: 1, far: size * 6 }}
+        camera={{ position: start.position.toArray(), fov: FOV, near: 1, far: size * 6 }}
         // Log depth keeps deck, guideway, roads and ground apart from 1 m to 400 km away.
         gl={{ logarithmicDepthBuffer: true }}
         dpr={[1, 2]}
@@ -87,8 +101,8 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         <color attach="background" args={[PALETTE.background]} />
         <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, 1.15]} />
         <Sun />
-        <MapControls makeDefault target={start.target.toArray()} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={40} maxDistance={size * 3} />
-        <CameraRig projection={scene.projection} hub={views.hub} network={views.network} />
+        <MapControls makeDefault target={start.target.toArray()} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
+        <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
         <LodWatcher onChange={setNear} />
         {showGround && (
           <mesh rotation-x={-Math.PI / 2} position={[(minX + maxX) / 2, 0, (minZ + maxZ) / 2]} receiveShadow>
@@ -104,6 +118,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
           <Trains scene={scene} service={service} colors={colors} stationNames={names} near={near} />
         </Suspense>
         <StationLabels stations={scene.stations} names={names} near={near} />
+        {journey && <RouteOverlay journey={journey} paths={scene.paths} stations={scene.stations} colors={colors} names={names} />}
         {!near && <TrackLines runs={scene.runs} colors={colors} />}
         {near && showGround && <TrackLines runs={surfaceRuns} colors={colors} dashSize={14} gapSize={10} />}
         {!near && <StationPoints stations={scene.stations} colors={colors} />}

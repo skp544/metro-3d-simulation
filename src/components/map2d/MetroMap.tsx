@@ -4,8 +4,10 @@ import "leaflet/dist/leaflet.css";
 import { LayersControl, MapContainer, Pane, TileLayer, useMap, ZoomControl } from "react-leaflet";
 import { BASE_LAYERS, DATA_ATTRIBUTION } from "../../constants/map";
 import type { Network } from "../../data/loadNetwork";
-import { useMapStore } from "../../store/useMapStore";
+import { useCommand } from "../../store/useCommand";
+import { useMapStore, viewHandoff } from "../../store/useMapStore";
 import { ConstructionLayer } from "./ConstructionLayer";
+import { RouteLayer } from "./RouteLayer";
 import { SegmentLayer } from "./SegmentLayer";
 import { StationLayer } from "./StationLayer";
 import { ValidationLayer } from "./ValidationLayer";
@@ -19,23 +21,31 @@ function DataAttribution() {
   return null;
 }
 
-function FocusHandler() {
+// Station search, list clicks and route fits; each runs once (not again when the view remounts).
+function CommandHandler() {
   const map = useMap();
   const focus = useMapStore((s) => s.focus);
-  useEffect(() => {
-    if (focus) map.flyTo([focus.coordinates[1], focus.coordinates[0]], Math.max(map.getZoom(), 16));
-  }, [map, focus]);
+  const fit = useMapStore((s) => s.fit);
+  useCommand("focus", focus?.key, true, () => map.flyTo([focus!.coordinates[1], focus!.coordinates[0]], Math.max(map.getZoom(), 16)));
+  useCommand("fit", fit?.key, true, () => {
+    const [[w, s], [e, n]] = fit!.bounds;
+    const wide = window.innerWidth >= 768;
+    map.flyToBounds([[s, w], [n, e]], { paddingTopLeft: [wide ? 320 : 16, 16], paddingBottomRight: [wide ? 340 : 16, 140] });
+  });
   return null;
 }
 
-// Keeps the view in the URL (#zoom/lat/lng) so a review spot can be shared or reopened.
-function HashView() {
+// Keeps the view in the URL (#zoom/lat/lng) so a review spot can be shared or reopened, and hands it to
+// the 3D view for the 2D/3D switch.
+function ViewReporter() {
   const map = useMap();
   useEffect(() => {
     const write = () => {
       const c = map.getCenter();
       history.replaceState(null, "", `#${map.getZoom()}/${c.lat.toFixed(5)}/${c.lng.toFixed(5)}`);
+      viewHandoff.current = { center: [c.lng, c.lat], zoom: map.getZoom(), heightPx: map.getSize().y };
     };
+    write();
     map.on("moveend", write);
     return () => void map.off("moveend", write);
   }, [map]);
@@ -48,9 +58,13 @@ const viewFromHash = () => {
 };
 
 export function MetroMap({ network }: { network: Network }) {
-  // Initial view: the URL hash if present, else fit the network itself (no hardcoded centre).
+  // Initial view: the 3D view's last view when switching from it (same centre, nearest whole zoom), else the
+  // URL hash if present, else fit the network itself (no hardcoded centre).
   const bounds = useMemo(() => L.geoJSON(network.lines).getBounds(), [network.lines]);
-  const initial = useMemo(() => viewFromHash(), []);
+  const initial = useMemo(() => {
+    const h = viewHandoff.current;
+    return h ? { zoom: Math.round(h.zoom), center: [h.center[1], h.center[0]] as [number, number] } : viewFromHash();
+  }, []);
   // ?base=Satellite opens a review link straight on imagery.
   const base = new URLSearchParams(location.search).get("base") ?? BASE_LAYERS[0].name;
   // On desktop the control panel covers the left ~300 px, so fit the network beside it.
@@ -73,6 +87,9 @@ export function MetroMap({ network }: { network: Network }) {
       <Pane name="track" style={{ zIndex: 400 }}>
         <SegmentLayer network={network} />
       </Pane>
+      <Pane name="route" style={{ zIndex: 420 }}>
+        <RouteLayer network={network} />
+      </Pane>
       <Pane name="stations" style={{ zIndex: 450 }}>
         <StationLayer network={network} />
       </Pane>
@@ -80,8 +97,8 @@ export function MetroMap({ network }: { network: Network }) {
         <ValidationLayer network={network} />
       </Pane>
       <DataAttribution />
-      <FocusHandler />
-      <HashView />
+      <CommandHandler />
+      <ViewReporter />
     </MapContainer>
   );
 }

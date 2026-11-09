@@ -39,3 +39,19 @@ export function boundsCentre(fc: { features: { geometry: { coordinates: unknown 
   fc.features.forEach((f) => visit(f.geometry.coordinates));
   return [(minX + maxX) / 2, (minY + maxY) / 2];
 }
+
+// Scale shared by the 2D map and the 3D camera (the 2D/3D view handoff). Leaflet uses 256-px Web Mercator
+// tiles, so the ground size of one CSS pixel at a latitude and zoom is the equator length × cos(lat) / (256 · 2^zoom).
+const EQUATOR_M = 2 * Math.PI * R;
+
+/** Ground metres per CSS pixel on the 2D map at this latitude and (fractional) zoom. */
+export const metresPerPixel = (lat: number, zoom: number) => (EQUATOR_M * Math.cos(lat * RAD)) / (256 * 2 ** zoom);
+
+/** The 2D zoom at which one CSS pixel covers `mpp` ground metres at this latitude. */
+export const zoomForMetresPerPixel = (lat: number, mpp: number) => Math.log2((EQUATOR_M * Math.cos(lat * RAD)) / (256 * mpp));
+
+/** Distance from a perspective camera (vertical `fovDeg`, viewport `heightPx`) at which its target shows `mpp` metres per pixel. */
+export const distanceForMetresPerPixel = (mpp: number, fovDeg: number, heightPx: number) => (mpp * heightPx) / (2 * Math.tan((fovDeg * RAD) / 2));
+
+/** Metres per pixel at the target of a perspective camera `distance` away. */
+export const metresPerPixelAtDistance = (distance: number, fovDeg: number, heightPx: number) => (2 * distance * Math.tan((fovDeg * RAD) / 2)) / heightPx;

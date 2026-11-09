@@ -157,6 +157,15 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | Look | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale | ✅ Phase 7 |
 | Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
 
+## Routes and the 2D/3D handoff (Phase 8)
+
+| Part | Approach |
+|---|---|
+| Route planner | `src/utils/routePlanner.ts`: nodes are (station, route) pairs; ride edges join consecutive stops of a route in both directions; change edges join a station's routes. Dijkstra on estimated time (DECISIONS #53). A journey is a list of legs, each with its stations, the real segment ids (2D) and km spans along the route path (3D) |
+| Highlight | 2D `RouteLayer` (own pane between track and stations) draws the legs' segments cased in white and dims the rest; 3D `RouteOverlay` slices `RoutePath3D` by the km spans and draws a cased line without depth test |
+| View handoff | `viewHandoff` (in `useMapStore.ts`, not reactive state) holds centre + zoom + viewport height. The 2D map writes it on every move; the 3D `CameraRig` writes it 2–3 times a second via `metresPerPixelAtDistance` → `zoomForMetresPerPixel`. A view reads it once on mount (`metresPerPixel` → `distanceForMetresPerPixel` for 3D) |
+| Train follow | `follow` in the store; `CameraRig` recomputes the train's position with `service.stateAt` + `pointAt` each frame and translates camera and target together |
+
 ## Roadmap
 
 | Phase | Deliverable | Exit criteria | Status |
@@ -168,5 +177,5 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | ✅ Done (continuity tested; FPS not measured on a real GPU) |
 | 7 | 3D look, city, trains and UI (user-expanded) | ≥ 50 trains; looks like ref_image.png | ✅ Done: 218 simulated trains; real-GPU fps not measured |
-| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | — | Most of the UI was done in Phase 7 |
+| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | All four work in both views where they apply | ✅ Done (36 tests); real-GPU fps still not measured |
 | 9 | Journey planner | — | Future |

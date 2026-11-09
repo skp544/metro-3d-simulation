@@ -31,7 +31,8 @@ export function SceneControls() {
           </svg>
         </button>
       </div>
-      <div className="rounded-xl border border-slate-200 bg-white/95 p-2 shadow-lg">
+      {/* Hidden on phones, where it would cover the left-hand cards. */}
+      <div className="hidden rounded-xl border border-slate-200 bg-white/95 p-2 shadow-lg sm:block">
         <div className="mb-1 text-[11px] text-slate-500">Labels</div>
         <div className="flex gap-0.5" role="radiogroup" aria-label="Labels">
           {LABELS.map((l) => (

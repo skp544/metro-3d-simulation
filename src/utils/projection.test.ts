@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { distance } from "@turf/turf";
-import { boundsCentre, createProjection } from "./projection.ts";
+import { boundsCentre, createProjection, distanceForMetresPerPixel, metresPerPixel, metresPerPixelAtDistance, zoomForMetresPerPixel } from "./projection.ts";
 import { heightProfile } from "./trackProfile.ts";
 
 const stations = JSON.parse(await readFile("data/processed/metro_stations.geojson", "utf8")).features as {
@@ -74,4 +74,19 @@ test("height profile: a short tunnel between at-grade runs is a shallow underpas
     0.4,
   );
   assert.ok(h(1.024) < 0 && h(1.024) > -1, `48 m of 800 m → ${h(1.024).toFixed(2)} m`);
+});
+
+test("2D zoom ↔ 3D camera distance round-trips and matches Leaflet's scale", () => {
+  // Leaflet's documented scale: ~156,543 m per pixel at zoom 0 on the equator.
+  assert.ok(Math.abs(metresPerPixel(0, 0) - 156543.03) < 0.01);
+  const lat = proj.origin[1];
+  for (const zoom of [10, 12.5, 16, 19]) {
+    const mpp = metresPerPixel(lat, zoom);
+    assert.ok(Math.abs(zoomForMetresPerPixel(lat, mpp) - zoom) < 1e-9);
+    const d = distanceForMetresPerPixel(mpp, 40, 900);
+    assert.ok(Math.abs(metresPerPixelAtDistance(d, 40, 900) - mpp) < 1e-9);
+  }
+  // Zoom 16 in Delhi ≈ 2.1 m per pixel: a 900-px-tall 40° view sits ≈ 2.6 km away.
+  const d16 = distanceForMetresPerPixel(metresPerPixel(lat, 16), 40, 900);
+  assert.ok(d16 > 2000 && d16 < 3200, `${d16.toFixed(0)} m`);
 });

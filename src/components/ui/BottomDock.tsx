@@ -52,7 +52,8 @@ export function BottomDock({ network, service }: { network: Network; service: Se
 
 function TrainList({ network, service }: { network: Network; service: Service }) {
   const now = useSimNow(1000);
-  const { hiddenLines, focusOn } = useMapStore();
+  const { hiddenLines, focusOn, followTrain, view } = useMapStore();
+  const following = useMapStore((s) => s.follow?.trainId);
   const lines = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties])), [network.lines]);
   const names = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
   const routes = useMemo(() => new Map(network.routes.features.map((f) => [f.properties.id, f])), [network.routes]);
@@ -65,11 +66,15 @@ function TrainList({ network, service }: { network: Network; service: Service })
           <tr
             key={s.train.id}
             onClick={() => {
+              // 3D: follow the train. 2D (no trains drawn): fly once to where it is.
+              if (view === "3d") return followTrain(s.train.id);
               // The route geometry starts before its first stop; stopKm[0] is that offset.
               const route = routes.get(s.train.routeId)!;
               focusOn(along(route, s.km + route.properties.stopKm[0], { units: "kilometers" }).geometry.coordinates as [number, number]);
             }}
-            className="cursor-pointer border-b border-slate-50 hover:bg-slate-50"
+            title={view === "3d" ? "Follow this train" : "Show where this train is"}
+            aria-selected={following === s.train.id}
+            className={`cursor-pointer border-b border-slate-50 ${following === s.train.id ? "bg-blue-50" : "hover:bg-slate-50"}`}
           >
             <td className="py-1.5 pl-4 font-semibold whitespace-nowrap text-slate-900">{s.train.id}</td>
             <td className="py-1.5">

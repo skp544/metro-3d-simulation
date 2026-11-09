@@ -2,6 +2,20 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-09: Phase 8 (remaining UI)
+
+The user said "start Phase 8" (2026-11-09). The four agreed items were done in order, smallest first.
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 50 | "Work in progress" systems (DECISIONS #1) | Rapid Metro Gurugram, Noida Metro Aqua Line and Namo Bharat (RapidX) appear as names only: a disabled "Other systems" section in the layer panel, and a "work in progress · not on this map yet" row when a search matches them. No stations, geometry or colours | Shows the scope honestly without inventing data |
+| 51 | Following a train | 3D only (the 2D map draws no trains). A train-list row or a train's 3D tag starts it; the camera flies in to 420 m and then moves with the train, while orbit and zoom keep working. It ends on a pan (target moved > 3 m off the train), Esc, "Stop", the hub/network buttons, a search or list jump, hiding the train's line, or switching to 2D. In 2D a train row still flies once to the train | Follows without taking the camera away from the user |
+| 52 | Route between two stations | Picked from the station panel ("Route from here" / "Route to here"), or `?route=<fromId>,<toId>`. Highlighted on both maps (2D: cased real segments, the rest dimmed; 3D: cased line drawn over everything, From/To tags) and listed by leg in a route card; both views fit to the route | First step to the Phase 9 journey planner, on the real segments |
+| 53 | Route cost (nominal) | Graph node = (station, route). Ride edges between consecutive stops, both ways, cost = run time at the simulation's 45 km/h + a 30 s dwell; a change of trains costs 5 min (2 min walk + half the 6-min headway). Changing between a line's branches (Yamuna Bank, Ashok Park Main) counts as a change. Labelled "estimated … not a DMRC timetable or fare route" | No open DMRC timetable or transfer times; reuse the simulation's nominal constants so everything agrees |
+| 54 | 2D/3D view handoff | Each view reports its centre and scale (metres per pixel at the centre, written as a Leaflet zoom) through `src/utils/projection.ts`; the other view opens there. 2D → 3D keeps the reference's oblique angle; 3D → 2D rounds to the nearest whole zoom (Leaflet `zoomSnap` 1). URL start parameters (`?at`, `?cam`, the 2D hash) only apply on first load | Same place and size on screen in both views; no second camera model |
+| 55 | Commands across views | A focus, fit, follow or camera command runs once, by whichever view is showing (`useCommand`). Before, remounting a view replayed the last search jump over the carried view | Needed for #54; a bug found while building it |
+| 56 | Phones | The 3D "Labels" card is hidden below 640 px (it covered the left cards); the follow card sits above the train list there | Layout check at 390 × 844 |
+
 ## 2026-11-09: Phase 7 (3D look, city, trains and UI)
 
 The user asked for the 3D view to look like `ref_image.png`, with real 3D models found first. Their answers on 2026-11-04: **real OSM surroundings, drawn low-poly**, and **moving trains with labels plus the reference-style UI** (bringing Phase 8 work forward).

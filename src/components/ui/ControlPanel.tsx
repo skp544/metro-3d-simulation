@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { STATION_TYPE_LABEL, TRACK_ORDER, TRACK_STYLE } from "../../constants/map";
+import { STATION_TYPE_LABEL, TRACK_ORDER, TRACK_STYLE, WORK_IN_PROGRESS_SYSTEMS } from "../../constants/map";
 import type { Network } from "../../data/loadNetwork";
 import type { InfraType, StationType } from "../../data/types";
 import { useMapStore } from "../../store/useMapStore";
@@ -62,6 +62,16 @@ export function ControlPanel({ network }: { network: Network }) {
                 <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: l.color }} />
                 {l.name}
               </Row>
+            ))}
+          </Section>
+
+          <Section title="Other systems">
+            {WORK_IN_PROGRESS_SYSTEMS.map((w) => (
+              <div key={w.name} className="flex items-center gap-2 px-1 py-1 text-xs text-slate-400" aria-disabled>
+                <input type="checkbox" disabled className="opacity-50" aria-label={`${w.name} (work in progress)`} />
+                <span className="min-w-0 flex-1">{w.name}</span>
+                <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">Work in progress</span>
+              </div>
             ))}
           </Section>
 
