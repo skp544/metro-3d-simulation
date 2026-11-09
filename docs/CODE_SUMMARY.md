@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-04 · **Phase:** 6 done (3D infrastructure), 7 not started. Phase 4's human imagery review is still pending
+**Last updated:** 2026-11-09 · **Phase:** 7 done (3D look, OSM city, simulated trains, reference-style UI), 8 not started. Phase 4's human imagery review is still pending
 
 ## Data pipeline
 
@@ -45,26 +45,33 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 - 1 unknown type: Rohini East (OSM `tunnel=building_passage`).
 - 25 stations have no DMRC code in OSM, so they use `stn_osm_*` IDs.
 
+## City context (3D only)
+
+| Path | What it does |
+|---|---|
+| `scripts/fetch-osm-city.ts` | Overpass: buildings, green areas and roads within 300 m of every DMRC station → `data/raw/osm-city/<date>.json` (snapshot 2026-11-04, 43,422 elements) |
+| `scripts/build-city.ts` | → `data/processed/city_{buildings,roads,green,trees}.geojson` + `data/metadata/city_report.json`: 25,197 buildings (175 with an OSM height, 1,697 from storeys, 23,325 nominal), 12,832 road pieces (service roads dropped), 860 green areas, 11,781 trees inside them. 12.3 MB raw / 1.45 MB gzipped |
+
 ## App
 
 | Path | State |
 |---|---|
-| `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network; renders the 2D map or the lazy-loaded 3D scene, the panels and the view toggle; loading and error states |
-| `src/data/loadNetwork.ts` | Fetches the 6 GeoJSON files, the validation report and sources (Vite `?url` from `data/`) |
-| `src/store/useMapStore.ts` | zustand: view (`2d`/`3d`, synced to `?view=`), hidden lines, track types and station types; layer toggles (incl. 3D ground); fly-to focus |
-| `src/constants/map.ts` | Base layers, attribution, track styles, severity colours |
-| `src/constants/scene.ts` | Nominal track heights, ramp length, vertical exaggeration, `STRUCTURE` sizes, LOD threshold, 3D colours |
-| `src/components/map2d/` | `MetroMap` (panes, base layers, URL hash, `?base=`), `SegmentLayer`, `StationLayer` (+ popup), `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `geometry.ts` (`buildScene3D`: type runs, continuous route paths, platforms on the track with heading), `buildStructures.ts` (pure: `extrudeRect`, `spansWhere`, `pillarMatrices`, `boxMatrix`, `buildStructures`), `Structures` (deck, pillars, tunnels, ribbon, station boxes), `MetroScene` (canvas, lights, log depth, ground toggle, LOD switch, `?cam=top`, `?at=`), `TrackLines` + `StationPoints` (far view) |
-| `src/components/scene3d/*.test.ts` | `buildStructures.test.ts` (5 builder tests), `geometry.test.ts` (4 network tests: continuity and max grade, platforms on track, platform levels, structure budget) |
-| `src/components/ui/` | `ControlPanel` (line, track-type, station-type and layer filters; 2D-only layers hidden in 3D), `ValidationPanel` (2D only), `ViewToggle` |
-| `src/utils/projection.ts` | Web Mercator → metres from the network centre; `createProjection`, `boundsCentre` |
-| `src/utils/trackProfile.ts` | `heightProfile`: nominal level per run with ramps |
-| `src/utils/projection.test.ts` | 6 tests: origin, round-trip, scale ≤ 0.5%, axes, height profile, short-run underpass |
+| `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network and builds the simulated service; top bar + 2D map or lazy 3D scene + floating cards (KPIs, layers, station panel, 3D controls, bottom dock) |
+| `src/data/loadNetwork.ts`, `src/data/loadCity.ts` | Fetch the network GeoJSON + reports; the city GeoJSON (3D only) |
+| `src/store/useMapStore.ts` | zustand: view, filters, layers (incl. X-ray ground), selected station, label mode, camera commands, simulation clock (play/pause, ×1/×2/×4/×8) |
+| `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
+| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (218 trains), `stateAt`, `nextArrivals` |
+| `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; nominal height profile with ramps |
+| `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles; 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
+| `src/components/map2d/` | `MetroMap`, `SegmentLayer`, `StationLayer` (click → station panel), `ValidationLayer`, `ConstructionLayer` |
+| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/zoom/views, `Sun`, `StationLabels`), `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (clickable station boxes), `Trains` (Kenney cars, stripe per line, labels, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
+| `src/components/ui/` | `TopBar` (search, `ViewToggle`, speed, LIVE clock), `KpiCards`, `ControlPanel`, `StationPanel`, `BottomDock` (Trains / Stations / `ValidationList`), `SceneControls` |
+| `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
+| Tests | 30: validator (10), projection + profile (6), structures (5), network geometry (4), city (1), train simulation (4) |
 
-Build: 2D bundle 399 KB JS (122 KB gzip); 3D chunk 968 KB (258 KB gzip), loaded only when the 3D view opens. Data loaded at runtime as separate assets. `npm test` runs 25 tests.
+Build: 2D bundle 420 KB JS (128 KB gzip); 3D chunk 1.06 MB (286 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
-3D scene: about 151k triangles; 8,487 pillars and 271 station boxes (200 above ground, 71 below), instanced; about 7 draw calls for the structures.
+3D scene: city ≈ 473k triangles in 107 chunks; structures ≈ 151k; trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
 
 ## Dependencies
 

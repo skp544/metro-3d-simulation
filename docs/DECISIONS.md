@@ -2,6 +2,22 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-09: Phase 7 (3D look, city, trains and UI)
+
+The user asked for the 3D view to look like `ref_image.png`, with real 3D models found first. Their answers on 2026-11-04: **real OSM surroundings, drawn low-poly**, and **moving trains with labels plus the reference-style UI** (bringing Phase 8 work forward).
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 41 | City around the stations (user) | Real OSM buildings, roads and green areas within 300 m of every station, extruded low-poly. Height = OSM `height`, else `building:levels` × 3.2 m, else nominal by type ±25% (flagged `heightSource: nominal`). Trees only inside real OSM green areas | Keeps the "never invent geography" rule while matching the reference's look |
+| 42 | True vertical scale (revises #29 and the vertical part of #37) | `VERTICAL_EXAGGERATION` = 1 | Real-proportioned trains, trees and buildings would look flattened next to ×4 structures |
+| 43 | 3D models | Kenney **Train Kit** (subway cars) and **Nature Kit** (trees), CC0 (docs/ASSETS.md). Rejected: Sketchfab "Riyadh Metro" (3.85M faces), Sketchfab "Subway Metro Train Concept" (Standard paid licence, not downloadable, 2.1M faces); no Delhi Metro model exists on Sketchfab | Licence-clean, ~1.5k triangles per car, and matches the reference's low-poly style |
+| 44 | DMRC train look | Stainless Kenney car with its stripe palette cell repainted per line; 6 cars (cab · b · c · b · c · reversed cab) scaled to 21.6 × 3.2 × 3.9 m; left-hand running | Close to real DMRC rolling stock (stainless body, line-coloured band) |
+| 45 | Simulated service (user: moving trains) | Deterministic pattern: 45 km/h, 30 s dwell, 3 min at termini, a train every 6 min per direction → 218 trains, ~34 km/h average. Labelled "simulated" everywhere | No open DMRC timetable or live positions exist |
+| 46 | Reference-style UI (user) | Top bar (search with `/`, 2D/3D, play/pause ×1/×2/×4/×8, LIVE IST clock), KPI cards, collapsible layer panel, right station panel with simulated next trains, bottom dock (Trains / Stations / Validation), 3D zoom/view/label controls. The 2D popup is replaced by the same station panel; the validation card moves into the dock | One consistent UI across 2D and 3D, matching ref_image.png |
+| 47 | Underground in the realistic view | Opaque ground; underground routes drawn as dashed surface lines close up; "X-ray" (ground off) shows tunnels, underground boxes and trains | Opaque ground matches the reference; the brief requires underground routes to stay understandable |
+| 48 | Default 3D view | ~700 m from the station with the most lines (Kashmere Gate), from the south-east; `?cam=network` for the whole network | The reference is a close-up of one hub; the hub comes from the data |
+| 49 | City data size | ~12 MB of GeoJSON (≈1.5 MB gzipped), loaded only by the 3D view; service roads dropped; coordinates at 5 decimals (`shortcut:` tiling if it grows) | Acceptable on a compressed host; tiling is the upgrade path |
+
 ## 2026-11-04: Phase 6 (3D infrastructure)
 
 | # | Topic | Decision | Reason |

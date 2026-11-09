@@ -5,17 +5,19 @@ import { PALETTE } from "../../constants/scene.ts";
 
 type LngLat = [number, number];
 type XZ = [number, number];
+// GeoJSON positions are number[]; build-city.ts always writes [lng, lat].
+type Pos = number[];
 interface CityInput {
-  buildings: { features: { geometry: { coordinates: LngLat[][] }; properties: { height: number } }[] };
-  roads: { features: { geometry: { coordinates: LngLat[] }; properties: { width: number } }[] };
-  green: { features: { geometry: { coordinates: LngLat[][] } }[] };
-  trees: { features: { geometry: { coordinates: LngLat }; properties: { variant: number } }[] };
+  buildings: { features: { geometry: { coordinates: Pos[][] }; properties: { height: number } }[] };
+  roads: { features: { geometry: { coordinates: Pos[] }; properties: { width: number } }[] };
+  green: { features: { geometry: { coordinates: Pos[][] } }[] };
+  trees: { features: { geometry: { coordinates: Pos }; properties: { variant: number } }[] };
 }
 
 const CHUNK_M = 3000;
 const ROAD_Y = 0.3; // above the ground, under nothing else
 const GREEN_Y = 0.15;
-const TREE_HEIGHT_SCALE = 4.8; // Kenney trees are ~1.7 units tall → ≈ 8 m
+const TREE_HEIGHT_SCALE = 7; // Kenney trees are ~1.7 units tall → ≈ 12 m, typical of Delhi park trees
 
 type Acc = { pos: number[]; col: number[] };
 const newAcc = (): Acc => ({ pos: [], col: [] });
@@ -46,7 +48,8 @@ function toGeometry(acc: Acc) {
   return g;
 }
 
-export function buildCity(city: CityInput, project: (p: LngLat) => XZ) {
+export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ) {
+  const project = (p: Pos) => projectLngLat(p as LngLat);
   const chunks = new Map<string, { buildings: Acc; roads: Acc; green: Acc }>();
   const chunk = ([x, z]: XZ) => {
     const key = `${Math.floor(x / CHUNK_M)},${Math.floor(z / CHUNK_M)}`;

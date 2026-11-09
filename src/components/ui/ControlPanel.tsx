@@ -6,8 +6,10 @@ import { useMapStore } from "../../store/useMapStore";
 
 const STATION_TYPES: StationType[] = ["elevated", "underground", "mixed", "at_grade", "unknown"];
 
+// Layer and filter card; MapPage positions it in the left column under the KPI cards.
 export function ControlPanel({ network }: { network: Network }) {
-  const [open, setOpen] = useState(() => window.innerWidth >= 768);
+  // Starts collapsed so the map stays in view; "Layers" opens it.
+  const [open, setOpen] = useState(false);
   const s = useMapStore();
 
   const counts = useMemo(() => {
@@ -22,12 +24,12 @@ export function ControlPanel({ network }: { network: Network }) {
   const lineIds = network.lines.features.map((f) => f.properties.id);
 
   return (
-    <aside className="pointer-events-auto absolute top-3 left-3 z-[1000] w-[calc(100%-1.5rem)] max-w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-lg backdrop-blur">
-      <header className="flex items-center justify-between gap-2 px-4 py-3">
+    <aside className="pointer-events-auto w-full max-w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-lg backdrop-blur">
+      <header className="flex items-center justify-between gap-2 px-4 py-2.5">
         <div>
-          <h1 className="text-sm font-semibold text-slate-900">Delhi Metro</h1>
+          <h2 className="text-sm font-semibold text-slate-900">Layers &amp; filters</h2>
           <p className="text-[11px] text-slate-500">
-            DMRC network · {network.stations.features.length} stations · OSM {network.osmSnapshot.slice(0, 10)}
+            {network.lines.features.length} lines · OSM {network.osmSnapshot.slice(0, 10)}
           </p>
         </div>
         <button
@@ -42,7 +44,7 @@ export function ControlPanel({ network }: { network: Network }) {
       </header>
 
       {open && (
-        <div id="control-panel-body" className="max-h-[calc(100dvh-7rem)] space-y-4 overflow-y-auto border-t border-slate-100 px-4 py-3">
+        <div id="control-panel-body" className="max-h-[calc(100dvh-19rem)] space-y-4 overflow-y-auto border-t border-slate-100 px-4 py-3">
           <Section
             title="Lines"
             action={
@@ -88,7 +90,7 @@ export function ControlPanel({ network }: { network: Network }) {
             </Row>
             {s.view === "3d" && (
               <Row checked={s.showGround} onChange={(v) => s.setLayer("showGround", v)}>
-                Ground (hide to see tunnels)
+                X-ray: hide ground, show tunnels
               </Row>
             )}
             {/* shortcut: these two layers exist only on the 2D map; add them to the 3D scene in a later phase. */}

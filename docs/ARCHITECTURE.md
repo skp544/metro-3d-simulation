@@ -152,7 +152,9 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | Viaduct and pillars | Deck (11 m wide) extruded wherever the track is above +2 m, ramps included. `InstancedMesh` pillars every 30 m, from the ground to under the deck | ✅ Phase 6 |
 | Tunnel | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it | ✅ Phase 6 |
 | Stations | One box per platform (180 m long), centred on the track at the stop and oriented along it. Above ground: white tinted by line; below: translucent slate. Instanced | ✅ Phase 6 |
-| Trains | One GLB (Draco/Meshopt), instanced; position and tangent from the route path | Phase 7 |
+| Trains | Kenney subway cars merged per car type, instanced per line (27 instanced meshes); stripe recoloured per line; positions from `trainSim` along the route path each frame, left-hand running; far away one dot per train | ✅ Phase 7 |
+| City | Real OSM buildings, roads and green areas (`scripts/build-city.ts`), merged into 3 km chunks (`buildCity.ts`); Kenney trees instanced inside green areas | ✅ Phase 7 |
+| Look | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale | ✅ Phase 7 |
 | Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
 
 ## Roadmap
@@ -165,6 +167,6 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | 4 | Leaflet 2D map | Every line reviewed against satellite imagery | ✅ Built; 4 conflict stations checked; full human review pending |
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | ✅ Done (continuity tested; FPS not measured on a real GPU) |
-| 7 | Trains | ≥ 50 trains at 60 fps | — |
-| 8 | UI (toggle, search, panels, work-in-progress entries) | — | — |
+| 7 | 3D look, city, trains and UI (user-expanded) | ≥ 50 trains; looks like ref_image.png | ✅ Done: 218 simulated trains; real-GPU fps not measured |
+| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | — | Most of the UI was done in Phase 7 |
 | 9 | Journey planner | — | Future |

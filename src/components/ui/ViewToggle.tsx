@@ -11,7 +11,7 @@ export function ViewToggle() {
     <div
       role="radiogroup"
       aria-label="View"
-      className="pointer-events-auto absolute top-3 left-1/2 z-[1000] flex -translate-x-1/2 rounded-full border border-slate-200 bg-white/95 p-1 shadow-lg backdrop-blur max-md:top-auto max-md:bottom-24"
+      className="flex shrink-0 rounded-full border border-slate-200 bg-slate-50 p-0.5"
     >
       {VIEWS.map((v) => (
         <button

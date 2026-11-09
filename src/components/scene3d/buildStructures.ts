@@ -2,7 +2,7 @@
 // placements, and buildStructures() which assembles the whole network's structures for <Structures>.
 // Explicit .ts imports: this module is also loaded directly by Node's test runner.
 import * as THREE from "three";
-import { COLORS, STRUCTURE as S, VERTICAL_EXAGGERATION as VE } from "../../constants/scene.ts";
+import { PALETTE, STRUCTURE as S, VERTICAL_EXAGGERATION as VE } from "../../constants/scene.ts";
 import type { InfraType, StationType } from "../../data/types.ts";
 import type { Scene3DData } from "./geometry.ts";
 
@@ -35,7 +35,7 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
     boxMatrix(s.position, s.yaw!, S.stationLength, S.stationHalfWidth, -S.stationBelowTrack * VE, S.stationAboveTrack * VE);
   const aboveStations = stations.filter((s) => s.position[1] >= -level);
   const belowStations = stations.filter((s) => s.position[1] < -level);
-  const white = new THREE.Color(COLORS.stationAbove);
+  const white = new THREE.Color(PALETTE.stationAbove);
 
   return {
     deck: showElevated ? extrudeRect(above, S.deckHalfWidth, -S.deckDepth * VE, -0.3, all) : null,
@@ -45,13 +45,15 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
       scene.runs.filter((r) => !f.hiddenLines.includes(r.lineId) && !f.hiddenTrackTypes.includes(r.type)).map((r) => ({ points: r.points, color: rgb(r.lineId) })),
       S.trackHalfWidth,
       0,
-      0.8,
+      S.railTop,
       ["top", "left", "right"],
     ),
     aboveStations: aboveStations.map(box),
+    aboveStationIds: aboveStations.map((s) => s.stationId), // instance index → station, for picking
     // Above-ground station roofs are white, tinted 30% toward their line colour.
     aboveColors: aboveStations.map((s) => white.clone().lerp(new THREE.Color(colors.get(s.lineId!)), 0.3)),
     belowStations: belowStations.map(box),
+    belowStationIds: belowStations.map((s) => s.stationId),
   };
 }
 

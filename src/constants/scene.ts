@@ -21,7 +21,7 @@ export const PALETTE = {
   background: "#e7e2da",
   ground: "#dcd6cc",
   road: "#c9c3b8",
-  green: "#cdd5b4",
+  green: "#c3d19f",
   wall: "#f5f2ec",
   roof: "#e6e1d7",
   deck: "#d4d0c9",
