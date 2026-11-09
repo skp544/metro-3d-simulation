@@ -11,9 +11,9 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-09)
 
-Phase 8 is finished and waiting for the user's approval (and their commit). Read `docs/phase8-remaining-ui.md` (§6 open issues, §9 next) and `docs/CODE_SUMMARY.md` first.
+Phase 8 is finished, including a revision for realistic track and stations (Phase 8 doc §9, DECISIONS #57), and is waiting for the user's approval (and their commit). Read `docs/phase8-remaining-ui.md` (§6 open issues, §9 revision, §10 next) and `docs/CODE_SUMMARY.md` first.
 
-**Phase 9 scope** (proposed, Phase 8 doc §9): From/To station fields; per-line speeds only where sourced (Airport Express); better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. The graph already exists: `src/utils/routePlanner.ts` (DECISIONS #52–#53).
+**Phase 9 scope** (proposed, Phase 8 doc §10): From/To station fields; per-line speeds only where sourced (Airport Express); better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. The graph already exists: `src/utils/routePlanner.ts` (DECISIONS #52–#53).
 
 **Still open from earlier phases:**
 - The human imagery review (`docs/phase4-leaflet-map.md` §5).
@@ -74,7 +74,7 @@ npm run data:build   # data/raw + data/manual → data/processed + data/metadata
 npm run data:validate  # validation only → data/metadata/validation_report.json
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (36)
+npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (39)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.

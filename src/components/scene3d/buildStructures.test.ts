@@ -2,7 +2,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as THREE from "three";
-import { boxMatrix, extrudeRect, pillarMatrices, spansWhere } from "./buildStructures.ts";
+import { STRUCTURE as S, TRAIN } from "../../constants/scene.ts";
+import { boxMatrix, extrudeRect, localBox, offsetPath, pillarMatrices, spansWhere, stationParts } from "./buildStructures.ts";
 
 type V3 = [number, number, number];
 const straight = (len: number, y: number): V3[] => Array.from({ length: 11 }, (_, i) => [(i * len) / 10, y, 0]);
@@ -45,4 +46,36 @@ test("boxMatrix: oriented along the yaw", () => {
   const end = new THREE.Vector3(0.5, 0, 0).applyMatrix4(m); // box's local +x end
   assert.ok(Math.abs(end.x) < 1e-6 && Math.abs(end.z + 90) < 1e-6, "yaw π/2 points the length north (−z)");
   assert.ok(Math.abs(end.y - 52) < 1e-6, "centre height = track + (bottom+top)/2");
+});
+
+test("offsetPath: moves the path to the left of travel, keeping heights", () => {
+  const p = offsetPath(straight(100, 12), 2); // travelling +x: left is −z
+  assert.ok(p.every((q, i) => Math.abs(q[2] + 2) < 1e-9 && q[1] === 12 && Math.abs(q[0] - i * 10) < 1e-9));
+});
+
+test("localBox: across is to the left of the yaw direction; roll lowers the left edge", () => {
+  const m = localBox([0, 12, 0], 0, { across: 5, length: 10, halfWidth: 1, bottom: 0, top: 2 });
+  const c = new THREE.Vector3().applyMatrix4(m);
+  assert.ok(Math.abs(c.z + 5) < 1e-9 && Math.abs(c.y - 13) < 1e-9, "yaw 0 travels +x, so left is −z");
+  const tilted = localBox([0, 0, 0], 0, { length: 10, halfWidth: 5, bottom: -0.5, top: 0.5, roll: 0.2 });
+  const leftEdge = new THREE.Vector3(0, 0, -0.5).applyMatrix4(tilted); // local −z = left of travel
+  const rightEdge = new THREE.Vector3(0, 0, 0.5).applyMatrix4(tilted);
+  assert.ok(leftEdge.y < 0 && rightEdge.y > 0 && leftEdge.z < 0);
+});
+
+test("stationParts: side platforms clear the trains, roof above them, concourse only under high track", () => {
+  const station = (y: number) => ({ stationId: "s", lineId: "red", stationType: "elevated", position: [0, y, 0] as V3, yaw: 0 });
+  const parts = stationParts([station(12)], new Map([["red", "#ff0000"]]));
+  const get = (k: string) => parts.find((p) => p.key === k)!;
+  const centres = (k: string) => get(k).matrices.map((m) => new THREE.Vector3().setFromMatrixPosition(m));
+  // A train on either track (left-hand running) must fit between the platforms, under the roof.
+  const trainEdge = TRAIN.trackOffset + TRAIN.carWidth / 2;
+  assert.ok(S.platform.inner > trainEdge, `platform edge ${S.platform.inner} m beyond the train's ${trainEdge} m`);
+  assert.ok(S.roof.eave > S.railTop + TRAIN.carHeight, "train fits under the eaves");
+  assert.deepEqual(centres("platform").map((c) => Math.sign(c.z)), [-1, 1], "one platform each side");
+  assert.ok(centres("roof").every((c) => c.y > 12 + S.platform.top));
+  assert.equal(get("column").matrices.length, 2 * Math.floor(S.stationLength / S.roof.columnSpacing));
+  assert.equal(get("fascia").colors!.length, 2);
+  assert.equal(get("concourse").matrices.length, 1);
+  assert.equal(stationParts([station(0.5)], new Map([["red", "#ff0000"]])).find((p) => p.key === "concourse"), undefined, "at grade: no concourse");
 });

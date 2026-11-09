@@ -148,10 +148,10 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 
 | Element | Approach | Status |
 |---|---|---|
-| Track | **Far:** screen-space lines (Phase 5). **Near:** coloured ribbon extruded along each type run (8 m, `extrudeRect`). The switch happens at 3 m per pixel, with hysteresis (`LodWatcher`) | ✅ Phase 6 |
-| Viaduct and pillars | Deck (11 m wide) extruded wherever the track is above +2 m, ramps included. `InstancedMesh` pillars every 30 m, from the ground to under the deck | ✅ Phase 6 |
+| Track | **Far:** screen-space lines in the line colour (Phase 5). **Near:** two tracks 4 m apart, each a concrete plinth with two rails (`offsetPath` + `extrudeRect`), on gravel ballast where at grade. The switch happens at 3 m per pixel, with hysteresis (`LodWatcher`) | ✅ Phase 6, realistic in Phase 8 (DECISIONS #57) |
+| Viaduct and piers | Deck slab (10 m) with line-coloured edge faces on a 5.6 m box girder, wherever the track is above +2 m, ramps included; parapets close up. Instanced round piers every 30 m with a pier cap turned across the track | ✅ Phase 6, realistic in Phase 8 |
 | Tunnel | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it | ✅ Phase 6 |
-| Stations | One box per platform (180 m long), centred on the track at the stop and oriented along it. Above ground: white tinted by line; below: translucent slate. Instanced | ✅ Phase 6 |
+| Stations | Per line at a stop, 180 m long, oriented along the track (`stationParts`, instanced): two side platforms with yellow edge strips, a glazed gabled roof on columns with a line-coloured fascia, a concourse box below high track. Underground: translucent slate box (X-ray). All parts clickable | ✅ Phase 6, realistic in Phase 8 |
 | Trains | Kenney subway cars merged per car type, instanced per line (27 instanced meshes); stripe recoloured per line; positions from `trainSim` along the route path each frame, left-hand running; far away one dot per train | ✅ Phase 7 |
 | City | Real OSM buildings, roads and green areas (`scripts/build-city.ts`), merged into 3 km chunks (`buildCity.ts`); Kenney trees instanced inside green areas | ✅ Phase 7 |
 | Look | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale | ✅ Phase 7 |

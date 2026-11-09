@@ -3,7 +3,7 @@
 **Completed:** 2026-11-09
 **Network data:** OSM snapshot `2026-10-31T12:28:36Z` (validation PASSED, 0 errors, unchanged in this phase)
 
-This document is a **frozen summary of Phase 8**. The living versions are [ARCHITECTURE.md](ARCHITECTURE.md) (§Routes and the 2D/3D handoff), [DECISIONS.md](DECISIONS.md) (#50–#56) and [CODE_SUMMARY.md](CODE_SUMMARY.md).
+This document is a **frozen summary of Phase 8**. The living versions are [ARCHITECTURE.md](ARCHITECTURE.md) (§Routes and the 2D/3D handoff), [DECISIONS.md](DECISIONS.md) (#50–#57) and [CODE_SUMMARY.md](CODE_SUMMARY.md).
 
 ---
 
@@ -18,7 +18,7 @@ Four UI items agreed at the end of Phase 7 (Phase 7 doc §9). No data or pipelin
 | Carry the view across the 2D/3D switch | ✅ Same centre and on-screen scale both ways, through `projection.ts` |
 | Route highlighting between two stations | ✅ "Route from here" / "Route to here" in the station panel; legs and changes in a route card; highlighted on both maps, which fit to it |
 
-Tests: **36/36** pass (+6 in this phase). Type-check and lint are clean. Network validation still PASSED.
+Tests: **39/39** pass (+9 in this phase, including §9). Type-check and lint are clean. Network validation still PASSED.
 
 ---
 
@@ -102,7 +102,7 @@ Bugs found during the check and fixed:
 
 | Item | Note |
 |---|---|
-| **Frame rate on real hardware not measured** | Still open from Phase 6/7. Please check `?view=3d` on your machine and a phone, ideally while following a train |
+| **Frame rate on real hardware not measured** | Still open from Phase 6/7, and more important after §9 (structures ≈ 522k triangles, from ≈ 151k). Please check `?view=3d` on your machine and a phone, ideally while following a train |
 | Phase 4 human imagery review | Still pending (`docs/phase4-leaflet-map.md` §5) |
 | City data size | 12.3 MB uncompressed; serve gzipped or brotli |
 | Route times are nominal | One speed for every line, so the Airport Express, which runs much faster in reality, is not given its real advantage; transfer time is a flat 5 min everywhere |
@@ -123,7 +123,7 @@ Bugs found during the check and fixed:
 ## 8. Reproduce
 
 ```bash
-npm test      # 36 tests (route planner: 5, view scale: 1)
+npm test      # 39 tests (route planner: 5, view scale: 1, station parts and offsets: 3)
 npx tsc -b && npm run lint && npm run build
 npx vite preview --port 4173
 # then, for example:
@@ -135,7 +135,26 @@ node scripts/screenshot.mjs "http://localhost:4173/?view=3d&route=stn_mkpr,stn_n
 
 ---
 
-## 9. Next: Phase 9 (journey planner)
+## 9. Revision after review: realistic track and stations (DECISIONS #57)
+
+After reviewing Phase 8, the user said the metro track and the stations did not look realistic. Close up, the track was an 8 m slab painted in the line colour, and each station a 26 × 10 m box in which the train standing at the platform was hidden.
+
+| Part | Before | Now (nominal sizes, `STRUCTURE`) |
+|---|---|---|
+| Viaduct | 11 m deck, square posts | 10 m concrete deck slab on a 5.6 m box girder; round piers (2 m) every 30 m with a 6.4 m cap across the track; 1.1 m parapets close up; the line colour on the deck's edge faces only |
+| Track (close up) | Line-coloured 8 m slab | Two tracks 4 m apart (where the trains already ran), each a concrete plinth with two rails; gravel ballast where at grade. Far away, the coloured lines are unchanged |
+| Elevated station | Box around the track | Two side platforms (3.8–8.2 m from the centre line, 1.1 m above the rail) with yellow edge strips; a gabled roof (eaves 7.4 m, ridge 8.9 m above the track) on columns every 15 m, glazed so the train shows through, with a line-coloured fascia; a concourse box 4–7.5 m above ground under high track |
+| Underground station | Translucent box (X-ray) | Unchanged |
+
+A test now checks that a train on either track clears the platform edges (3.8 m vs 3.6 m) and fits under the eaves. Checked in screenshots: Kashmere Gate (hub), Mohan Nagar–Arthala viaduct, Tagore Garden, and YL-02 followed into Sikanderpur, standing between the platforms under the glazed roof.
+
+**Cost:** about 522k structure triangles across the network (from about 151k). 8,429 open-ended 8-sided piers make up about 135k, the station parts about 79k. Rails, plinths and parapets (about 150k) are drawn only close up. The 3D chunk grew by 3 KB.
+
+**Limits:** the platform layout (side or island), roof shape and sizes are generic, not per station. Straight stations sit on curved track as before.
+
+---
+
+## 10. Next: Phase 9 (journey planner)
 
 - From/To fields with station search, and swapping (the route card already swaps)
 - Per-line speeds where a source exists (Airport Express), and better change times at large interchanges, each sourced or marked nominal

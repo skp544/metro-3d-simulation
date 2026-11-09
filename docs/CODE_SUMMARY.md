@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-09 · **Phase:** 8 done (work-in-progress entries, train follow, 2D/3D view handoff, route highlighting), waiting for approval. Phase 4's human imagery review is still pending
+**Last updated:** 2026-11-09 · **Phase:** 8 done (work-in-progress entries, train follow, 2D/3D view handoff, route highlighting; realistic track and stations after review), waiting for approval. Phase 4's human imagery review is still pending
 
 ## Data pipeline
 
@@ -67,14 +67,14 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; 2D zoom ↔ metres per pixel ↔ 3D camera distance; nominal height profile with ramps |
 | `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles, `WORK_IN_PROGRESS_SYSTEMS` (names only); 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
 | `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (clickable station boxes), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
+| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, plinths and rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
 | `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
-| Tests | 36: validator (10), projection + profile + view scale (7), structures (5), network geometry (4), city (1), train simulation (4), route planner (5) |
+| Tests | 39: validator (10), projection + profile + view scale (7), structures (8), network geometry (4), city (1), train simulation (4), route planner (5) |
 
 Build: 2D bundle 432 KB JS (131 KB gzip); 3D chunk 1.07 MB (287 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
-3D scene: city ≈ 473k triangles in 107 chunks; structures ≈ 151k; trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
+3D scene: city ≈ 473k triangles in 107 chunks; structures ≈ 522k (8,429 piers, 6,595 station parts; rails, plinths and parapets ≈ 150k of it, drawn close up only); trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
 
 ## Dependencies
 

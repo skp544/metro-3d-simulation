@@ -65,12 +65,17 @@ test("structure budget: merged/instanced, counts reported", () => {
   const colors = new Map<string, string>(network.lines.features.map((f: { properties: { id: string; color: string } }) => [f.properties.id, f.properties.color]));
   const b = buildStructures(scene, colors, { hiddenLines: [], hiddenTrackTypes: [], hiddenStationTypes: [], showStations: true });
   const tris = (g: { getIndex(): { count: number } | null } | null) => (g ? g.getIndex()!.count / 3 : 0);
-  const total = tris(b.deck) + tris(b.tunnel) + tris(b.ribbon) + 12 * (b.pillars.length + b.aboveStations.length + b.belowStations.length);
+  const swept = { deck: b.deck, deckEdges: b.deckEdges, girder: b.girder, tunnel: b.tunnel, parapets: b.parapets, plinths: b.plinths, ballast: b.ballast, rails: b.rails };
+  const instances = b.aboveParts.reduce((a, p) => a + p.matrices.length, 0);
+  const total =
+    Object.values(swept).reduce((a, g) => a + tris(g), 0) + 16 * b.piers.length + 12 * (b.pierCaps.length + instances + b.belowStations.length); // open 8-sided pier = 16 triangles
   console.log(
-    `  pillars ${b.pillars.length}, station boxes ${b.aboveStations.length} above + ${b.belowStations.length} below,` +
-      ` triangles: deck ${tris(b.deck)}, tunnel ${tris(b.tunnel)}, ribbon ${tris(b.ribbon)}, total ≈ ${total}`,
+    `  piers ${b.piers.length}, station parts ${instances} (${b.aboveParts.map((p) => `${p.key} ${p.matrices.length}`).join(", ")}) + ${b.belowStations.length} below,` +
+      ` triangles: ${Object.entries(swept).map(([k, g]) => `${k} ${tris(g)}`).join(", ")}, total ≈ ${total}`,
   );
-  assert.ok(b.pillars.length > 5000 && b.pillars.length < 15000, "about one pillar per 30 m of viaduct");
-  assert.equal(b.aboveStations.length + b.belowStations.length, scene.stations.filter((s) => s.lineId).length);
+  assert.ok(b.piers.length > 5000 && b.piers.length < 15000, "about one pier per 30 m of viaduct");
+  assert.equal(b.pierCaps.length, b.piers.length);
+  const platforms = b.aboveParts.find((p) => p.key === "platform")!.matrices.length;
+  assert.equal(platforms / 2 + b.belowStations.length, scene.stations.filter((s) => s.lineId).length, "two side platforms per above-ground station");
   assert.ok(total < 1_000_000, "under 1M triangles for the whole network");
 });
