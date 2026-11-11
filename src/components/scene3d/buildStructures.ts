@@ -73,9 +73,11 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
     parapets: showElevated
       ? extrudeRect(above.flatMap((s) => [1, -1].map((side) => ({ points: offsetPath(s.points, side * (S.deckHalfWidth - S.parapetHalfThickness)), color: plain }))), S.parapetHalfThickness, 0, S.parapetHeight, upper)
       : null,
-    plinths: extrudeRect(tracks.map((points) => ({ points, color: plain })), S.plinthHalfWidth, 0, S.plinthHeight, upper),
-    ballast: extrudeRect(runs.filter((r) => r.type === "at_grade" || r.type === "unknown").map((r) => ({ points: r.points, color: plain })), S.ballastHalfWidth, -0.15, S.plinthHeight - 0.1, upper),
-    rails: extrudeRect(rails, S.railHalfWidth, S.plinthHeight, S.railTop, upper),
+    // Ballastless track bed; sleepers sit on it (placed near the view only, see sleeperMatrices).
+    trackBed: extrudeRect(tracks.map((points) => ({ points, color: plain })), S.plinthHalfWidth, 0, S.sleeper.bottom, upper),
+    tracks,
+    ballast: extrudeRect(runs.filter((r) => r.type === "at_grade" || r.type === "unknown").map((r) => ({ points: r.points, color: plain })), S.ballastHalfWidth, -0.15, S.sleeper.top - 0.08, upper),
+    rails: extrudeRect(rails, S.railHalfWidth, S.sleeper.top, S.railTop, upper),
     // Stations.
     aboveParts: stationParts(aboveStations, colors),
     belowStations: belowStations.map((s) => boxMatrix(s.position, s.yaw!, S.stationLength, S.stationHalfWidth, -S.stationBelowTrack * VE, S.stationAboveTrack * VE)),
@@ -142,6 +144,41 @@ export function localBox(position: V3, yaw: number, { along = 0, across = 0, len
     q,
     new THREE.Vector3(length, top - bottom, halfWidth * 2),
   );
+}
+
+/**
+ * Sleeper instance matrices every `spacing` metres along the given track paths, but only within `radius`
+ * of `centre` (x, z) and at most `max` of them, so the whole network never needs a million instances.
+ * Each sleeper spans its track (across) and is turned to the local heading.
+ */
+export function sleeperMatrices(tracks: V3[][], centre: [number, number], radius: number, spacing = S.sleeper.spacing, max = 40_000): THREE.Matrix4[] {
+  const out: THREE.Matrix4[] = [];
+  const up = new THREE.Vector3(0, 1, 0);
+  const size = new THREE.Vector3(S.sleeper.width, S.sleeper.top - S.sleeper.bottom, S.sleeper.length);
+  const [cx, cz] = centre;
+  const r2 = radius * radius;
+  for (const t of tracks) {
+    let next = 0; // distance along this track of the next sleeper
+    let walked = 0; // distance along this track to the start of segment i
+    for (let i = 1; i < t.length && out.length < max; i++) {
+      const [a, b] = [t[i - 1], t[i]];
+      const [dx, dz] = [b[0] - a[0], b[2] - a[2]];
+      const seg = Math.hypot(dx, dz);
+      // Closest point of the segment to the centre: skip the whole segment if it is outside the radius.
+      const k = seg > 0 ? Math.min(1, Math.max(0, ((cx - a[0]) * dx + (cz - a[2]) * dz) / (seg * seg))) : 0;
+      if ((a[0] + k * dx - cx) ** 2 + (a[2] + k * dz - cz) ** 2 < r2) {
+        const q = new THREE.Quaternion().setFromAxisAngle(up, Math.atan2(-dz, dx));
+        for (; next <= walked + seg && out.length < max; next += spacing) {
+          const u = seg > 0 ? (next - walked) / seg : 0;
+          const [x, y, z] = [a[0] + u * dx, a[1] + u * (b[1] - a[1]), a[2] + u * dz];
+          if ((x - cx) ** 2 + (z - cz) ** 2 < r2) out.push(new THREE.Matrix4().compose(new THREE.Vector3(x, y + (S.sleeper.bottom + S.sleeper.top) / 2, z), q, size));
+        }
+      }
+      walked += seg;
+      if (next < walked) next += Math.ceil((walked - next) / spacing) * spacing; // keep the spacing across skipped segments
+    }
+  }
+  return out;
 }
 
 /** Horizontal unit normals to the left of travel at each point (averaged over the neighbouring segments). */

@@ -1,17 +1,17 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
-import type { ThreeEvent } from "@react-three/fiber";
+import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import { PALETTE } from "../../constants/scene";
+import { PALETTE, STRUCTURE } from "../../constants/scene";
 import { useMapStore } from "../../store/useMapStore";
-import { buildStructures } from "./buildStructures";
+import { buildStructures, sleeperMatrices } from "./buildStructures";
 import type { Scene3DData } from "./geometry";
 
 /**
  * The metro's built structures, generic and nominal (DECISIONS #57):
  * - always: the concrete viaduct (deck slab with line-coloured edges, box girder, round piers with caps),
  *   tunnel shells in X-ray, and stations;
- * - close up only: parapets, the two tracks (concrete plinths or ballast, and rails). Far away, TrackLines
- *   draws the line colours instead.
+ * - close up only: parapets, the two tracks (concrete bed or ballast, sleepers near the view, rails). Far
+ *   away, TrackLines draws the line colours instead.
  * Above-ground stations have side platforms, an open gabled glazed roof on columns and a concourse below.
  * Everything is merged or instanced (about 20 draw calls for the whole network); station parts are clickable.
  */
@@ -42,7 +42,8 @@ export function Structures({ scene, colors, near }: { scene: Scene3DData; colors
         <>
           <Swept geometry={built.parapets} color={PALETTE.deck} />
           <Swept geometry={built.ballast} color={PALETTE.ballast} shadow={false} />
-          <Swept geometry={built.plinths} color={PALETTE.plinth} shadow={false} />
+          <Swept geometry={built.trackBed} color={PALETTE.plinth} shadow={false} />
+          <Sleepers tracks={built.tracks} />
           <Swept geometry={built.rails} color={PALETTE.rail} shadow={false} />
         </>
       )}
@@ -57,6 +58,40 @@ export function Structures({ scene, colors, near }: { scene: Scene3DData; colors
       ))}
       {!showGround && <Instances matrices={built.belowStations} color={PALETTE.stationBelow} opacity={0.55} onClick={pick(built.belowStationIds)} />}
     </>
+  );
+}
+
+const SLEEPER_CAPACITY = 40_000;
+const SLEEPER_REFRESH_M = 200; // re-place when the view target has moved this far
+const SLEEPER_MAX_DISTANCE_M = 1200; // camera further than this: sleepers are sub-pixel, skip them
+
+/**
+ * Concrete sleepers under the rails, every 0.65 m, but only within STRUCTURE.sleeper.radius of the view
+ * target: about 2,800 per km of route, so the whole network would need over a million. One instanced mesh,
+ * refilled as the view moves.
+ */
+function Sleepers({ tracks }: { tracks: [number, number, number][][] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const placedAt = useRef<{ x: number; z: number; tracks: unknown } | null>(null);
+  useLayoutEffect(() => void (ref.current && (ref.current.count = 0)), []); // empty until the first placement
+  useFrame(({ camera, controls }) => {
+    const mesh = ref.current;
+    const target = (controls as unknown as { target?: THREE.Vector3 } | null)?.target;
+    if (!mesh || !target) return;
+    mesh.visible = camera.position.distanceTo(target) < SLEEPER_MAX_DISTANCE_M;
+    const last = placedAt.current;
+    if (!mesh.visible || (last && last.tracks === tracks && Math.hypot(target.x - last.x, target.z - last.z) < SLEEPER_REFRESH_M)) return;
+    const ms = sleeperMatrices(tracks, [target.x, target.z], STRUCTURE.sleeper.radius, STRUCTURE.sleeper.spacing, SLEEPER_CAPACITY);
+    ms.forEach((m, i) => mesh.setMatrixAt(i, m));
+    mesh.count = ms.length;
+    mesh.instanceMatrix.needsUpdate = true;
+    placedAt.current = { x: target.x, z: target.z, tracks };
+  });
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, SLEEPER_CAPACITY]} receiveShadow frustumCulled={false}>
+      <boxGeometry />
+      <meshLambertMaterial color={PALETTE.sleeper} flatShading />
+    </instancedMesh>
   );
 }
 

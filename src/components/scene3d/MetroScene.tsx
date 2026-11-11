@@ -87,12 +87,17 @@ export function MetroScene({ network, service }: { network: Network; service: Se
     return params.get("cam") === "network" ? views.network : views.hub;
   }, [scene, views, size]);
 
+  // Stable objects: new ones on every render make React Three Fiber re-apply them (a new camera, new
+  // controls), snapping the view back to the start whenever the scene re-renders (LOD switch, X-ray, route).
+  const startTarget = useMemo(() => start.target.toArray(), [start]);
+  const cameraOptions = useMemo(() => ({ position: start.position.toArray(), fov: FOV, near: 1, far: size * 6 }), [start, size]);
+
   return (
     <div className="relative h-full w-full" style={{ background: PALETTE.background }}>
       <Canvas
         shadows
         flat // no tone mapping: palette colours render as specified, like the reference's flat look
-        camera={{ position: start.position.toArray(), fov: FOV, near: 1, far: size * 6 }}
+        camera={cameraOptions}
         // Log depth keeps deck, guideway, roads and ground apart from 1 m to 400 km away.
         gl={{ logarithmicDepthBuffer: true }}
         dpr={[1, 2]}
@@ -101,7 +106,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         <color attach="background" args={[PALETTE.background]} />
         <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, 1.15]} />
         <Sun />
-        <MapControls makeDefault target={start.target.toArray()} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
+        <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
         <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
         <LodWatcher onChange={setNear} />
         {showGround && (

@@ -65,7 +65,7 @@ test("structure budget: merged/instanced, counts reported", () => {
   const colors = new Map<string, string>(network.lines.features.map((f: { properties: { id: string; color: string } }) => [f.properties.id, f.properties.color]));
   const b = buildStructures(scene, colors, { hiddenLines: [], hiddenTrackTypes: [], hiddenStationTypes: [], showStations: true });
   const tris = (g: { getIndex(): { count: number } | null } | null) => (g ? g.getIndex()!.count / 3 : 0);
-  const swept = { deck: b.deck, deckEdges: b.deckEdges, girder: b.girder, tunnel: b.tunnel, parapets: b.parapets, plinths: b.plinths, ballast: b.ballast, rails: b.rails };
+  const swept = { deck: b.deck, deckEdges: b.deckEdges, girder: b.girder, tunnel: b.tunnel, parapets: b.parapets, trackBed: b.trackBed, ballast: b.ballast, rails: b.rails };
   const instances = b.aboveParts.reduce((a, p) => a + p.matrices.length, 0);
   const total =
     Object.values(swept).reduce((a, g) => a + tris(g), 0) + 16 * b.piers.length + 12 * (b.pierCaps.length + instances + b.belowStations.length); // open 8-sided pier = 16 triangles

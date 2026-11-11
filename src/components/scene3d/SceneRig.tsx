@@ -71,11 +71,15 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
   });
 
   useCommand("camera", command?.key, !!controls, () => {
-    const d = camera.position.distanceTo(controls!.target);
+    // Zoom around where the camera is going, not where it is: the followed train, or the end of a flight
+    // in progress (else a quick zoom right after "follow" or a fit would abandon it half-way).
     const f = useMapStore.getState().follow;
     const anchor = f && trainPosition(f.trainId);
-    if (command!.command === "zoomIn") flyTo(around(controls!.target.clone(), d * 0.6), anchor);
-    if (command!.command === "zoomOut") flyTo(around(controls!.target.clone(), d / 0.6), anchor);
+    const goal = anim.current?.to;
+    const centre = anchor ?? goal?.target.clone() ?? controls!.target.clone();
+    const d = goal ? goal.position.distanceTo(goal.target) : camera.position.distanceTo(controls!.target);
+    if (command!.command === "zoomIn") flyTo(around(centre, d * 0.6), anchor);
+    if (command!.command === "zoomOut") flyTo(around(centre, d / 0.6), anchor);
     if (command!.command === "network") flyTo(network);
     if (command!.command === "hub") flyTo(hub);
   });

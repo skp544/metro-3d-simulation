@@ -3,7 +3,7 @@
 **Completed:** 2026-11-09
 **Network data:** OSM snapshot `2026-10-31T12:28:36Z` (validation PASSED, 0 errors, unchanged in this phase)
 
-This document is a **frozen summary of Phase 8**. The living versions are [ARCHITECTURE.md](ARCHITECTURE.md) (§Routes and the 2D/3D handoff), [DECISIONS.md](DECISIONS.md) (#50–#57) and [CODE_SUMMARY.md](CODE_SUMMARY.md).
+This document is a **frozen summary of Phase 8**. The living versions are [ARCHITECTURE.md](ARCHITECTURE.md) (§Routes and the 2D/3D handoff), [DECISIONS.md](DECISIONS.md) (#50–#58) and [CODE_SUMMARY.md](CODE_SUMMARY.md).
 
 ---
 
@@ -18,7 +18,7 @@ Four UI items agreed at the end of Phase 7 (Phase 7 doc §9). No data or pipelin
 | Carry the view across the 2D/3D switch | ✅ Same centre and on-screen scale both ways, through `projection.ts` |
 | Route highlighting between two stations | ✅ "Route from here" / "Route to here" in the station panel; legs and changes in a route card; highlighted on both maps, which fit to it |
 
-Tests: **39/39** pass (+9 in this phase, including §9). Type-check and lint are clean. Network validation still PASSED.
+Tests: **40/40** pass (+10 in this phase, including §9). Type-check and lint are clean. Network validation still PASSED.
 
 ---
 
@@ -123,7 +123,7 @@ Bugs found during the check and fixed:
 ## 8. Reproduce
 
 ```bash
-npm test      # 39 tests (route planner: 5, view scale: 1, station parts and offsets: 3)
+npm test      # 40 tests (route planner: 5, view scale: 1, station parts, offsets and sleepers: 4)
 npx tsc -b && npm run lint && npm run build
 npx vite preview --port 4173
 # then, for example:
@@ -151,6 +151,12 @@ A test now checks that a train on either track clears the platform edges (3.8 m 
 **Cost:** about 522k structure triangles across the network (from about 151k). 8,429 open-ended 8-sided piers make up about 135k, the station parts about 79k. Rails, plinths and parapets (about 150k) are drawn only close up. The 3D chunk grew by 3 KB.
 
 **Limits:** the platform layout (side or island), roof shape and sizes are generic, not per station. Straight stations sit on curved track as before.
+
+**Sleepers (DECISIONS #58).** The user then pointed at a Sketchfab track model (rails on sleepers). It was not used: the listing is spam, a "free game download" advert, so its licence can't be trusted (docs/ASSETS.md). The same look is drawn in code: concrete sleepers every 0.65 m on a concrete track bed (in the ballast at grade) under the rails, placed within 900 m of the view and refilled as it moves. Checked close up while following BL-01 on the Blue Line viaduct near Noida Sector 62.
+
+**Camera bugs found during this check (fixed):**
+- **Snap-back to the start view.** `<MapControls target>` and `<Canvas camera>` got new objects on every render, so any re-render of the 3D scene (X-ray toggle, route change, LOD switch) could reset the camera to where it started. Both are now memoised. This dates from Phase 5/7.
+- **Zoom during a flight.** A zoom right after "follow" (or during any fly-to) replaced the flight and zoomed around its half-way point, so the follow was lost; on slow GPUs this is easy to hit. A zoom now aims at the followed train or the flight's destination.
 
 ---
 

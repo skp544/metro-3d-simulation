@@ -26,7 +26,8 @@ export const PALETTE = {
   roof: "#e6e1d7",
   deck: "#d4d0c9", // concrete
   pillar: "#bdb7ad",
-  plinth: "#a8a299",
+  plinth: "#aaa49b", // track bed
+  sleeper: "#8a857d", // concrete sleepers
   ballast: "#b3a896",
   rail: "#6e737a",
   platform: "#d9d4cb",
@@ -59,10 +60,10 @@ export const STRUCTURE = {
   pillarSpacing: 30,
   pillarSize: 2, // pier diameter
   pierCap: { along: 2.2, across: 6.4, depth: 1 },
-  // Track: two tracks, each a concrete plinth with two rails; ballast where the track is at grade.
+  // Track: two tracks, each two rails on concrete sleepers over a concrete bed (ballast where at grade).
   trackSpacing: 4, // between track centres; trains run on the left one (TRAIN.trackOffset = half this)
-  plinthHalfWidth: 1.3,
-  plinthHeight: 0.5,
+  plinthHalfWidth: 1.4, // track bed
+  sleeper: { length: 2.6, width: 0.26, bottom: 0.3, top: 0.5, spacing: 0.65, radius: 900 }, // drawn within `radius` of the view
   railHalfGauge: 0.75,
   railHalfWidth: 0.09,
   ballastHalfWidth: 4.2,

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as THREE from "three";
 import { STRUCTURE as S, TRAIN } from "../../constants/scene.ts";
-import { boxMatrix, extrudeRect, localBox, offsetPath, pillarMatrices, spansWhere, stationParts } from "./buildStructures.ts";
+import { boxMatrix, extrudeRect, localBox, offsetPath, pillarMatrices, sleeperMatrices, spansWhere, stationParts } from "./buildStructures.ts";
 
 type V3 = [number, number, number];
 const straight = (len: number, y: number): V3[] => Array.from({ length: 11 }, (_, i) => [(i * len) / 10, y, 0]);
@@ -78,4 +78,19 @@ test("stationParts: side platforms clear the trains, roof above them, concourse 
   assert.equal(get("fascia").colors!.length, 2);
   assert.equal(get("concourse").matrices.length, 1);
   assert.equal(stationParts([station(0.5)], new Map([["red", "#ff0000"]])).find((p) => p.key === "concourse"), undefined, "at grade: no concourse");
+});
+
+test("sleeperMatrices: evenly spaced along the track, only near the view, capped", () => {
+  const track = straight(1000, 12); // 0..1000 m along +x, points every 100 m
+  const all = sleeperMatrices([track], [500, 0], 10_000, 0.65);
+  assert.equal(all.length, Math.floor(1000 / 0.65) + 1);
+  const xs = all.map((m) => new THREE.Vector3().setFromMatrixPosition(m).x);
+  assert.ok(xs.every((x, i) => i === 0 || Math.abs(x - xs[i - 1] - 0.65) < 1e-6), "constant spacing across segment joins");
+  const near = sleeperMatrices([track], [500, 0], 100, 0.65);
+  assert.ok(near.length > 300 && near.length < 310, `${near.length} within 100 m`);
+  const nx = near.map((m) => new THREE.Vector3().setFromMatrixPosition(m).x);
+  assert.ok(nx.every((x) => x > 400 && x < 600));
+  assert.ok(Math.abs((nx[0] / 0.65) - Math.round(nx[0] / 0.65)) < 1e-6, "same positions as the full set: no jump when the window moves");
+  assert.equal(sleeperMatrices([track], [500, 0], 10_000, 0.65, 50).length, 50);
+  assert.equal(sleeperMatrices([track], [500, 5000], 100, 0.65).length, 0);
 });
