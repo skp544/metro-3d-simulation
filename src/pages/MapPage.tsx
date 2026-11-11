@@ -8,6 +8,7 @@ import { RoutePanel } from "../components/ui/RoutePanel";
 import { SceneControls } from "../components/ui/SceneControls";
 import { StationPanel } from "../components/ui/StationPanel";
 import { TopBar } from "../components/ui/TopBar";
+import { UndergroundControls } from "../components/ui/UndergroundControls";
 import { loadNetwork, type Network } from "../data/loadNetwork";
 import { useMapStore } from "../store/useMapStore";
 import { buildService } from "../utils/trainSim";
@@ -44,6 +45,7 @@ export function MapPage() {
           <KpiCards network={network} service={service} />
           <RoutePanel network={network} />
           <ControlPanel network={network} />
+          {view === "3d" && <div className="md:hidden"><UndergroundControls /></div>}
         </div>
         {/* In 2D, leave room for Leaflet's own controls in the top-right corner. */}
         <div className={`pointer-events-none absolute top-3 z-[1000] flex max-h-[calc(100%-12rem)] items-start gap-3 ${view === "2d" ? "right-16" : "right-3"}`}>
@@ -52,13 +54,13 @@ export function MapPage() {
         </div>
         {view === "3d" && (
           // Desktop: bottom right (the dock sits bottom left). Phones: stacked above the dock, below.
-          <div className="pointer-events-none absolute right-3 bottom-9 z-[1000] hidden md:block">
+          <div className="pointer-events-none absolute right-3 bottom-9 z-[1000] hidden xl:block">
             <FollowCard network={network} service={service} />
           </div>
         )}
-        <div className="pointer-events-none absolute right-3 bottom-8 left-3 z-[1000] flex flex-col items-center gap-2 md:right-auto">
+        <div className="pointer-events-none absolute right-3 bottom-14 left-3 z-[1000] flex flex-col items-center gap-2 md:right-auto md:bottom-8">
           {view === "3d" && (
-            <div className="md:hidden">
+            <div className="xl:hidden">
               <FollowCard network={network} service={service} />
             </div>
           )}

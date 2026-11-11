@@ -4,9 +4,10 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { STRUCTURE, TRAIN } from "../../constants/scene";
-import { simSeconds, useMapStore } from "../../store/useMapStore";
+import { groundVisible, simSeconds, useMapStore } from "../../store/useMapStore";
 import type { Service, TrainState } from "../../utils/trainSim";
 import { pointAt, type Scene3DData } from "./geometry";
+import { trainPitch, UNDERGROUND_Y } from "./trainGeometry";
 
 const CAR_MODELS = [
   "/models/kenney/train/train-electric-subway-a.glb", // cab car (nose towards +z); used reversed at the rear
@@ -14,7 +15,6 @@ const CAR_MODELS = [
   "/models/kenney/train/train-electric-subway-c.glb",
 ];
 const RENDER_RADIUS_M = 5000; // full models only near the view target; further away is sub-pixel anyway
-const UNDERGROUND_Y = -2;
 
 /** Where each train is this frame; shared with the labels and the train dots. */
 type Live = Map<
@@ -119,19 +119,16 @@ export function Trains({
     [service],
   );
   const dotColors = useMemo(() => {
-    const c = new Float32Array(service.trains.length * 3);
-    service.trains.forEach((t, i) =>
-      new THREE.Color(colors.get(t.lineId)).toArray(c, i * 3),
-    );
-    return c;
-  }, [service, colors]);
+    return new Float32Array(service.trains.length * 3);
+  }, [service]);
+  const lineColors = useMemo(() => new Map([...colors].map(([id, color]) => [id, new THREE.Color(color)])), [colors]);
 
   const tmp = useMemo(
     () => ({
       m: new THREE.Matrix4(),
       q: new THREE.Quaternion(),
       p: new THREE.Vector3(),
-      up: new THREE.Vector3(0, 1, 0),
+      e: new THREE.Euler(0, 0, 0, "YXZ"),
     }),
     [],
   );
@@ -147,16 +144,17 @@ export function Trains({
       if (s.hiddenLines.includes(train.lineId)) continue;
       const path = paths.get(train.routeId);
       if (!path) continue;
-      const state = service.stateAt(train, t);
+      const state = service.stateAt(train, t, s.trainControls);
       const head = pointAt(path.points, path.km, state.km);
       const position = new THREE.Vector3(...head.position);
-      const visible = position.y > UNDERGROUND_Y || !s.showGround;
+      const visible = position.y > UNDERGROUND_Y || !groundVisible(s);
       live.current.set(train.id, { position, state, visible });
-      if (visible)
-        dotPositions.set([position.x, position.y + 6, position.z], 3 * dot++);
+      if (visible) {
+        dotPositions.set([position.x, position.y + 6, position.z], 3 * dot);
+        lineColors.get(train.lineId)!.toArray(dotColors, 3 * dot++);
+      }
       if (
         !near ||
-        !visible ||
         !target ||
         position.distanceTo(target) > RENDER_RADIUS_M
       )
@@ -173,6 +171,8 @@ export function Trains({
           path.km,
           Math.min(end, Math.max(0, state.km + (state.dir * off) / 1000)),
         );
+        // Cull per car, not the whole train at its midpoint, at tunnel portals.
+        if (groundVisible(s) && at.position[1] < UNDERGROUND_Y) continue;
         const [fx, fz] = [
           Math.cos(at.yaw) * state.dir,
           -Math.sin(at.yaw) * state.dir,
@@ -185,7 +185,8 @@ export function Trains({
           at.position[1] + STRUCTURE.railTop,
           at.position[2] - fx * TRAIN.trackOffset,
         );
-        tmp.m.compose(tmp.p, tmp.q.setFromAxisAngle(tmp.up, yaw), scale);
+        const pitch = trainPitch(path, Math.min(end, Math.max(0, state.km + (state.dir * off) / 1000)), state.dir);
+        tmp.m.compose(tmp.p, tmp.q.setFromEuler(tmp.e.set(j === TRAIN.cars - 1 ? pitch : -pitch, yaw, 0, "YXZ")), scale);
         lineMeshes?.[type]?.setMatrixAt(c[type]++, tmp.m);
       }
     }
@@ -198,6 +199,7 @@ export function Trains({
     if (dots.current) {
       dots.current.geometry.setDrawRange(0, near ? 0 : dot);
       dots.current.geometry.attributes.position.needsUpdate = true;
+      dots.current.geometry.attributes.color.needsUpdate = true;
     }
   });
 
@@ -318,7 +320,7 @@ function TrainLabels({
               state.atStationId ? "text-emerald-600" : "text-amber-600"
             }
           >
-            {state.atStationId
+            {state.held ? "Stopped by operator" : state.atStationId
               ? `At ${stationNames.get(state.atStationId)}`
               : `→ ${stationNames.get(state.nextStationId)}`}
           </span>

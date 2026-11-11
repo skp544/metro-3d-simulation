@@ -166,6 +166,12 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | View handoff | `viewHandoff` (in `useMapStore.ts`, not reactive state) holds centre + zoom + viewport height. The 2D map writes it on every move; the 3D `CameraRig` writes it 2–3 times a second via `metresPerPixelAtDistance` → `zoomForMetresPerPixel`. A view reads it once on mount (`metresPerPixel` → `distanceForMetresPerPixel` for 3D) |
 | Train follow | `follow` in the store; `CameraRig` recomputes the train's position with `service.stateAt` + `pointAt` each frame and translates camera and target together |
 
+## Train management and underground visibility (Phase 9)
+
+`useMapStore.trainControls` stores `{delayS, heldAtS}` per train. `trainControl.ts` freezes its effective simulation time and accumulates delay on resume. `service.stateAt(train, time, controls)` is used by every position/status consumer; `nextArrivals(station, time, controls)` excludes held trains and honors delay. Global clock pause/speed are independent. State is session-only. `runMotion` eases station departures and arrivals while retaining existing hop durations; motion is nominal, not calibrated DMRC dynamics.
+
+`TrainControlManager` replaces the passive train list and operates on the entire fleet independent of map filters. “Follow” reveals the line and opens 3D. `UndergroundWatcher` samples the full consist along the existing projected path and reports only depth transitions. `groundVisible` resolves Auto/Surface/Underground for the ground, city, trains, structures, labels and route overlay. Auto clears when following ends; manual modes remain selected. Car pitch samples the path grade; instancing and distance-based detail remain in place.
+
 ## Roadmap
 
 | Phase | Deliverable | Exit criteria | Status |
@@ -177,5 +183,6 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
 | 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | ✅ Done (continuity tested; FPS not measured on a real GPU) |
 | 7 | 3D look, city, trains and UI (user-expanded) | ≥ 50 trains; looks like ref_image.png | ✅ Done: 218 simulated trains; real-GPU fps not measured |
-| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | All four work in both views where they apply | ✅ Done (36 tests); real-GPU fps still not measured |
-| 9 | Journey planner | — | Future |
+| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | All four work in both views where they apply | ✅ Done (40 tests after track revision); real-GPU fps still not measured |
+| 9 | Train control manager, underground visibility, nominal motion (owner-selected scope) | Individual/fleet Start/Stop, consistent predictions, Auto/manual X-ray; tests and screenshots | Implemented; see `phase9-train-control.md` |
+| 10 | Journey planner enhancements (proposed) | Scope to be agreed with owner | Future; do not start without approval |

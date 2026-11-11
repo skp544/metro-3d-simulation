@@ -137,7 +137,7 @@ function SpeedControls() {
   const { playing, speed, togglePlay, setSpeed } = useMapStore();
   return (
     <div className="flex shrink-0 items-center gap-0.5 rounded-full border border-slate-200 bg-slate-50 p-0.5" role="group" aria-label="Simulation speed">
-      <button type="button" onClick={togglePlay} aria-label={playing ? "Pause trains" : "Play trains"} className="rounded-full px-2 py-1 text-xs text-slate-600 hover:bg-white">
+      <button type="button" onClick={togglePlay} aria-label={playing ? "Pause simulation clock" : "Resume simulation clock"} className="rounded-full px-2 py-1 text-xs text-slate-600 hover:bg-white">
         {playing ? "❚❚" : "▶"}
       </button>
       {SPEEDS.map((s) => (
@@ -165,7 +165,7 @@ function LiveClock() {
       title="Trains follow a simulated service pattern, not live DMRC positions"
     >
       <span className={`h-1.5 w-1.5 rounded-full ${live ? "bg-emerald-500" : "bg-amber-500"}`} />
-      {live ? "LIVE" : playing ? `SIM ×${speed}` : "PAUSED"} {formatIst(now)}
+      {playing ? `SIM ×${speed}` : "PAUSED"} {formatIst(now)}
       <span className="hidden font-normal opacity-70 lg:inline">· simulated</span>
     </div>
   );

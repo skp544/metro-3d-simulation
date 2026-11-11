@@ -8,6 +8,8 @@ import type { Service } from "../../utils/trainSim";
 export function FollowCard({ network, service }: { network: Network; service: Service }) {
   const follow = useMapStore((s) => s.follow);
   const followTrain = useMapStore((s) => s.followTrain);
+  const setTrainsHeld = useMapStore((s) => s.setTrainsHeld);
+  const trainControls = useMapStore((s) => s.trainControls);
   const now = useSimNow(1000);
   const train = useMemo(() => service.trains.find((t) => t.id === follow?.trainId), [service, follow]);
   const line = useMemo(() => network.lines.features.find((f) => f.properties.id === train?.lineId)?.properties, [network.lines, train]);
@@ -21,18 +23,22 @@ export function FollowCard({ network, service }: { network: Network; service: Se
   }, [follow, followTrain]);
 
   if (!train) return null;
-  const s = service.stateAt(train, now);
+  const s = service.stateAt(train, now, trainControls);
   return (
-    <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-slate-200 bg-white/95 py-1 pr-1 pl-3 text-xs shadow-lg backdrop-blur" role="status">
+    <div className="pointer-events-auto flex max-w-[min(28rem,calc(100vw-1.5rem))] flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white/95 py-1 pr-1 pl-3 text-xs shadow-lg backdrop-blur" role="status">
       <span className="h-2.5 w-2.5 rounded-full" style={{ background: line?.color }} />
       <span className="text-slate-500">Following</span>
       <span className="font-semibold text-slate-900">{train.id}</span>
       <span className="hidden text-slate-600 sm:inline">
         → {names.get(s.terminusId)} · {s.atStationId ? `at ${names.get(s.atStationId)}` : `next ${names.get(s.nextStationId)}`}
       </span>
+      {s.held && <span className="text-amber-700">Stopped</span>}
       <span className="hidden text-[11px] text-slate-400 md:inline">simulated</span>
+      <button type="button" onClick={() => setTrainsHeld([train.id], !s.held)} className="rounded-full border border-slate-200 px-2.5 py-1 font-medium text-slate-800 hover:bg-slate-100">
+        {s.held ? "Start train" : "Stop train"}
+      </button>
       <button type="button" onClick={() => followTrain(null)} className="rounded-full bg-slate-900 px-2.5 py-1 font-medium text-white hover:bg-slate-700" title="Stop following (Esc, or drag the map)">
-        Stop
+        Stop following
       </button>
     </div>
   );

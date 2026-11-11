@@ -1,4 +1,5 @@
 import { useMapStore, type LabelMode } from "../../store/useMapStore";
+import { UndergroundControls } from "./UndergroundControls";
 
 const LABELS: { id: LabelMode; label: string }[] = [
   { id: "trains", label: "Trains" },
@@ -13,6 +14,7 @@ export function SceneControls() {
   const button = "grid h-9 w-9 place-items-center text-slate-600 hover:bg-slate-50 hover:text-slate-900";
   return (
     <div className="pointer-events-auto flex flex-col items-end gap-3">
+      <div className="hidden md:block"><UndergroundControls /></div>
       <div className="flex flex-col divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white/95 shadow-lg">
         <button type="button" className={button} onClick={() => cameraDo("zoomIn")} aria-label="Zoom in">
           +

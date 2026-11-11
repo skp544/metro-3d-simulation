@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-09 · **Phase:** 8 done (work-in-progress entries, train follow, 2D/3D view handoff, route highlighting; realistic track and stations after review), waiting for approval. Phase 4's human imagery review is still pending
+**Last updated:** 2026-11-11 · **Phase:** 9 implemented (train control manager, individual/fleet holds, automatic/manual underground X-ray, nominal eased motion and carriage pitch). Phase 4's human imagery review and real-GPU frame-rate checks remain pending.
 
 ## Data pipeline
 
@@ -58,23 +58,27 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 |---|---|
 | `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network and builds the simulated service; top bar + 2D map or lazy 3D scene + floating cards (KPIs, route, layers, station panel, 3D controls, follow card, bottom dock) |
 | `src/data/loadNetwork.ts`, `src/data/loadCity.ts` | Fetch the network GeoJSON + reports; the city GeoJSON (3D only) |
-| `src/store/useMapStore.ts` | zustand: view, filters, layers (incl. X-ray ground), selected station, label mode, camera/focus/fit commands, followed train, route ends (`?route=from,to`), simulation clock (play/pause, ×1/×2/×4/×8). Also `viewHandoff` (non-reactive: last view, for the 2D/3D switch) |
+| `src/store/useMapStore.ts` | zustand: view, filters, layers, Auto/Surface/Underground mode, per-train controls, selected station, label mode, camera/focus/fit commands, followed train, route ends (`?route=from,to`), simulation clock (play/pause, ×1/×2/×4/×8). Also `viewHandoff` (non-reactive: last view, for the 2D/3D switch) |
 | `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
 | `src/store/useCommand.ts` | Runs a focus/fit/follow/camera command once, in whichever view is showing |
 | `src/store/useJourney.ts` | The planned journey for the chosen route ends (one planner per network) |
-| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (218 trains), `stateAt`, `nextArrivals` |
+| `src/utils/trainSim.ts`, `src/utils/trainControl.ts` | 218 simulated trains; per-train hold/resume offsets shared by `stateAt` and `nextArrivals`; nominal eased motion preserving hop durations. Held trains excluded from upcoming arrivals |
 | `src/utils/routePlanner.ts` | `buildRoutePlanner(routes, segments).plan(from, to)`: fastest estimated journey on a (station, route) graph; legs with stations, segment ids and km spans; nominal 5-min change (`TRANSFER_S`) |
 | `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; 2D zoom ↔ metres per pixel ↔ 3D camera distance; nominal height profile with ramps |
 | `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles, `WORK_IN_PROGRESS_SYSTEMS` (names only); 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
 | `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
-| `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
+| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars pitched to grades, per-car portal visibility, clickable labels, correctly coloured far dots), `UndergroundWatcher` + `trainGeometry.ts` (whole-consist Auto X-ray), `utils/underground.ts` (visibility policy), `geometry.ts`, `TrackLines`, `StationPoints` |
+| `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, SIM/PAUSED clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (`TrainControlManager`: search/filter/Start/Stop/Follow / Stations / `ValidationList`), `SceneControls`, `UndergroundControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
-| Tests | 40: validator (10), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5) |
+| Tests | 49: validator (10), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), train controls + motion (6), train geometry + visibility (3), route planner (5) |
 
-Build: 2D bundle 432 KB JS (131 KB gzip); 3D chunk 1.07 MB (287 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
+Build: 2D bundle 437 KB JS (132 KB gzip); 3D chunk 1.07 MB (289 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
 3D scene: city ≈ 473k triangles in 107 chunks; structures ≈ 522k (8,429 piers, 6,595 station parts; rails, track bed and parapets ≈ 150k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view); trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
+
+## Train control behavior
+
+The manager controls all trains regardless of map filters. Start/Stop holds/resumes simulation position; global pause freezes the clock independently. Follow opens 3D and reveals the train’s line. Auto X-ray hides ground/city while any part of the followed consist is below −2 m; manual Surface/Underground overrides it. Controls reset on reload. No collision avoidance or operational signalling. Station arrivals reflect holds; static journey estimates exclude them. See `docs/phase9-train-control.md` and decisions #59–#65.
 
 ## Dependencies
 

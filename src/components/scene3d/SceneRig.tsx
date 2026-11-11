@@ -6,7 +6,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE, SHADOW } from "../../constants/scene";
 import { useCommand } from "../../store/useCommand";
-import { simSeconds, useMapStore, viewHandoff } from "../../store/useMapStore";
+import { groundVisible, simSeconds, useMapStore, viewHandoff } from "../../store/useMapStore";
 import { metresPerPixelAtDistance, zoomForMetresPerPixel, type Projection } from "../../utils/projection";
 import type { Service } from "../../utils/trainSim";
 import { pointAt, type RoutePath3D, type StationPoint3D } from "./geometry";
@@ -40,7 +40,7 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
     const train = trainById.get(trainId);
     const path = train && pathById.get(train.routeId);
     if (!train || !path || s.hiddenLines.includes(train.lineId)) return null;
-    return new THREE.Vector3(...pointAt(path.points, path.km, service.stateAt(train, simSeconds(s)).km).position);
+    return new THREE.Vector3(...pointAt(path.points, path.km, service.stateAt(train, simSeconds(s), s.trainControls).km).position);
   };
   const flyTo = (to: View3D, anchor: THREE.Vector3 | null = null) => {
     if (!controls) return;
@@ -168,7 +168,7 @@ const MAX_STATION_LABELS = 18;
 /** Station names over the nearest stations (labels mode "stations" or "all"). */
 export function StationLabels({ stations, names, near }: { stations: StationPoint3D[]; names: Map<string, string>; near: boolean }) {
   const labels = useMapStore((s) => s.labels);
-  const showGround = useMapStore((s) => s.showGround);
+  const showGround = useMapStore(groundVisible);
   const selectStation = useMapStore((s) => s.selectStation);
   const target = useRef<THREE.Vector3 | null>(null);
   const [shown, setShown] = useState<StationPoint3D[]>([]);

@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { LOD_METRES_PER_PIXEL, PALETTE } from "../../constants/scene";
 import type { Network } from "../../data/loadNetwork";
 import { useJourney } from "../../store/useJourney";
-import { useMapStore, viewHandoff } from "../../store/useMapStore";
+import { groundVisible, useMapStore, viewHandoff } from "../../store/useMapStore";
 import { distanceForMetresPerPixel, metresPerPixel } from "../../utils/projection";
 import type { Service } from "../../utils/trainSim";
 import { City } from "./City";
@@ -17,6 +17,7 @@ import { StationPoints } from "./StationPoints";
 import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
+import { UndergroundWatcher } from "./UndergroundWatcher";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.
 function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
@@ -41,7 +42,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
   const scene = useMemo(() => buildScene3D(network), [network]);
   const colors = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties.color])), [network.lines]);
   const names = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
-  const showGround = useMapStore((s) => s.showGround);
+  const showGround = useMapStore(groundVisible);
   const journey = useJourney(network);
   const [near, setNear] = useState(false);
   // Close up, the opaque ground hides tunnels; keep underground routes readable as dashed lines on the
@@ -108,6 +109,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         <Sun />
         <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
         <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
+        <UndergroundWatcher paths={scene.paths} service={service} />
         <LodWatcher onChange={setNear} />
         {showGround && (
           <mesh rotation-x={-Math.PI / 2} position={[(minX + maxX) / 2, 0, (minZ + maxZ) / 2]} receiveShadow>
@@ -116,7 +118,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
           </mesh>
         )}
         <Suspense fallback={null}>
-          <City projection={scene.projection} />
+          <group visible={showGround}><City projection={scene.projection} /></group>
         </Suspense>
         <Structures scene={scene} colors={colors} near={near} />
         <Suspense fallback={null}>

@@ -9,12 +9,13 @@ import type { Service } from "../../utils/trainSim";
 export function StationPanel({ network, service }: { network: Network; service: Service }) {
   const id = useMapStore((s) => s.selectedStationId);
   const selectStation = useMapStore((s) => s.selectStation);
+  const trainControls = useMapStore((s) => s.trainControls);
   const now = useSimNow(1000);
   const lines = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties])), [network.lines]);
   const names = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
   const station = useMemo(() => network.stations.features.find((f) => f.properties.id === id)?.properties, [network.stations, id]);
   if (!station) return null;
-  const arrivals = service.nextArrivals(station.id, now).slice(0, 8);
+  const arrivals = service.nextArrivals(station.id, now, trainControls).slice(0, 8);
 
   return (
     <aside className="pointer-events-auto max-h-full w-[min(20rem,calc(100vw-1.5rem))] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 shadow-lg backdrop-blur" aria-label={`${station.name} details`}>
@@ -57,6 +58,7 @@ export function StationPanel({ network, service }: { network: Network; service: 
         <h3 className="mb-1.5 text-xs font-semibold text-slate-800">
           Next trains <span className="font-normal text-slate-400">· simulated</span>
         </h3>
+        {!arrivals.length && <p className="text-xs text-amber-700">No active trains scheduled here. Restart trains in the Control Manager.</p>}
         <ul className="space-y-1">
           {arrivals.map((a) => (
             <li key={`${a.routeId}-${a.terminusId}`} className="flex items-center gap-2 text-xs">

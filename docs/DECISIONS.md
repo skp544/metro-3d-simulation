@@ -2,6 +2,20 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-11: Phase 9 (train control and underground visibility)
+
+The owner requested research, a plan, then implementation of a control manager with Start/Stop, more realistic motion, and visible underground trains. Research and the sequence were recorded in [phase9-plan.md](phase9-plan.md) before implementation.
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 59 | Phase order (user) | Phase 9 is train control and underground visibility. The previously proposed journey-planner enhancements move to a future phase, requiring the owner's go-ahead | Follow the owner's current priority |
+| 60 | Train Control Manager (user) | Replace the passive Trains dock tab with the full 218-train fleet: search, line/status filters, per-train Start/Stop, Start all/Stop all, Follow in 3D. Map-hidden lines remain controllable; Follow reveals the chosen line | Manage every simulated train from one panel in either view |
+| 61 | Hold semantics | Start/Stop is an immediate simulation hold/resume. Each train retains accumulated delay in shared simulation seconds. Commands are idempotent; the global clock pause and speed remain separate. Controls last for the page session, including 2D/3D switches | No position jumps on resume; one consistent position for the scene, camera, labels and panels. No claim of signalling or collision avoidance |
+| 62 | Arrival predictions | Held trains have no upcoming arrival until restarted. Resumed trains retain delay; trains currently dwelling return “Now”. Static journey estimates explicitly exclude operator holds | Do not advertise an arrival for a train with no known restart time |
+| 63 | Underground visibility (user) | Auto X-ray while following, plus manual Surface and Underground modes. Auto samples the entire consist. Hide the ground and city in X-ray, retain actual nominal track depths and translucent tunnel/station envelopes. Replace the inverted old Layers checkbox | Seeing only a surface marker would not show the underground train itself; city buildings must not cover the X-ray view. Three.js material guidance: https://threejs.org/docs/pages/Material.html |
+| 64 | Nominal motion and rendering | Ease departures/braking over up to 8 s (at most a quarter of a hop), preserving hop durations. 45 km/h is now the nominal hop average; peak ≤60 km/h. Pitch carriages to track grade; cull portal entry per car; compact distant-dot colours with their positions. Keep instanced Kenney models | Smoother station motion and ramp alignment without inventing official operating parameters or changing geographic data. Instancing guidance: https://threejs.org/docs/pages/InstancedMesh.html |
+| 65 | Clear control status | “Stop following” ends only camera follow; Start/Stop controls the train. Global clock explicitly says SIM/PAUSED; active counts reflect holds and clock pause. Follow command keys remain monotonic across stops | Avoid ambiguous Stop/LIVE labels and dropped repeated follow commands |
+
 ## 2026-11-09: Phase 8 (remaining UI)
 
 The user said "start Phase 8" (2026-11-09). The four agreed items were done in order, smallest first.

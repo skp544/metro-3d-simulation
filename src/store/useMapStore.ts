@@ -1,6 +1,9 @@
 // UI state shared by the 2D map, the 3D scene and the panels.
 import { create } from "zustand";
 import type { InfraType, StationType } from "../data/types";
+import { controlTrains, type TrainControls } from "../utils/trainControl";
+import type { UndergroundMode } from "../utils/underground";
+export { groundVisible, type UndergroundMode } from "../utils/underground";
 
 type LngLat = [number, number];
 export type View = "2d" | "3d";
@@ -24,7 +27,12 @@ interface MapState {
   showStations: boolean;
   showConstruction: boolean;
   showValidation: boolean;
-  showGround: boolean; // 3D: hide the ground to see tunnels and underground trains
+  undergroundMode: UndergroundMode;
+  undergroundFollow: { trainId: string; underground: boolean } | null;
+  setUndergroundMode: (mode: UndergroundMode) => void;
+  reportUnderground: (trainId: string, underground: boolean) => void;
+  trainControls: TrainControls;
+  setTrainsHeld: (ids: readonly string[], held: boolean) => void;
   // Bumped `key` lets the map re-fly to the same place twice.
   focus: { coordinates: LngLat; key: number } | null;
   selectedStationId: string | null;
@@ -45,7 +53,7 @@ interface MapState {
   setAllLines: (hidden: string[]) => void;
   toggleTrackType: (t: InfraType) => void;
   toggleStationType: (t: StationType) => void;
-  setLayer: (layer: "showStations" | "showConstruction" | "showValidation" | "showGround", on: boolean) => void;
+  setLayer: (layer: "showStations" | "showConstruction" | "showValidation", on: boolean) => void;
   focusOn: (coordinates: LngLat) => void;
   fitTo: (bounds: [LngLat, LngLat]) => void;
   followTrain: (trainId: string | null) => void;
@@ -65,6 +73,10 @@ export const simSeconds = (s: Pick<MapState, "playing" | "speed" | "clock">, now
   s.clock.simAtBase + (s.playing ? ((now - s.clock.realAtBase) / 1000) * s.speed : 0);
 
 const routeParam = (new URLSearchParams(location.search).get("route") ?? "").split(",").filter(Boolean);
+const undergroundParam = new URLSearchParams(location.search).get("underground");
+
+// Keep follow command keys monotonic even after stopping, so useCommand does not discard a new follow.
+let followKey = 0;
 
 export const useMapStore = create<MapState>((set, get) => ({
   // ?view=3d opens (and links to) the 3D view; the #zoom/lat/lng hash belongs to the 2D map.
@@ -82,7 +94,12 @@ export const useMapStore = create<MapState>((set, get) => ({
   showStations: true,
   showConstruction: false, // DECISIONS #3: Phase 4 corridors are off by default
   showValidation: false,
-  showGround: true,
+  undergroundMode: undergroundParam === "surface" || undergroundParam === "underground" ? undergroundParam : "auto",
+  undergroundFollow: null,
+  setUndergroundMode: (undergroundMode) => set({ undergroundMode }),
+  reportUnderground: (trainId, underground) => set({ undergroundFollow: { trainId, underground } }),
+  trainControls: {},
+  setTrainsHeld: (ids, held) => set((s) => ({ trainControls: controlTrains(s.trainControls, ids, held, simSeconds(s)) })),
   focus: null,
   selectedStationId: null,
   labels: "trains",
@@ -94,7 +111,7 @@ export const useMapStore = create<MapState>((set, get) => ({
   routeTo: routeParam[1] ?? null,
   playing: true,
   speed: 1,
-  // The simulation starts at the real current time ("LIVE"); trains follow a simulated pattern.
+  // The simulation starts at the real current time; trains follow a nominal simulated pattern.
   clock: { simAtBase: Date.now() / 1000, realAtBase: performance.now() },
   toggleLine: (id) => set((s) => ({ hiddenLines: toggle(s.hiddenLines, id) })),
   setAllLines: (hidden) => set({ hiddenLines: hidden }),
@@ -104,7 +121,7 @@ export const useMapStore = create<MapState>((set, get) => ({
   // Moving the view somewhere else ends a train follow.
   focusOn: (coordinates) => set((s) => ({ focus: { coordinates, key: (s.focus?.key ?? 0) + 1 }, follow: null })),
   fitTo: (bounds) => set((s) => ({ fit: { bounds, key: (s.fit?.key ?? 0) + 1 }, follow: null })),
-  followTrain: (trainId) => set((s) => ({ follow: trainId ? { trainId, key: (s.follow?.key ?? 0) + 1 } : null })),
+  followTrain: (trainId) => set({ follow: trainId ? { trainId, key: ++followKey } : null }),
   setRouteEnd: (end, stationId) => set(end === "from" ? { routeFrom: stationId } : { routeTo: stationId }),
   swapRoute: () => set((s) => ({ routeFrom: s.routeTo, routeTo: s.routeFrom })),
 

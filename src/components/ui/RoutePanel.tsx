@@ -91,7 +91,7 @@ export function RoutePanel({ network }: { network: Network }) {
               );
             })}
           </ol>
-          <p className="mt-2 text-[11px] leading-snug text-slate-400">Estimated from simulated speeds and a nominal {Math.round(TRANSFER_S / 60)}-minute change; not a DMRC timetable or fare route.</p>
+          <p className="mt-2 text-[11px] leading-snug text-slate-400">Estimated from simulated speeds and a nominal {Math.round(TRANSFER_S / 60)}-minute change; excludes operator holds. Not a DMRC timetable or fare route.</p>
         </div>
       )}
     </section>

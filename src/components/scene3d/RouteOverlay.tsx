@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Html, Line } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 import type { Journey } from "../../utils/routePlanner";
 import { pointAt, type RoutePath3D, type StationPoint3D, type V3 } from "./geometry";
 
@@ -20,7 +20,7 @@ function slice(path: RoutePath3D, a: number, b: number): V3[] {
  * at the surface, like the dashed underground lines.
  */
 export function RouteOverlay({ journey, paths, stations, colors, names }: { journey: Journey; paths: RoutePath3D[]; stations: StationPoint3D[]; colors: Map<string, string>; names: Map<string, string> }) {
-  const showGround = useMapStore((s) => s.showGround);
+  const showGround = useMapStore(groundVisible);
   // Mount the tags after the first frame: when two drei <Html> mount in the scene's first render, the
   // first one's content is lost (seen 2026-11-09 with drei 10.7; later-mounting labels are unaffected).
   const [framed, setFramed] = useState(false);

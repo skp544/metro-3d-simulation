@@ -6,14 +6,16 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 
 ## Current phase
 
-Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map), 5 (3D foundations), 6 (3D infrastructure), 7 (3D look, OSM city, simulated trains, reference-style UI) and 8 (remaining UI: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 9 (journey planner) has **not started** and is waiting for the user's go-ahead.
+Phases 1–8 are committed. Phase 9 (train control and underground visibility) is implemented; owner review and commit pending. The owner replaced the proposed journey-planner scope with this work. Do not start another phase without their go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
-## Next session: start here (handoff, 2026-11-09)
+## Next session: start here (handoff, 2026-11-11)
 
-Phase 8 is finished, including a revision for realistic track, sleepers and stations (Phase 8 doc §9, DECISIONS #57–#58), and is waiting for the user's approval (and their commit). Read `docs/phase8-remaining-ui.md` (§6 open issues, §9 revision, §10 next) and `docs/CODE_SUMMARY.md` first.
+Read `docs/HANDOFF.md`, `docs/CODE_SUMMARY.md`, `docs/phase9-train-control.md` and `docs/phase9-plan.md`. Phase 9 adds a Train Control Manager for all 218 simulated trains, individual/fleet Start/Stop, session hold offsets shared by all consumers and station predictions, Auto/Surface/Underground X-ray modes, nominal eased motion, and carriage pitch. The owner chose Auto X-ray while following plus a manual toggle. Decisions #59–#65 explain the choices.
 
-**Phase 9 scope** (proposed, Phase 8 doc §10): From/To station fields; per-line speeds only where sourced (Airport Express); better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. The graph already exists: `src/utils/routePlanner.ts` (DECISIONS #52–#53).
+The manager works in either view; Follow opens 3D and reveals its line. On phones, Follow collapses the manager to expose the train; the follow card also has Start/Stop. “Stop following” only ends camera tracking. Holds survive 2D/3D switches and reset on reload. Global clock pause is separate. No operational signalling or collision avoidance.
+
+**Next scope:** wait for the owner. Journey-planner enhancements (From/To search, sourced line speeds, change times, alternatives, simulated departures) remain a proposal for Phase 10, not started.
 
 **Still open from earlier phases:**
 - The human imagery review (`docs/phase4-leaflet-map.md` §5).
@@ -27,7 +29,8 @@ Phase 8 is finished, including a revision for realistic track, sleepers and stat
 - `?view=2d#zoom/lat/lng` opens the 2D map at a spot.
 - `?base=Satellite` opens the 2D map on imagery.
 - `?route=<fromStationId>,<toStationId>` opens with a route highlighted (e.g. `stn_mkpr,stn_necc`).
-- `EVAL='js'` runs page JavaScript before the shot (click a train row, the view toggle, etc.).
+- `EVAL='js'` runs page JavaScript before the shot (click a train's Start/Stop/Follow button, the view toggle, etc.).
+- `?view=3d&underground=underground` forces X-ray; omit the parameter for Auto.
 
 **Gotchas:**
 - macOS disks are case-insensitive. Never create files whose names differ only in case (`Structures.tsx` vs the old `structures.ts` broke the dev server).
@@ -38,6 +41,8 @@ Phase 8 is finished, including a revision for realistic track, sleepers and stat
 - Props passed to `<Canvas>` / `<MapControls>` in `MetroScene` must be memoised objects: a new object each render resets the camera.
 - Focus/fit/follow/camera commands go through `useCommand` so a view switch doesn't replay them; the view itself crosses via `viewHandoff`.
 - The user commits each phase themselves unless they ask otherwise.
+- All train consumers pass `trainControls` to `service.stateAt` / `nextArrivals`. Never drive the camera from an unadjusted train clock.
+- Underground consumers use `groundVisible`; Auto reports match the current followed train. Follow command keys stay monotonic even after following ends.
 
 ## Workflow rules
 
@@ -75,7 +80,7 @@ npm run data:build   # data/raw + data/manual → data/processed + data/metadata
 npm run data:validate  # validation only → data/metadata/validation_report.json
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (40)
+npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (49)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.
@@ -100,6 +105,8 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 | `docs/phase7-3d-look-trains-ui.md` | Phase 7 summary: OSM city, Kenney models, simulated trains, reference-style UI |
 | `docs/phase8-remaining-ui.md` | Phase 8 summary: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting |
 | `docs/ASSETS.md` | Every third-party 3D asset: source, licence, notes, rejected candidates |
+| `docs/phase9-plan.md` | Research, sources and implementation plan for the owner’s revised Phase 9 scope |
+| `docs/phase9-train-control.md` | Phase 9 train control, underground visibility, motion, checks and limitations |
 | `docs/phaseN-*.md` | One frozen summary per later phase |
 | `text.txt` | The original project brief |
 | `ref_image.png` | Visual style reference for the UI and the 3D view |

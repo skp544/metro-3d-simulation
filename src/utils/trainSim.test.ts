@@ -29,7 +29,8 @@ test("a train runs out and back, stays on its route, and dwells at stops", () =>
   for (let t = start + 5; t < start + r.cycleS; t += 5) {
     const s = service.stateAt(train, t);
     assert.ok(s.km >= -1e-9 && s.km <= r.stopKm.at(-1)! + 1e-9, "km within the route");
-    assert.ok(Math.abs(s.km - prev.km) * 1000 <= ((TRAIN.cruiseKmh * 1000) / 3600) * 5 + 1e-6, "no jumps");
+    // Eased departures preserve duration; peak nominal speed is at most 4/3 of the hop average.
+    assert.ok(Math.abs(s.km - prev.km) * 1000 <= ((TRAIN.cruiseKmh * 1000) / 3600) * (4 / 3) * 5 + 1e-6, "no jumps");
     if (s.atStationId) dwells++;
     if (s.dir !== prev.dir) reversals++;
     prev = s;

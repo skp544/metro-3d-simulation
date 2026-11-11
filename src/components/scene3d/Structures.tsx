@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE, STRUCTURE } from "../../constants/scene";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 import { buildStructures, sleeperMatrices } from "./buildStructures";
 import type { Scene3DData } from "./geometry";
 
@@ -20,7 +20,7 @@ export function Structures({ scene, colors, near }: { scene: Scene3DData; colors
   const hiddenTrackTypes = useMapStore((s) => s.hiddenTrackTypes);
   const hiddenStationTypes = useMapStore((s) => s.hiddenStationTypes);
   const showStations = useMapStore((s) => s.showStations);
-  const showGround = useMapStore((s) => s.showGround);
+  const showGround = useMapStore(groundVisible);
   const selectStation = useMapStore((s) => s.selectStation);
   const built = useMemo(
     () => buildStructures(scene, colors, { hiddenLines, hiddenTrackTypes, hiddenStationTypes, showStations }),

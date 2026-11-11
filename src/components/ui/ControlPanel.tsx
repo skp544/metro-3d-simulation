@@ -98,11 +98,6 @@ export function ControlPanel({ network }: { network: Network }) {
             <Row checked={s.showStations} onChange={(v) => s.setLayer("showStations", v)}>
               Stations
             </Row>
-            {s.view === "3d" && (
-              <Row checked={s.showGround} onChange={(v) => s.setLayer("showGround", v)}>
-                X-ray: hide ground, show tunnels
-              </Row>
-            )}
             {/* shortcut: these two layers exist only on the 2D map; add them to the 3D scene in a later phase. */}
             {s.view === "2d" && (
               <>

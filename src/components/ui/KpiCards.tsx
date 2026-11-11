@@ -1,22 +1,27 @@
 import { useMemo } from "react";
 import type { Network } from "../../data/loadNetwork";
+import { useMapStore } from "../../store/useMapStore";
 import { useSimNow } from "../../store/useSimNow";
 import type { Service } from "../../utils/trainSim";
 
 /** KPI tiles like the reference's top-left row: network, stations, trains running. */
 export function KpiCards({ network, service }: { network: Network; service: Service }) {
+  const trainControls = useMapStore((s) => s.trainControls);
   const now = useSimNow(2000);
   const fixed = useMemo(() => {
     const km = (t?: string) => network.segments.features.filter((f) => !t || f.properties.trackType === t).reduce((a, f) => a + f.properties.lengthKm, 0);
     return { total: km(), elevated: km("elevated"), underground: km("underground"), interchanges: network.interchanges.features.length };
   }, [network]);
-  const atStation = useMemo(() => service.trains.filter((t) => service.stateAt(t, now).atStationId).length, [service, now]);
+  const atStation = useMemo(() => service.trains.filter((t) => service.stateAt(t, now, trainControls).atStationId).length, [service, now, trainControls]);
+
+  const playing = useMapStore((s) => s.playing);
+  const held = service.trains.filter((t) => trainControls[t.id]?.heldAtS != null).length;
 
   return (
     <div className="pointer-events-auto hidden gap-3 md:flex">
       <Kpi label="Network" value={fixed.total.toFixed(0)} unit="km" note={`${fixed.elevated.toFixed(0)} elevated · ${fixed.underground.toFixed(0)} underground`} />
       <Kpi label="Stations" value={String(network.stations.features.length)} note={`${fixed.interchanges} interchanges · 9 lines`} />
-      <Kpi label="Trains running" value={String(service.trains.length)} note={`${atStation} at a station now · simulated`} accent />
+      <Kpi label="Active trains" value={String(playing ? service.trains.length - held : 0)} note={`${held} stopped · ${playing ? `${atStation} at stations` : "clock paused"} · simulated`} accent />
     </div>
   );
 }

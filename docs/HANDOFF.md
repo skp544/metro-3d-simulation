@@ -1,9 +1,9 @@
 # Handoff: Delhi Metro 2D/3D Visualization
 
 **Written:** 2026-11-11 · **For:** any coding model or developer picking this project up without earlier chat history.
-**State at handoff:** Phases 1–8 done and committed (`f11d309`). Phase 9 (journey planner) **not started**. Wait for the owner to say "start Phase 9".
+**State at handoff:** Phases 1–8 committed. Phase 9 (train control and underground visibility, the owner’s revised scope) implemented; owner review and commit pending. Do not start another phase without the owner’s go-ahead. Journey-planner enhancements remain proposed for Phase 10.
 
-Read this file first, then `docs/CODE_SUMMARY.md` (what exists now) and `docs/phase8-remaining-ui.md` (the latest phase). `CLAUDE.md` holds the same rules for Claude Code; this file is the self-contained version.
+Read this file first, then `docs/CODE_SUMMARY.md` (what exists now) and `docs/phase9-train-control.md` (the latest phase) and `docs/phase9-plan.md` (research and plan). `CLAUDE.md` holds the same rules for Claude Code; this file is the self-contained version.
 
 ---
 
@@ -24,9 +24,10 @@ Priorities, in this order: **geographic accuracy → 2D validation → 3D qualit
 |---|---|
 | **One phase at a time** | The roadmap is in `docs/ARCHITECTURE.md` §Roadmap. Never start the next phase without the owner's explicit go-ahead ("start Phase N") |
 | **Close every phase the same way** | Write `docs/phaseN-<topic>.md`, a frozen summary in the same shape as the earlier ones: goal and result, what was built, outputs with **real measured figures**, method, verified, open issues, limitations, how to reproduce, next phase. Update `docs/DECISIONS.md`, `docs/CODE_SUMMARY.md`, `docs/ARCHITECTURE.md` (roadmap row) and the "Next session" section of `CLAUDE.md`. Then stop and report |
-| **Log every decision** | `docs/DECISIONS.md`, newest section first, numbered rows (last is **#58**), with date, decision and reason. Owner choices are marked "(user)" |
+| **Log every decision** | `docs/DECISIONS.md`, newest section first, numbered rows (last is **#65**), with date, decision and reason. Owner choices are marked "(user)" |
 | **The owner commits** | Don't commit or push unless asked. Leave the work tree ready and say so |
 | **Never invent data** | No made-up stations, coordinates, geometry, colours or station types. Unverifiable means `unknown`, logged in the quality report. Hand fixes go in `data/manual/`; `data/processed/` is generated only; `data/raw/` is immutable dated snapshots |
+| **Keep attribution** | Retain “© OpenStreetMap contributors” (ODbL), plus applicable tile/model credits |
 | **Label what isn't real** | Trains are a **simulated** service; route times are **estimated**; structure sizes and most building heights are **nominal**. Keep these labels in the UI and docs |
 | **Realistic visuals, nothing made up** | The owner wants the 3D view to look real and like `ref_image.png`. They pushed back on abstract shapes (a coloured slab for track, boxes for stations). Line colour is an accent, not paint over everything |
 | **Vet any 3D model before using it** | Check licence, `isDownloadable`, `faceCount` (`https://api.sketchfab.com/v3/models/<uid>`) **and the listing itself**. Rejected so far: multi-million-face models, a paid licence, and a spam "free game download" listing. Record every candidate in `docs/ASSETS.md`. Often the owner wants the *look*; building it in code along the real alignment is usually better |
@@ -44,7 +45,7 @@ npm install
 npm run dev            # http://localhost:5173
 npm run build          # tsc -b (app + scripts) && vite build
 npm run lint           # oxlint
-npm test               # 40 tests (node --test): validator, projection, height profile, 3D geometry, structures, city, train sim, route planner
+npm test               # 49 tests (node --test): validator, projection, height profile, 3D geometry, structures, city, train sim, route planner
 npm run data:build     # data/raw + data/manual → data/processed + data/metadata, then validates (offline; exit 1 on errors)
 npm run data:validate  # validation only
 npm run data:fetch     # new OSM + Wikipedia snapshots (network; Overpass is often busy, retries take minutes)
@@ -64,10 +65,12 @@ npm run data:fetch-city && npm run data:city   # OSM buildings/roads/green near 
 Plain `chrome --headless --screenshot` gives a blank WebGL canvas on macOS. Use the project's script, which drives real-time headless Chrome:
 
 ```bash
-npm run build && npx vite preview --port 4173 &
+# Terminal 1: wait for the preview server to print its ready URL.
+npm run build && npx vite preview --port 4173 --strictPort
+# Terminal 2:
 node scripts/screenshot.mjs "http://localhost:4173/?view=3d" /path/out.png 1440 900 16000
 # EVAL='js' runs page JavaScript first (click a train row, a button…); WHEEL=n scrolls n notches in.
-EVAL='document.querySelector("tbody tr").click(); "ok"' node scripts/screenshot.mjs "http://localhost:4173/?view=3d" out.png 1440 900 15000
+EVAL='document.querySelector("[aria-label=\"Follow RD-01 in 3D\"]").click(); "ok"' node scripts/screenshot.mjs "http://localhost:4173/?view=3d" out.png 1440 900 15000
 ```
 
 The script also prints page `console.log` lines and exceptions, which helps with debugging.
@@ -78,10 +81,11 @@ The script also prints page `console.log` lines and exceptions, which helps with
 | `?view=3d&cam=network` / `&cam=top` | Whole network / straight down |
 | `?view=3d&at=lat,lng,dist` | 3D aimed at a place from `dist` metres |
 | `?view=2d#zoom/lat/lng` | 2D at a spot (the hash updates as you move) |
+| `?view=3d&underground=underground` / `&underground=surface` | Manual X-ray / surface; default is Auto while following |
 | `?base=Satellite` | 2D on imagery |
 | `?route=<fromId>,<toId>` | With a route highlighted, e.g. `stn_mkpr,stn_necc` (Majlis Park → Noida Electronic City) |
 
-The headless browser renders in software (SwiftShader), so frames are slow there. Timing-sensitive UI (camera flights) can behave differently from real hardware; this exposed a real bug once (§8).
+The headless browser renders in software (SwiftShader), so frames are slow there. Timing-sensitive UI (camera flights) can behave differently from real hardware; this exposed a camera-flight bug during Phase 8.
 
 ---
 
@@ -107,7 +111,9 @@ shared UI state: src/store/useMapStore.ts (zustand)
 | 3D geometry | `scene3d/geometry.ts` | Route paths (km from the first stop), track runs, station points with heading |
 | Structures | `scene3d/buildStructures.ts` (pure, tested) → `Structures.tsx` | Concrete viaduct, piers with caps, parapets, track bed, sleepers (only within 900 m of the view), rails; stations with side platforms, glazed roof, concourse. Sizes in `STRUCTURE` (`constants/scene.ts`), all nominal |
 | City | `scripts/build-city.ts` → `scene3d/buildCity.ts` → `City.tsx` | Real OSM buildings, roads and parks near stations, in 3 km chunks |
-| Trains | `src/utils/trainSim.ts` → `scene3d/Trains.tsx` | Deterministic simulated service (218 trains); instanced Kenney CC0 cars with line-coloured stripes |
+| Trains | `src/utils/trainSim.ts`, `trainControl.ts` → `scene3d/Trains.tsx` | 218 simulated trains; nominal eased station motion, grade-aligned instanced Kenney cars; per-train hold/resume offsets |
+| Train control | `ui/TrainControlManager.tsx`, `useMapStore.trainControls` | Whole fleet in either view; search/filter, single/all Start/Stop, Follow in 3D. Controls survive view switches, reset on reload. Held trains excluded from next-arrival predictions |
+| Underground | `scene3d/UndergroundWatcher.tsx`, `trainGeometry.ts`, `utils/underground.ts`, `ui/UndergroundControls.tsx` | Auto reveals the entire followed consist below −2 m; manual Surface/Underground overrides. Ground/city hidden in X-ray; true nominal depth retained |
 | Routes | `src/utils/routePlanner.ts` → `store/useJourney.ts` → `ui/RoutePanel.tsx`, `map2d/RouteLayer.tsx`, `scene3d/RouteOverlay.tsx` | Dijkstra on (station, route) nodes; estimated time from the simulation constants plus a 5-minute change |
 | Camera | `scene3d/SceneRig.tsx` (`CameraRig`) | Fly-to, fit, zoom, network/hub views, following a train, reporting the view for the 2D/3D switch |
 | View switch | `viewHandoff` in `useMapStore.ts` | Non-reactive holder of centre + zoom + viewport height; each view writes it, the other reads it once on mount |
@@ -130,6 +136,8 @@ shared UI state: src/store/useMapStore.ts (zustand)
 - **Blue and Green have branches** as separate routes (`blue_vaishali`, `green_kirti_nagar`), joined at Yamuna Bank and Ashok Park Main. Magenta also has two routes.
 - **Left-hand running:** trains run 2 m left of the centre line (`TRAIN.trackOffset`); the two tracks are 4 m apart. In a station's local frame, left of travel is local −z.
 - **The Overpass API is often busy** (429/502/504); the fetch scripts retry with backoff.
+- **Train control is an immediate simulation hold**, not braking/signalling. Use `stateAt(train, time, trainControls)` for every position/status consumer; `nextArrivals` also accepts controls. Camera follow must use the same offsets.
+- **Use `groundVisible` for underground visibility**, not a second ground flag. Auto reports must match the current followed train. Keep follow command keys monotonic after “Stop following”.
 - **City GeoJSON is 12.3 MB** raw (1.45 MB gzipped). Serve it compressed.
 
 ---
@@ -150,7 +158,8 @@ shared UI state: src/store/useMapStore.ts (zustand)
 |---|---|
 | **Frame rate on real hardware** | Never measured (only software rendering). More important now: structures ≈ 522k triangles, city ≈ 473k, up to 40k sleepers. Ask the owner to try `?view=3d`, follow a train and zoom in |
 | **Human imagery review** | The owner's check of the 2D map against satellite imagery, `docs/phase4-leaflet-map.md` §5, is pending |
-| Route times are nominal | One speed (45 km/h) for every line, so the Airport Express gets no speed advantage; flat 5-minute change everywhere |
+| Route times are nominal | Same hop-average speed (45 km/h) on every line, flat 5-minute change; static route estimates exclude operator holds. Station next-arrival predictions do account for holds |
+| Operational realism | Immediate simulation holds; no collision avoidance, signals, route interlocking or real dispatch. Station motion and dimensions are nominal |
 | Station design is generic | Side platforms and one roof type everywhere; not checked per station. Straight stations sit on curved track |
 | Interchange station boxes overlap | One station per line's platform |
 | City coverage | Building density follows OSM mapping, sparse in places |
@@ -158,9 +167,9 @@ shared UI state: src/store/useMapStore.ts (zustand)
 
 ---
 
-## 9. Next: Phase 9, the journey planner (proposed, not started)
+## 9. Next: Phase 10, journey-planner enhancements (proposed, not started)
 
-Proposed scope, from `docs/phase8-remaining-ui.md` §10. Confirm it with the owner first:
+The owner chose train control and underground visibility for Phase 9 (decisions #59–#65). The former journey-planner proposal from `docs/phase8-remaining-ui.md` §10 is still available for a later phase. Confirm the next scope with the owner first:
 
 1. From/To fields with station search (reuse `StationSearch` matching in `ui/TopBar.tsx`) and swap. The route card (`ui/RoutePanel.tsx`) already shows legs, changes and the estimate.
 2. Per-line speeds **only where a source exists** (e.g. the Airport Express), logged in DECISIONS with the source; everything else stays nominal and labelled.
@@ -168,7 +177,7 @@ Proposed scope, from `docs/phase8-remaining-ui.md` §10. Confirm it with the own
 4. Alternatives: fastest vs fewest changes (the planner is `src/utils/routePlanner.ts`; its tests in `routePlanner.test.ts` show the expected shape).
 5. Trains to catch, from the simulated service (`trainSim.nextArrivals`), labelled simulated.
 
-The graph already routes all 59,292 station pairs in about 0.05 ms each. End the phase with `docs/phase9-<topic>.md` and stop for approval.
+The graph already routes all 59,292 station pairs in about 0.05 ms each. That benchmark is from Phase 8. End the next phase with `docs/phase10-<topic>.md` and stop for approval.
 
 ---
 
@@ -178,8 +187,8 @@ The graph already routes all 59,292 station pairs in about 0.05 ms each. End the
 |---|---|
 | What the app must do | `docs/REQUIREMENTS.md` |
 | Structure, schema, pipeline, projection, roadmap | `docs/ARCHITECTURE.md` |
-| Why something is the way it is | `docs/DECISIONS.md` (#1–#58) |
+| Why something is the way it is | `docs/DECISIONS.md` (#1–#65) |
 | What exists in code right now, with figures | `docs/CODE_SUMMARY.md` |
-| A phase's full story | `docs/phase1-…` to `docs/phase8-remaining-ui.md` |
+| A phase's full story | `docs/phase1-…` to `docs/phase9-train-control.md` |
 | Third-party models and rejected candidates | `docs/ASSETS.md` |
 | Data quality issues | `data/metadata/data_quality_report.json`, `validation_report.json` |

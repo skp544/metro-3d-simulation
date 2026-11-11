@@ -4,6 +4,7 @@
 // Explicit .ts imports: this module is also loaded directly by Node's test runner.
 import { TRAIN } from "../constants/scene.ts";
 import type { RoutesFC } from "../data/types.ts";
+import { isTrainHeld, runMotion, trainTime, type TrainControls } from "./trainControl.ts";
 
 /** One leg of a route's round trip: a dwell (fromKm === toKm) or a run between two stops. */
 interface Leg {
@@ -39,6 +40,8 @@ export interface TrainState {
   nextStationId: string; // next stop in the direction of travel (or current, while dwelling)
   terminusId: string; // where this trip ends
   progress: number; // 0..1 of the current one-way trip
+  held: boolean;
+  speedKmh: number; // nominal simulated speed; zero during an operator hold or station dwell
 }
 
 const LINE_CODE: Record<string, string> = {
@@ -81,9 +84,10 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
   }
   const routeById = new Map(simRoutes.map((r) => [r.routeId, r]));
 
-  function stateAt(train: SimTrain, timeS: number): TrainState {
+  function stateAt(train: SimTrain, timeS: number, controls: TrainControls = {}): TrainState {
     const r = routeById.get(train.routeId)!;
-    const phase = (((timeS + train.offsetS) % r.cycleS) + r.cycleS) % r.cycleS;
+    const time = trainTime(timeS, controls[train.id]);
+    const phase = (((time + train.offsetS) % r.cycleS) + r.cycleS) % r.cycleS;
     let lo = 0;
     let hi = r.legs.length - 1;
     while (lo < hi) {
@@ -92,8 +96,9 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
       else hi = mid;
     }
     const leg = r.legs[lo];
-    const f = leg.t1 > leg.t0 ? (phase - leg.t0) / (leg.t1 - leg.t0) : 0;
-    const km = leg.fromKm + (leg.toKm - leg.fromKm) * f;
+    const motion = runMotion(phase - leg.t0, leg.t1 - leg.t0);
+    const held = isTrainHeld(controls[train.id]);
+    const km = leg.fromKm + (leg.toKm - leg.fromKm) * motion.fraction;
     const last = r.stationIds.length - 1;
     const total = r.stopKm[last] || 1;
     return {
@@ -104,11 +109,13 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
       nextStationId: r.stationIds[leg.stop],
       terminusId: r.stationIds[leg.dir === 1 ? last : 0],
       progress: leg.dir === 1 ? km / total : 1 - km / total,
+      held,
+      speedKmh: held ? 0 : Math.abs(leg.toKm - leg.fromKm) * motion.perSecond * 3600,
     };
   }
 
   /** Soonest arrival per (route, direction) at a station, in seconds from `timeS`. */
-  function nextArrivals(stationId: string, timeS: number) {
+  function nextArrivals(stationId: string, timeS: number, controls: TrainControls = {}) {
     const out: { lineId: string; routeId: string; terminusId: string; inS: number; trainId: string }[] = [];
     for (const r of simRoutes) {
       const arrivals = r.legs.filter((l) => l.fromKm === l.toKm && r.stationIds[l.stop] === stationId);
@@ -116,8 +123,11 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
         let best: (typeof out)[number] | null = null;
         for (const leg of arrivals.filter((l) => l.dir === dir))
           for (const t of trains.filter((x) => x.routeId === r.routeId)) {
-            const phase = (((timeS + t.offsetS) % r.cycleS) + r.cycleS) % r.cycleS;
-            const inS = (((leg.t0 - phase) % r.cycleS) + r.cycleS) % r.cycleS;
+            // A held train has no known departure time. Never advertise it as an upcoming arrival.
+            if (isTrainHeld(controls[t.id])) continue;
+            const time = trainTime(timeS, controls[t.id]);
+            const phase = (((time + t.offsetS) % r.cycleS) + r.cycleS) % r.cycleS;
+            const inS = phase >= leg.t0 && phase < leg.t1 ? 0 : (((leg.t0 - phase) % r.cycleS) + r.cycleS) % r.cycleS;
             if (!best || inS < best.inS)
               best = { lineId: r.lineId, routeId: r.routeId, terminusId: r.stationIds[dir === 1 ? r.stationIds.length - 1 : 0], inS, trainId: t.id };
           }
