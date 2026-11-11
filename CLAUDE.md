@@ -86,6 +86,7 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 
 | File | Purpose |
 |---|---|
+| `docs/HANDOFF.md` | Self-contained handoff for another model or developer (also linked from `AGENTS.md`) |
 | `docs/REQUIREMENTS.md` | What the app must do |
 | `docs/ARCHITECTURE.md` | Structure, data schema, pipeline, projection, roadmap |
 | `docs/DECISIONS.md` | Dated decision log |
