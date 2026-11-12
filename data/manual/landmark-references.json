@@ -1,19 +1,88 @@
 {
   "checked": "2026-11-12",
   "references": [
-    { "url": "https://www.delhitourism.gov.in/tourist_place/india_gate.html", "facts": "42 m arch; sandstone proportions and cornices in site photographs", "distributedImages": false },
-    { "url": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html", "facts": "White marble lotus architecture", "distributedImages": false },
-    { "url": "https://www.ice.org.uk/what-is-civil-engineering/infrastructure-projects/lotus-temple", "facts": "27 petals; three types of leaves; separated inner leaves and central skylight", "distributedImages": false },
-    { "url": "https://bahaihouseofworship.in/wp-content/uploads/2024/04/architectural_blossoming_of_the_lotus.pdf", "facts": "Inner leaves rise 34.3 m above inner podium; current model height is rounded nominal 34 m from its own base", "distributedImages": false },
-    { "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/LotusDelhi.jpg/960px-LotusDelhi.jpg", "facts": "Visual comparison of outer petal tips and open gaps; reference downloaded only to temporary folder", "distributedImages": false },
-    { "url": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html", "facts": "72.5 m high; 14.32 m base diameter and 2.75 m top diameter; projecting balconies", "distributedImages": false },
-    { "url": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/", "facts": "Red sandstone facade; gate towers, battlements, chhatris", "distributedImages": false },
-    { "url": "https://commons.wikimedia.org/wiki/File:Lahori_Gate_-_Red_Fort_-_Delhi_2014-05-13_3151-3160_Compress.JPG", "facts": "Gate facade reference; actual scope limited to OSM way 80429907", "distributedImages": false }
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/india_gate.html",
+      "facts": "42 m arch; sandstone proportions and cornices in site photographs",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html",
+      "facts": "White marble lotus architecture",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.ice.org.uk/what-is-civil-engineering/infrastructure-projects/lotus-temple",
+      "facts": "27 petals; three types of leaves; separated inner leaves and central skylight",
+      "distributedImages": false
+    },
+    {
+      "url": "https://bahaihouseofworship.in/wp-content/uploads/2024/04/architectural_blossoming_of_the_lotus.pdf",
+      "facts": "Inner leaves rise 34.3 m above inner podium; current model height is rounded nominal 34 m from its own base",
+      "distributedImages": false
+    },
+    {
+      "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/LotusDelhi.jpg/960px-LotusDelhi.jpg",
+      "facts": "Visual comparison of outer petal tips and open gaps; reference downloaded only to temporary folder",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html",
+      "facts": "72.5 m high; 14.32 m base diameter and 2.75 m top diameter; projecting balconies",
+      "distributedImages": false
+    },
+    {
+      "url": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/",
+      "facts": "Red sandstone facade; gate towers, battlements, chhatris",
+      "distributedImages": false
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Lahori_Gate_-_Red_Fort_-_Delhi_2014-05-13_3151-3160_Compress.JPG",
+      "facts": "Gate facade reference; actual scope limited to OSM way 80429907",
+      "distributedImages": false
+    },
+    {
+      "url": "https://rashtrapatibhavan.gov.in/index.php/rbtour/central-dome",
+      "facts": "Central dome 55 m above forecourt; Sanchi-inspired form, copper cladding, railings, chhatris and flag. Height datum is forecourt, terrain slope is not modeled.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://rashtrapatibhavan.gov.in/presidents-secretariat-making-rashtrapati-bhavan",
+      "facts": "H-shaped palace; classical and Indian architectural elements. Referenced photographs for original procedural facade; no photo textures distributed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.sci.gov.in/about-department/history/",
+      "facts": "Original 1958 building; scales-of-justice concept, central wing, 27.6 m dome and colonnaded verandah. Separate 2019 complex excluded from the custom model.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.bhaktibharat.com/mandir/108-foot-hanumanji",
+      "facts": "Jhandewalan Sankat Mochan Dham identification; 108-foot description and published 28.64497 N, 77.19801 E point. Photographs show orange figure, crown, gada and hands at chest. HTML snapshot retained; location approximate, no surveyed footprint.",
+      "distributedImages": false
+    }
   ],
   "assetSearch": [
-    { "url": "https://sketchfab.com/3d-models/lotus-temple-bf5edd0ef1a74bc3be8c2a52ac2f0362", "result": "Search advertised CC Attribution, but model page/download unavailable (403); not imported" },
-    { "url": "https://www.fab.com/listings/06306e01-c286-4b39-ad4f-bb80d0deefd8", "result": "India Gate listing; no verified usable downloadable asset captured; not imported" },
-    { "url": "https://www.nexprint.com/en/models/G3213670", "result": "Red Fort miniature listing, not used; no verified architectural extent/licence/download captured" }
+    {
+      "url": "https://sketchfab.com/3d-models/lotus-temple-bf5edd0ef1a74bc3be8c2a52ac2f0362",
+      "result": "Search advertised CC Attribution, but model page/download unavailable (403); not imported"
+    },
+    {
+      "url": "https://www.fab.com/listings/06306e01-c286-4b39-ad4f-bb80d0deefd8",
+      "result": "India Gate listing; no verified usable downloadable asset captured; not imported"
+    },
+    {
+      "url": "https://www.nexprint.com/en/models/G3213670",
+      "result": "Red Fort miniature listing, not used; no verified architectural extent/licence/download captured"
+    }
   ],
-  "limitations": ["Station circulation and all street access are generic nominal layouts, not verified entrances.", "India Gate and Lahori Gate front/back orientation is symmetric about the OSM footprint long axis.", "Lotus petal rotation and shell curvature are nominal; pools and grounds omitted without captured site geometry.", "Reference images are not texture licences. Only original generated geometry and materials are distributed."]
+  "limitations": [
+    "Station circulation and all street access are generic nominal layouts, not verified entrances.",
+    "India Gate and Lahori Gate front/back orientation is symmetric about the OSM footprint long axis.",
+    "Lotus petal rotation and shell curvature are nominal; pools and grounds omitted without captured site geometry.",
+    "Reference images are not texture licences. Only original generated geometry and materials are distributed.",
+    "Rashtrapati Bhavan and Supreme Court use source building outlines including courtyard holes for 2D; 3D architecture and interior wing layout are approximate, not surveyed reconstruction.",
+    "Hanuman statue uses a rounded published directory point; no verified OSM statue footprint was found. Width 14 m, depth 12 m, heading, pose and sculptural details are nominal. 108 ft converted to rounded nominal 32.92 m.",
+    "New models are original procedural bpy geometry, generated locally with Blender Python 5.0.1. No paid, downloaded third-party or photo-textured model is included."
+  ]
 }

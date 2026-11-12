@@ -4,6 +4,10 @@ Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows /
 
 The landmark/station extension and the user's visual-review requests (buildings, roads and Yamuna) are implemented. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #72–#75 and `docs/phase8-city-environment.md` first, then the frozen landmark report. The pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
 
+## Latest: Delhi landmark batch 2 (2026-11-12)
+
+Added Rashtrapati Bhavan, Supreme Court and Hanuman Statue · Jhandewalan. Seven places now work through the shared dataset, search and Places list in both views. Read `docs/phase8-landmark-expansion.md` and decisions #78–#80. The palace/court use OSM building relations with courtyard holes; Hanuman has an approximate published directory point, no verified footprint, and nominal model proportions/heading. Landmark focus now fits wide models and faces their modeled facade. Original Blender source/GLBs are included. TypeScript, lint, data build, production build and 75 tests pass. This batch is ready for owner review/commit; further places require a new scope choice.
+
 ## India Gate visibility repair (2026-11-12)
 
 The generic city outline enclosing India Gate is now excluded from rendering so the custom arch is visible. `buildCity.ts` checks containment in both directions; the real-tile regression confirms only the duplicate is removed. Source data/models are unchanged. TypeScript, lint, build and all 75 tests pass. See decision #77 and the Code Summary's India Gate note.

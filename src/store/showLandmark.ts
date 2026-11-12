@@ -5,5 +5,5 @@ import { useMapStore } from "./useMapStore";
 export function showLandmark(f: LandmarksFC["features"][number]) {
   const s = useMapStore.getState();
   s.selectLandmark(f.properties.id);
-  s.focusOn(f.geometry.coordinates as [number, number], Math.max(180, f.properties.heightM * 4), f.properties.heightM * .35);
+  s.focusOn(f.geometry.coordinates as [number, number], Math.max(180, f.properties.heightM * 4, f.properties.widthM * 1.6, f.properties.depthM * 1.6), f.properties.heightM * .35, f.properties.yaw + .35);
 }

@@ -82,7 +82,11 @@ export const CHECKS: Record<string, [Severity, string]> = {
   DUPLICATE_NAME: ["warning", "No two stations share a name"],
   NEARBY_STATIONS: [
     "warning",
-    "No two separate stations within 300 m (possible missed interchange)",
+    "Separate stations within 300 m have a valid explicit walking connection (otherwise a possible missed interchange)",
+  ],
+  WALKING_TRANSFER: [
+    "info",
+    "Nearby separate stations connected by an explicit pedestrian link; alignment is schematic and walking time estimated",
   ],
   REFERENCE_COUNT: [
     "warning",
@@ -682,6 +686,7 @@ export async function validate(
 
   // ---------- 9. Connectivity ----------
   const transferPairs = new Set<string>();
+  const validTransfers = new Map<string, TransferProps>();
   for (const t of transfers) {
     const p = t.properties;
     const a = stationById.get(p.fromStationId),
@@ -710,6 +715,7 @@ export async function validate(
         `${p.id}: schematic link does not join its station coordinates`,
         { featureIds: [p.id] },
       );
+    else validTransfers.set(pair, p);
     transferPairs.add(pair);
   }
   const parent = new Map(
@@ -726,14 +732,14 @@ export async function validate(
         find(s.properties.fromStationId),
         find(s.properties.toStationId),
       );
-  for (const t of transfers)
+  for (const t of validTransfers.values())
     if (
-      parent.has(t.properties.fromStationId) &&
-      parent.has(t.properties.toStationId)
+      parent.has(t.fromStationId) &&
+      parent.has(t.toStationId)
     )
       parent.set(
-        find(t.properties.fromStationId),
-        find(t.properties.toStationId),
+        find(t.fromStationId),
+        find(t.toStationId),
       );
   const comps = new Map<string, string[]>();
   for (const id of parent.keys())
@@ -767,10 +773,13 @@ export async function validate(
     for (let j = i + 1; j < stations.length; j++) {
       const [a, b] = [stations[i], stations[j]];
       const d = meters(a.geometry.coordinates, b.geometry.coordinates);
+      const walk = validTransfers.get([a.properties.id, b.properties.id].sort().join("|"));
       if (d < 300)
         add(
-          "NEARBY_STATIONS",
-          `${a.properties.name} and ${b.properties.name} are ${Math.round(d)} m apart but separate stations`,
+          walk ? "WALKING_TRANSFER" : "NEARBY_STATIONS",
+          walk
+            ? `${a.properties.name} ↔ ${b.properties.name}: walking connection · ≈ ${Math.round(walk.walkSeconds / 60)} min (estimated); ${Math.round(d)} m straight-line separation. Separate stations; schematic path.`
+            : `${a.properties.name} and ${b.properties.name} are ${Math.round(d)} m apart but separate stations`,
           {
             featureIds: [a.properties.id, b.properties.id],
             location: a.geometry.coordinates,

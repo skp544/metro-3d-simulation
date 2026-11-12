@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Delhi landmark second batch
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 78 | Next landmarks (user) | Add Rashtrapati Bhavan, Supreme Court of India and the Hanuman statue near Jhandewalan as one batch; extend the shared landmark pipeline. | Owner confirmed this batch and the statue identity. Other suggested landmarks remain future scope. |
+| 79 | Location and model provenance | Use verified OSM building relations with courtyard holes for the palace/court; use a captured published directory point for Hanuman with an empty footprint. Author original CC0 procedural Blender models. Palace/court dome heights have official sources; statue proportions/heading and rounded height remain nominal. | Never invent a geographic footprint or confuse the court with its metro station. No verified OSM statue outline was found; model dimensions and architecture must remain explicitly approximate. |
+| 80 | Landmark view | Size focus distance using width/depth as well as height and optionally aim at the modeled facade. | The new buildings are substantially wider than earlier landmarks; a height-only focus cropped them or showed their rear elevation. |
+
 ## 2026-11-12: India Gate duplicate city extrusion
 
 | # | Topic | Decision | Reason |

@@ -114,8 +114,9 @@ export function StationPanel({
         {walks.length > 0 && (
           <div className="mb-3 space-y-2">
             <h3 className="text-xs font-semibold text-slate-800">
-              Walking connections
+              Walking pathways
             </h3>
+            <p className="text-[11px] text-slate-500">Dashed amber paths show schematic connections between separate stations. Walking times are estimated.</p>
             {walks.map(({ properties: t }) => {
               const other =
                 t.fromStationId === station.id

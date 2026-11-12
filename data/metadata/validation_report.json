@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-12T09:25:19.191Z",
+  "generatedAt": "2026-11-12T17:42:41.013Z",
   "input": "data/processed",
   "passed": true,
   "summary": {
     "errors": 0,
-    "warnings": 7,
-    "info": 68
+    "warnings": 2,
+    "info": 73
   },
   "checks": [
     {
@@ -130,9 +130,16 @@
     {
       "code": "NEARBY_STATIONS",
       "severity": "warning",
-      "description": "No two separate stations within 300 m (possible missed interchange)",
+      "description": "Separate stations within 300 m have a valid explicit walking connection (otherwise a possible missed interchange)",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
+      "code": "WALKING_TRANSFER",
+      "severity": "info",
+      "description": "Nearby separate stations connected by an explicit pedestrian link; alignment is schematic and walking time estimated",
       "issues": 5,
-      "status": "fail"
+      "status": "noted"
     },
     {
       "code": "REFERENCE_COUNT",
@@ -413,9 +420,9 @@
   ],
   "issues": [
     {
-      "severity": "warning",
-      "code": "NEARBY_STATIONS",
-      "message": "Anand Vihar and Anand Vihar (Namo Bharat) are 135 m apart but separate stations",
+      "severity": "info",
+      "code": "WALKING_TRANSFER",
+      "message": "Anand Vihar ↔ Anand Vihar (Namo Bharat): walking connection · ≈ 5 min (estimated); 135 m straight-line separation. Separate stations; schematic path.",
       "featureIds": [
         "stn_anvr",
         "stn_ncrtc_a02"
@@ -426,9 +433,9 @@
       ]
     },
     {
-      "severity": "warning",
-      "code": "NEARBY_STATIONS",
-      "message": "New Ashok Nagar and New Ashok Nagar (Namo Bharat) are 267 m apart but separate stations",
+      "severity": "info",
+      "code": "WALKING_TRANSFER",
+      "message": "New Ashok Nagar ↔ New Ashok Nagar (Namo Bharat): walking connection · ≈ 4 min (estimated); 267 m straight-line separation. Separate stations; schematic path.",
       "featureIds": [
         "stn_nagr",
         "stn_ncrtc_a01"
@@ -439,9 +446,9 @@
       ]
     },
     {
-      "severity": "warning",
-      "code": "NEARBY_STATIONS",
-      "message": "Ghaziabad (Namo Bharat) and Shaheed Sthal are 272 m apart but separate stations",
+      "severity": "info",
+      "code": "WALKING_TRANSFER",
+      "message": "Ghaziabad (Namo Bharat) ↔ Shaheed Sthal: walking connection · ≈ 6 min (estimated); 272 m straight-line separation. Separate stations; schematic path.",
       "featureIds": [
         "stn_ncrtc_a04",
         "stn_osm_n9144051094"
@@ -452,9 +459,9 @@
       ]
     },
     {
-      "severity": "warning",
-      "code": "NEARBY_STATIONS",
-      "message": "Sarai Kale Khan (Namo Bharat) and Sarai Kale Khan - Nizamuddin are 93 m apart but separate stations",
+      "severity": "info",
+      "code": "WALKING_TRANSFER",
+      "message": "Sarai Kale Khan (Namo Bharat) ↔ Sarai Kale Khan - Nizamuddin: walking connection · ≈ 5 min (estimated); 93 m straight-line separation. Separate stations; schematic path.",
       "featureIds": [
         "stn_ncrtc_z00",
         "stn_nizm"
@@ -465,9 +472,9 @@
       ]
     },
     {
-      "severity": "warning",
-      "code": "NEARBY_STATIONS",
-      "message": "Noida Sector 51 and Noida Sector 52 are 253 m apart but separate stations",
+      "severity": "info",
+      "code": "WALKING_TRANSFER",
+      "message": "Noida Sector 51 ↔ Noida Sector 52: walking connection · ≈ 8 min (estimated); 253 m straight-line separation. Separate stations; schematic path.",
       "featureIds": [
         "stn_nmrc_osm_n4950923222",
         "stn_osm_n6539894866"

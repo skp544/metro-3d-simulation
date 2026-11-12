@@ -1,4 +1,5 @@
-import { Polyline, Tooltip } from "react-leaflet";
+import { Fragment, useState } from "react";
+import { Polyline, Tooltip, useMapEvents } from "react-leaflet";
 import type { Network } from "../../data/loadNetwork";
 import { useJourney } from "../../store/useJourney";
 import { useMapStore } from "../../store/useMapStore";
@@ -8,7 +9,10 @@ export function TransferLayer({ network }: { network: Network }) {
   const hidden = useMapStore(s => s.hiddenLines);
   const hiddenTypes = useMapStore(s => s.hiddenStationTypes);
   const show = useMapStore(s => s.showStations);
+  const selectStation = useMapStore(s => s.selectStation);
   const journey = useJourney(network);
+  const map = useMapEvents({ zoomend: () => setZoom(map.getZoom()) });
+  const [zoom, setZoom] = useState(() => map.getZoom());
   if (!show) return null;
   const stations = new Map(network.stations.features.map(f => [f.properties.id, f.properties]));
   const visible = (id: string) => {
@@ -18,9 +22,22 @@ export function TransferLayer({ network }: { network: Network }) {
   return network.transfers.features.filter(f => visible(f.properties.fromStationId) && visible(f.properties.toStationId)).map(f => {
     const t = f.properties;
     const used = journey?.walks.some(w => w.id === t.id);
-    return <Polyline key={t.id} positions={f.geometry.coordinates.map(([lng, lat]) => [lat, lng] as [number, number])}
-      pathOptions={{ color: used ? "#b45309" : "#475569", weight: used ? 5 : 2.5, dashArray: "4 5", opacity: journey && !used ? 0.3 : 1 }}>
-      <Tooltip>Walk: {stations.get(t.fromStationId)!.name} ↔ {stations.get(t.toStationId)!.name}<br />≈ {Math.round(t.walkSeconds / 60)} min (estimated). Schematic connection.</Tooltip>
-    </Polyline>;
+    const positions = f.geometry.coordinates.map(([lng, lat]) => [lat, lng] as [number, number]);
+    const opacity = journey && !used ? 0.3 : 1;
+    const label = zoom >= 15 && (!journey || used);
+    return <Fragment key={t.id}>
+      <Polyline positions={positions} interactive={false}
+        pathOptions={{ color: "#ffffff", weight: used ? 10 : 8, opacity }} />
+      <Polyline positions={positions}
+        eventHandlers={{ click: () => selectStation(t.fromStationId) }}
+        pathOptions={{ color: "#b45309", weight: used ? 5 : 4, dashArray: "6 7", opacity }}>
+        <Tooltip key={String(label)} permanent={label} direction="top" offset={[0, -6]}>
+          <span title={`${stations.get(t.fromStationId)!.name} ↔ ${stations.get(t.toStationId)!.name}. ${t.note}`}>
+            <b>🚶 Walk · ≈ {Math.round(t.walkSeconds / 60)} min (estimated)</b><br />
+            {label ? "Schematic path · click for details" : `${stations.get(t.fromStationId)!.name} ↔ ${stations.get(t.toStationId)!.name} · schematic path`}
+          </span>
+        </Tooltip>
+      </Polyline>
+    </Fragment>;
   });
 }

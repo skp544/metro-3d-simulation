@@ -5,6 +5,8 @@ export interface LandmarkProps extends Provenance {
   id: string;
   name: string;
   footprint: [number, number][];
+  footprintHoles?: [number, number][][];
+  positionSource?: string;
   model: string;
   widthM: number;
   depthM: number;

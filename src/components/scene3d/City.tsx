@@ -75,7 +75,7 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
     }).catch((e:Error)=>{if(active&&e.name!=="AbortError")onStatus("Some surroundings could not load. Move the view to retry.");});
     return ()=>{active=false;abort.abort();};
   },[wanted,environment,onStatus,projection]);
-  const exclusions=useMemo(()=>landmarks.features.map(f=>({footprint:f.properties.footprint,osmId:f.properties.source[0].split("@")[0]})),[landmarks]);
+  const exclusions=useMemo(()=>landmarks.features.filter(f=>f.properties.footprint.length>0).map(f=>({footprint:f.properties.footprint,osmId:f.properties.source[0].split("@")[0]})),[landmarks]);
   const empty=useMemo<CityData>(()=>({buildings:{type:"FeatureCollection",features:[]},roads:{type:"FeatureCollection",features:[]},green:{type:"FeatureCollection",features:[]},trees:{type:"FeatureCollection",features:[]}}),[]);
   const built=useMemo(()=>buildCity(city??empty,projection,exclusions),[city,empty,projection,exclusions]);
   const backdrop=useMemo(()=>environment?buildCity(empty,projection,[],environment.context):null,[environment,empty,projection]);

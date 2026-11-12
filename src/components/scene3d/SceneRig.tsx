@@ -54,7 +54,14 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
 
   useCommand("focus", focus?.key, !!controls, () => {
     const [x, z] = projection.project(focus!.coordinates);
-    flyTo(around(new THREE.Vector3(x, focus!.heightM ?? 0, z), focus!.distanceM ?? FOCUS_DISTANCE_M));
+    const target = new THREE.Vector3(x, focus!.heightM ?? 0, z);
+    const distance = focus!.distanceM ?? FOCUS_DISTANCE_M;
+    const yaw = focus!.viewYaw;
+    // Landmark selection opens on its modeled facade; ordinary station focus retains the viewing angle.
+    flyTo(yaw === undefined ? around(target, distance) : {
+      target,
+      position: target.clone().add(new THREE.Vector3(Math.sin(yaw), .65, Math.cos(yaw)).setLength(distance)),
+    });
   });
 
   useCommand("fit", fit?.key, !!controls, () => {

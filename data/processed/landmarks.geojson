@@ -67,13 +67,15 @@
             28.6130578
           ]
         ],
+        "footprintHoles": [],
         "model": "/models/landmarks/india-gate.glb",
         "widthM": 27.41695766346309,
         "depthM": 17.752913888008017,
         "heightM": 42,
         "heightEstimated": false,
         "yaw": 1.5352549136994207,
-        "orientationSource": "OSM footprint long axis (front/back symmetric approximation)",
+        "orientationSource": "OSM footprint long axis; facade details approximate",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
         "scope": "Stone arch; architectural details approximated from reference photographs.",
         "nearestStation": {
           "stationId": "stn_km",
@@ -253,6 +255,7 @@
             28.5533484
           ]
         ],
+        "footprintHoles": [],
         "model": "/models/landmarks/lotus-temple.glb",
         "widthM": 68.93145744154029,
         "depthM": 67.94067065754973,
@@ -260,6 +263,7 @@
         "heightEstimated": true,
         "yaw": 0,
         "orientationSource": "nominal; radial model",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
         "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed.",
         "nearestStation": {
           "stationId": "stn_kjmd",
@@ -379,6 +383,7 @@
             28.5244758
           ]
         ],
+        "footprintHoles": [],
         "model": "/models/landmarks/qutb-minar.glb",
         "widthM": 14.141502942618938,
         "depthM": 14.072607887590303,
@@ -386,6 +391,7 @@
         "heightEstimated": false,
         "yaw": 0,
         "orientationSource": "nominal; radial model",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
         "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified.",
         "nearestStation": {
           "stationId": "stn_qm",
@@ -457,13 +463,15 @@
             28.6556722
           ]
         ],
+        "footprintHoles": [],
         "model": "/models/landmarks/red-fort.glb",
         "widthM": 49.46842549350586,
         "depthM": 21.37138811139633,
         "heightM": 33,
         "heightEstimated": true,
         "yaw": -1.6139830912313131,
-        "orientationSource": "OSM footprint long axis (front/back symmetric approximation)",
+        "orientationSource": "OSM footprint long axis; facade details approximate",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
         "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed.",
         "nearestStation": {
           "stationId": "stn_llqa",
@@ -475,6 +483,693 @@
         "source": [
           "osm:way/80429907@11",
           "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.19942230112274,
+          28.614543800664478
+        ]
+      },
+      "properties": {
+        "id": "rashtrapati-bhavan",
+        "name": "Rashtrapati Bhavan",
+        "footprint": [
+          [
+            77.1987457,
+            28.6152655
+          ],
+          [
+            77.1993803,
+            28.6152363
+          ],
+          [
+            77.199383,
+            28.6152815
+          ],
+          [
+            77.1997972,
+            28.6152624
+          ],
+          [
+            77.1997947,
+            28.6152203
+          ],
+          [
+            77.200451,
+            28.6151901
+          ],
+          [
+            77.2004387,
+            28.6149843
+          ],
+          [
+            77.1999466,
+            28.615007
+          ],
+          [
+            77.1998898,
+            28.6140549
+          ],
+          [
+            77.1998677,
+            28.613685
+          ],
+          [
+            77.200273,
+            28.6136664
+          ],
+          [
+            77.2002608,
+            28.6134618
+          ],
+          [
+            77.1996723,
+            28.6134889
+          ],
+          [
+            77.1996897,
+            28.6137815
+          ],
+          [
+            77.1997564,
+            28.6137784
+          ],
+          [
+            77.1997712,
+            28.6140268
+          ],
+          [
+            77.1991553,
+            28.6140552
+          ],
+          [
+            77.1991395,
+            28.6137902
+          ],
+          [
+            77.1992032,
+            28.6137873
+          ],
+          [
+            77.1991864,
+            28.6135063
+          ],
+          [
+            77.1986055,
+            28.613533
+          ],
+          [
+            77.1986235,
+            28.6138349
+          ],
+          [
+            77.1989432,
+            28.6138201
+          ],
+          [
+            77.1990099,
+            28.6149371
+          ],
+          [
+            77.1987268,
+            28.6149502
+          ],
+          [
+            77.1987457,
+            28.6152655
+          ]
+        ],
+        "footprintHoles": [
+          [
+            [
+              77.1997056,
+              28.615084
+            ],
+            [
+              77.1998085,
+              28.6150776
+            ],
+            [
+              77.1998146,
+              28.6151526
+            ],
+            [
+              77.1997117,
+              28.615159
+            ],
+            [
+              77.1997056,
+              28.615084
+            ]
+          ],
+          [
+            [
+              77.1998723,
+              28.6146871
+            ],
+            [
+              77.199893,
+              28.6149501
+            ],
+            [
+              77.1993193,
+              28.6149842
+            ],
+            [
+              77.1993066,
+              28.614952
+            ],
+            [
+              77.1992781,
+              28.6149294
+            ],
+            [
+              77.1992554,
+              28.6149048
+            ],
+            [
+              77.199236,
+              28.6148518
+            ],
+            [
+              77.1992468,
+              28.6148083
+            ],
+            [
+              77.1992738,
+              28.6147685
+            ],
+            [
+              77.1992992,
+              28.6147561
+            ],
+            [
+              77.1993099,
+              28.6147401
+            ],
+            [
+              77.1993115,
+              28.6147212
+            ],
+            [
+              77.1998723,
+              28.6146871
+            ]
+          ],
+          [
+            [
+              77.1988714,
+              28.6151202
+            ],
+            [
+              77.1988679,
+              28.6150399
+            ],
+            [
+              77.1989884,
+              28.6150359
+            ],
+            [
+              77.1989918,
+              28.6151162
+            ],
+            [
+              77.1988714,
+              28.6151202
+            ]
+          ],
+          [
+            [
+              77.1990569,
+              28.6151101
+            ],
+            [
+              77.1990534,
+              28.6150299
+            ],
+            [
+              77.1991739,
+              28.6150258
+            ],
+            [
+              77.1991774,
+              28.6151061
+            ],
+            [
+              77.1990569,
+              28.6151101
+            ]
+          ],
+          [
+            [
+              77.1996674,
+              28.6151578
+            ],
+            [
+              77.1996019,
+              28.6151614
+            ],
+            [
+              77.199598,
+              28.6151081
+            ],
+            [
+              77.199503,
+              28.6151134
+            ],
+            [
+              77.1994989,
+              28.6150577
+            ],
+            [
+              77.1996594,
+              28.6150487
+            ],
+            [
+              77.1996674,
+              28.6151578
+            ]
+          ],
+          [
+            [
+              77.1992598,
+              28.6142308
+            ],
+            [
+              77.1991659,
+              28.6142363
+            ],
+            [
+              77.1991853,
+              28.6144882
+            ],
+            [
+              77.1992792,
+              28.6144826
+            ],
+            [
+              77.1992598,
+              28.6142308
+            ]
+          ]
+        ],
+        "model": "/models/landmarks/rashtrapati-bhavan.glb",
+        "widthM": 198.40364100166033,
+        "depthM": 170.37422716424618,
+        "heightM": 55,
+        "heightEstimated": false,
+        "yaw": 1.5179025464322062,
+        "orientationSource": "OSM footprint long axis; facade details approximate",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
+        "scope": "Main palace with central dome, colonnaded portico, courtyard wings and chhatris. Height referenced to the forecourt; facade details and internal layout approximated. Presidential Estate, gardens and Jaipur Column are not reconstructed.",
+        "nearestStation": {
+          "stationId": "stn_ctst",
+          "name": "Central Secretariat",
+          "distanceM": 1264
+        },
+        "reference": "https://rashtrapatibhavan.gov.in/index.php/rbtour/central-dome",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:relation/5354966@25",
+          "https://rashtrapatibhavan.gov.in/index.php/rbtour/central-dome"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.23947721160735,
+          28.622544190261806
+        ]
+      },
+      "properties": {
+        "id": "supreme-court",
+        "name": "Supreme Court of India",
+        "footprint": [
+          [
+            77.2401026,
+            28.6228844
+          ],
+          [
+            77.2397912,
+            28.6221289
+          ],
+          [
+            77.2397232,
+            28.6221512
+          ],
+          [
+            77.2396383,
+            28.6216076
+          ],
+          [
+            77.2397244,
+            28.6215692
+          ],
+          [
+            77.2397989,
+            28.6214851
+          ],
+          [
+            77.2398261,
+            28.6213932
+          ],
+          [
+            77.2398139,
+            28.6212989
+          ],
+          [
+            77.239767,
+            28.6212301
+          ],
+          [
+            77.2396744,
+            28.6211579
+          ],
+          [
+            77.2395787,
+            28.6211377
+          ],
+          [
+            77.2394622,
+            28.6211448
+          ],
+          [
+            77.2394684,
+            28.6211895
+          ],
+          [
+            77.2394259,
+            28.6211895
+          ],
+          [
+            77.2394231,
+            28.621274
+          ],
+          [
+            77.239508,
+            28.6212615
+          ],
+          [
+            77.2396128,
+            28.6212715
+          ],
+          [
+            77.2396609,
+            28.6213112
+          ],
+          [
+            77.2396779,
+            28.6213734
+          ],
+          [
+            77.2396524,
+            28.621443
+          ],
+          [
+            77.2396071,
+            28.6214852
+          ],
+          [
+            77.2395448,
+            28.6215026
+          ],
+          [
+            77.2394684,
+            28.6215175
+          ],
+          [
+            77.2395618,
+            28.6221413
+          ],
+          [
+            77.2391343,
+            28.6222631
+          ],
+          [
+            77.2388172,
+            28.6216964
+          ],
+          [
+            77.2387295,
+            28.6217312
+          ],
+          [
+            77.2386502,
+            28.6217437
+          ],
+          [
+            77.2385851,
+            28.6217312
+          ],
+          [
+            77.2385426,
+            28.6216815
+          ],
+          [
+            77.2385313,
+            28.621612
+          ],
+          [
+            77.2385681,
+            28.6215523
+          ],
+          [
+            77.2386134,
+            28.621525
+          ],
+          [
+            77.2386927,
+            28.6214877
+          ],
+          [
+            77.2386474,
+            28.6214057
+          ],
+          [
+            77.2385766,
+            28.621438
+          ],
+          [
+            77.2385433,
+            28.621402
+          ],
+          [
+            77.2384464,
+            28.6214703
+          ],
+          [
+            77.2383897,
+            28.6215645
+          ],
+          [
+            77.2383812,
+            28.6216592
+          ],
+          [
+            77.238412,
+            28.6217502
+          ],
+          [
+            77.2384718,
+            28.6218108
+          ],
+          [
+            77.2385774,
+            28.6218676
+          ],
+          [
+            77.2386757,
+            28.6218729
+          ],
+          [
+            77.2387408,
+            28.6218729
+          ],
+          [
+            77.2390239,
+            28.6223501
+          ],
+          [
+            77.2389503,
+            28.6223774
+          ],
+          [
+            77.2392334,
+            28.6231428
+          ],
+          [
+            77.2393268,
+            28.6232776
+          ],
+          [
+            77.2394648,
+            28.6233747
+          ],
+          [
+            77.2396298,
+            28.6234069
+          ],
+          [
+            77.2398039,
+            28.6233901
+          ],
+          [
+            77.2399667,
+            28.6233075
+          ],
+          [
+            77.2400794,
+            28.623192
+          ],
+          [
+            77.2401111,
+            28.6230391
+          ],
+          [
+            77.2401026,
+            28.6228844
+          ]
+        ],
+        "footprintHoles": [
+          [
+            [
+              77.2392299,
+              28.6225427
+            ],
+            [
+              77.2394396,
+              28.6230353
+            ],
+            [
+              77.2394849,
+              28.623094
+            ],
+            [
+              77.2395346,
+              28.6231377
+            ],
+            [
+              77.2395687,
+              28.6231478
+            ],
+            [
+              77.2395885,
+              28.6230976
+            ],
+            [
+              77.2396457,
+              28.6231073
+            ],
+            [
+              77.239705,
+              28.6231054
+            ],
+            [
+              77.2397666,
+              28.6230745
+            ],
+            [
+              77.239804,
+              28.6230339
+            ],
+            [
+              77.2398633,
+              28.6230648
+            ],
+            [
+              77.2398963,
+              28.6230185
+            ],
+            [
+              77.2398971,
+              28.6229683
+            ],
+            [
+              77.239887,
+              28.6229228
+            ],
+            [
+              77.2396808,
+              28.6224063
+            ],
+            [
+              77.2392299,
+              28.6225427
+            ]
+          ]
+        ],
+        "model": "/models/landmarks/supreme-court.glb",
+        "widthM": 248.30365908796958,
+        "depthM": 145.77143946648044,
+        "heightM": 27.6,
+        "heightEstimated": false,
+        "yaw": 4.404340883478405,
+        "orientationSource": "OSM footprint long axis; facade details approximate",
+        "positionSource": "OSM position and footprint snapshot 2026-11-12",
+        "scope": "Original main building: central dome, colonnaded verandah and symmetrical wings. Dome height source-backed; wing proportions and details approximate. Additional Building Complex and interior access are not reconstructed.",
+        "nearestStation": {
+          "stationId": "stn_ptmd",
+          "name": "Supreme Court",
+          "distanceM": 315
+        },
+        "reference": "https://www.sci.gov.in/about-department/history/",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:relation/5492821@6",
+          "https://www.sci.gov.in/about-department/history/"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.19801,
+          28.64497
+        ]
+      },
+      "properties": {
+        "id": "hanuman-jhandewalan",
+        "name": "Hanuman Statue · Jhandewalan",
+        "footprint": [],
+        "footprintHoles": [],
+        "model": "/models/landmarks/hanuman-jhandewalan.glb",
+        "widthM": 14,
+        "depthM": 12,
+        "heightM": 32.92,
+        "heightEstimated": true,
+        "yaw": 0,
+        "orientationSource": "nominal; statue heading not surveyed",
+        "positionSource": "Directory point captured 2026-11-12; Published directory point, rounded to five decimals; not a surveyed statue centre",
+        "scope": "108-foot Hanuman murti at Sankat Mochan Dham near Jhandewalan. Approximate directory location; no verified footprint. Crown, mace, tail and hands at the chest are original stylized geometry. Width, depth, pose details and heading nominal; chest opening is not animated.",
+        "nearestStation": {
+          "stationId": "stn_jw",
+          "name": "Jhandewalan",
+          "distanceM": 200
+        },
+        "reference": "https://www.bhaktibharat.com/mandir/108-foot-hanumanji",
+        "snapshot": "2026-11-12",
+        "source": [
+          "data/raw/landmarks/2026-11-12/hanuman-jhandewalan.json",
+          "https://www.bhaktibharat.com/mandir/108-foot-hanumanji"
         ],
         "verified": false,
         "estimated": true,

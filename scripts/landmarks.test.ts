@@ -9,14 +9,31 @@ const landmarks=read("../data/processed/landmarks.geojson") as LandmarksFC;
 const stations=read("../data/processed/metro_stations.geojson") as StationsFC;
 
 test("landmarks: real snapshot identity and footprint, positions and nearest distances independently checked",()=>{
-  assert.equal(landmarks.features.length,4);
+  assert.equal(landmarks.features.length,7);
   for(const f of landmarks.features){
-    const p=f.properties, id=Number(p.source[0].split("/")[1].split("@")[0]);
-    const raw=read(`../data/raw/landmarks/${p.snapshot}/way-${id}.json`);
-    const way=raw.elements.find((e:{type:string})=>e.type==="way");
-    const nodes=new Map<number,[number,number]>(raw.elements.filter((e:{type:string})=>e.type==="node").map((n:{id:number;lon:number;lat:number})=>[n.id,[n.lon,n.lat]]));
-    assert.deepEqual(p.footprint,way.nodes.map((n:number)=>nodes.get(n)));
-    assert.deepEqual(f.geometry.coordinates,centerOfMass(polygon([p.footprint])).geometry.coordinates);
+    const p=f.properties, osm=/^osm:(way|relation)\/(\d+)@/.exec(p.source[0]);
+    if(osm){
+      const raw=read(`../data/raw/landmarks/${p.snapshot}/${osm[1]}-${osm[2]}.json`);
+      const entity=raw.elements.find((e:{type:string;id:number})=>e.type===osm[1]&&e.id===Number(osm[2]));
+      const nodes=new Map<number,[number,number]>(raw.elements.filter((e:{type:string})=>e.type==="node").map((n:{id:number;lon:number;lat:number})=>[n.id,[n.lon,n.lat]]));
+      const ring=(id:number)=>raw.elements.find((e:{type:string;id:number})=>e.type==="way"&&e.id===id).nodes.map((n:number)=>nodes.get(n));
+      if(osm[1]==="way")assert.deepEqual(p.footprint,ring(entity.id));
+      else {
+        assert.deepEqual(p.footprint,ring(entity.members.find((m:{role:string})=>m.role==="outer").ref));
+        const holes=entity.members.filter((m:{role:string})=>m.role==="inner").map((m:{ref:number})=>ring(m.ref));
+        assert.deepEqual(new Set((p.footprintHoles??[]).map(h=>JSON.stringify(h))),new Set(holes.map((h:unknown)=>JSON.stringify(h))));
+      }
+      assert.deepEqual(f.geometry.coordinates,centerOfMass(polygon([p.footprint,...(p.footprintHoles??[])])).geometry.coordinates);
+    }else{
+      assert.equal(p.id,"hanuman-jhandewalan");
+      const source=read(`../data/raw/landmarks/${p.snapshot}/hanuman-jhandewalan.json`);
+      assert.deepEqual(f.geometry.coordinates,source.coordinates);
+      assert.deepEqual(p.footprint,[],"no invented statue footprint");
+      assert.ok(p.positionSource?.includes("Directory point"));
+      assert.ok(p.heightEstimated&&Math.abs(p.heightM-source.heightFeet*.3048)<.01);
+      const html=readFileSync(new URL(`../data/raw/landmarks/${p.snapshot}/${source.htmlSnapshot}`,import.meta.url),"utf8");
+      for(const coordinate of source.coordinates)assert.ok(html.includes(String(coordinate)));
+    }
     const nearest=stations.features.map(s=>({id:s.properties.id,d:distance(point(f.geometry.coordinates),s)*1000})).sort((a,b)=>a.d-b.d)[0];
     assert.equal(nearest.id,p.nearestStation.stationId); assert.equal(Math.round(nearest.d),p.nearestStation.distanceM);
     assert.ok(p.source.length>=2 && p.estimated && !p.verified && p.scope);

@@ -212,8 +212,187 @@ def red_fort():
     for i,m in enumerate([mat('FlagSaffron',(1,.40,.08)),marble,mat('FlagGreen',(.06,.36,.15))]):
         box('Flag stripe',(1,-4,31.9-i*.4),(2,.05,.4),m)
 
-builders={'india-gate':india_gate,'lotus-temple':lotus,'qutb-minar':qutb,'red-fort':red_fort}
+# Proportions below are nominal architectural/sculptural interpretations of cited photographs.
+# Geographic location, overall footprint extents and sourced total heights come from the dataset.
+def sphere(name, xyz, size, material, segments=24, rings=12):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=segments, ring_count=rings, location=xyz)
+    ob=link(bpy.context.object, material); ob.name=name; ob.scale=size
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    for p in ob.data.polygons: p.use_smooth=True
+    return ob
+
+def limb(name, a, b, radius, material, r2=None):
+    a,b=Vector(a),Vector(b); direction=b-a
+    ob=cylinder(name,0,0,0,radius,direction.length,material,20,r2)
+    ob.location=(a+b)/2; ob.rotation_euler=direction.to_track_quat('Z','Y').to_euler()
+    return ob
+
+def tube(name, points, radius, material):
+    cu=bpy.data.curves.new(name,'CURVE'); cu.dimensions='3D'; cu.bevel_depth=radius; cu.bevel_resolution=2; cu.resolution_u=12
+    spline=cu.splines.new('BEZIER'); spline.bezier_points.add(len(points)-1)
+    for p,co in zip(spline.bezier_points,points): p.co=co; p.handle_left_type='AUTO'; p.handle_right_type='AUTO'
+    ob=bpy.data.objects.new(name,cu); current.objects.link(ob); cu.materials.append(material)
+    bpy.context.view_layer.objects.active=ob; ob.select_set(True); bpy.ops.object.convert(target='MESH'); ob.select_set(False)
+    return ob
+
+def stupa(name,x,y,z,r,height,material):
+    n=64; rows=16; verts=[]
+    for j in range(rows+1):
+        t=j/rows*pi/2
+        for i in range(n):
+            a=i*2*pi/n; verts.append((x+r*cos(t)*cos(a),y+r*cos(t)*sin(a),z+height*sin(t)))
+    ob=mesh(name,verts,[(j*n+i,j*n+(i+1)%n,(j+1)*n+(i+1)%n,(j+1)*n+i) for j in range(rows) for i in range(n)],material)
+    for p in ob.data.polygons:p.use_smooth=True
+
+def balustrade(name,x,y,z,width):
+    box(name+' coping',(x,y,z+1.1),(width,.5,.28),light)
+    for i in range(int(width/1.7)+1):
+        box(name+' baluster',(x-width/2+i*1.7,y,z+.5),(.20,.35,1),light)
+
+def palace_windows(x,y,z,width,count,material=shadow):
+    for i in range(count):
+        xx=x-width/2+(i+.5)*width/count
+        box('Deep window recess',(xx,y,z),(1.55,.2,2.7),material)
+        box('Window lintel',(xx,y-.15,z+1.55),(2.1,.5,.3),light)
+        box('Window mullion',(xx,y-.15,z),(.13,.25,2.7),light)
+
+def rashtrapati():
+    # Four surrounding wings leave genuine open courtyards around the central block.
+    box('Palace base',(0,0,.8),(198,170,1.6),red)
+    for x in [-75,75]:
+        box('Courtyard longitudinal wing',(x,0,11),(42,164,20),stone)
+        for y in [-82,82]:
+            box('Red sandstone foundation',(x,y,3.7),(42,.6,4),red)
+            box('Projecting chhajja',(x,y,20),(45,2,1),light)
+            for z in [7,14]:palace_windows(x,y-.4,z,37,10)
+    for y in [-64,64]:
+        # Leave the centre of the east-facing facade open for the recessed ceremonial portico.
+        spans=[(-65,64),(65,64)] if y<0 else [(0,194)]
+        for x,width in spans:
+            box('Cross wing',(x,y,11),(width,36,20),stone)
+            box('Cross wing cornice',(x,y,21.3),(width+2,38,1.5),light)
+            for z in [7,14]:palace_windows(x,y-18.3,z,width-6,max(1,int(width/5.5)))
+    box('Central ceremonial block',(0,0,13),(56,78,24),stone)
+    box('Central red lower course',(0,-39.1,5),(56,.5,6),red)
+    # Long colonnaded entrance, with clear gaps between columns.
+    for x in range(-24,25,4):
+        cylinder('Delhi order portico column',x,-49,3.5,.65,18,light,16)
+        box('Column capital',(x,-49,21.6),(1.8,1.8,.7),light)
+    box('Portico entablature',(0,-49,23),(60,13,2.2),light)
+    box('Portico shadow ceiling',(0,-44,21.8),(55,15,.35),shadow)
+    for i in range(10):box('Broad ceremonial step',(0,-61-i*.9,3.2-i*.28),(61+i*.35,1.15,.5),light)
+    for z,r,h in [(25,19,1.5),(26.5,16,9),(35.5,19,1.1),(36.6,17.8,.8)]:
+        cylinder('Central dome drum',0,0,z,r,h,stone if z<35 else light,64)
+    # Sanchi-inspired railing surrounding the copper dome.
+    for i in range(48):
+        a=2*pi*i/48;cylinder('Dome railing post',18*cos(a),18*sin(a),36.9,.17,2.2,light,8)
+    cylinder('Dome railing cornice',0,0,39,18.3,.28,light,64)
+    copper=mat('DomeCopper',(.38,.29,.20),.3)
+    stupa('Copper central stupa dome',0,0,37,16,13.5,copper)
+    cylinder('Dome crown',0,0,50.5,1.9,1,light,24)
+    cylinder('Flagpole',0,0,51.5,.10,3.5,light,12)
+    for i,m in enumerate([mat('FlagSaffron',(1,.40,.08)),marble,mat('FlagGreen',(.06,.36,.15))]):box('Indian flag stripe',(1.2,0,54.5-i*.34),(2.4,.06,.34),m)
+    for x in [-37,37]:
+        for y in [-32,32]:
+            cylinder('Chhatri podium',x,y,24,5.6,.8,light,16)
+            for i in range(8):
+                a=i*pi/4;cylinder('Chhatri column',x+3.7*cos(a),y+3.7*sin(a),24.8,.22,4.1,light,8)
+            cylinder('Chhatri eaves',x,y,28.9,5.8,.5,light,32)
+            stupa('Palace chhatri',x,y,29.4,4.8,3.4,stone)
+            cylinder('Chhatri finial',x,y,32.8,.18,1.1,light,8,r2=0)
+    for x in [-75,75]:
+        for y in [-82,82]:balustrade('Wing parapet',x,y,22,40)
+
+def supreme_court():
+    courtred=mat('CourtSandstone',(.59,.31,.22)); cream=mat('CourtCream',(.86,.79,.66))
+    # Broad original central beam and low symmetrical wings, rather than the modern annexe.
+    box('Original central wing',(0,12,7),(232,22,14),cream)
+    for x in [-102,102]:
+        box('Side wing',(x,26,6.7),(28,125,13.4),cream)
+        box('Side wing red plinth',(x,26,2),(29,126,4),courtred)
+        box('Side wing cornice',(x,26,13.6),(30,128,.6),courtred)
+        for y in range(-30,83,8):
+            for z in [6.5,10.5]:box('Wing recessed window',(x-14.1,y,z),(.2,2.8,2.2),shadow)
+    box('Centre court block',(0,0,8),(47,45,16),cream)
+    for side in [-1,1]:
+        for x in range(30,101,5):
+            xx=side*x;cylinder('Colonnaded verandah',xx,-4,2,.42,10.3,cream,12)
+            box('Verandah capitals',(xx,-4,12.3),(1.2,1.3,.5),cream)
+            for z in [5,9]:box('Courthouse recessed window',(xx,1,z),(2,.2,2.5),shadow)
+        box('Long red verandah fascia',(side*65,-4,13.6),(82,7,1.2),courtred)
+    box('Main portico roof',(0,-25,15),(49,13,2),courtred)
+    for x in [-20,-12,-4,4,12,20]:
+        cylinder('Main entrance pillar',x,-25,2,.65,12,cream,16)
+    for i in range(8):box('Entrance stair',(0,-33-i*1.2,2-i*.22),(48+i*.5,1.3,.35),cream)
+    cylinder('Dome drum',0,0,12,14,3.8,cream,64)
+    cylinder('Red dome rim',0,0,15.8,14.7,.5,courtred,64)
+    stupa('Supreme Court cream dome',0,0,16.3,13.5,10.2,cream)
+    cylinder('Dome finial',0,0,26.5,.35,1.1,cream,16,r2=0)
+    for x in [-22,22]:
+        cylinder('Small roof pavilion',x,0,16,3,3,cream,16)
+        stupa('Small roof cupola',x,0,19,3.3,2.3,cream)
+    # Original geometric inscription, not a distributed photograph.
+    cu=bpy.data.curves.new('Court inscription','FONT');cu.body='SUPREME COURT OF INDIA';cu.align_x='CENTER';cu.size=1.6;cu.extrude=.012
+    ob=bpy.data.objects.new('Court inscription',cu);current.objects.link(ob);ob.location=(0,-31.55,14.5);ob.rotation_euler=(pi/2,0,0);cu.materials.append(cream)
+    bpy.context.view_layer.objects.active=ob;ob.select_set(True);bpy.ops.object.convert(target='MESH');ob.select_set(False)
+
+def hanuman():
+    orange=mat('HanumanVermilion',(.86,.23,.065)); face=mat('HanumanFace',(.94,.40,.16)); gold=mat('HanumanGold',(.87,.60,.16),.3); cloth=mat('HanumanDhoti',(.65,.045,.025)); black=mat('HanumanEyes',(.045,.028,.015)); white=mat('HanumanTilak',(.96,.91,.75))
+    box('Shrine pedestal',(0,0,.65),(9,7,1.3),red)
+    box('Pedestal cornice',(0,0,1.5),(9.5,7.5,.4),gold)
+    # Feet and strongly planted legs; a simplified sculptural pose.
+    for s in [-1,1]:
+        sphere('Foot',(s*1.65,-.75,2.1),(1.3,2.2,.75),orange)
+        limb('Shin',(s*1.6,0,2.4),(s*1.8,.15,8.3),1.15,orange,1.45)
+        sphere('Knee',(s*1.8,0,8.3),(1.45,1.35,1.5),orange)
+        limb('Thigh',(s*1.8,.15,8.3),(s*1.2,.3,13.4),1.5,orange,1.8)
+        cylinder('Gold anklet',s*1.6,0,2.8,1.26,.45,gold,24)
+    sphere('Dhoti hips',(0,.2,13.1),(3.6,2.1,3.4),cloth)
+    for i in range(-3,4):
+        ob=box('Dhoti pleat',(i*.74,-1.9,11.4),(.38,.28,5.1-abs(i)*.3),gold if abs(i)==3 else orange);ob.rotation_euler.y=i*.06
+    sphere('Torso',(0,.15,18.3),(4,2.15,5.2),orange,32,20)
+    sphere('Waist sash',(0,.05,14.2),(3.8,2.35,.65),gold)
+    for s in [-1,1]:
+        sphere('Shoulder',(s*3.3,.1,21.1),(1.7,1.7,1.9),orange)
+        limb('Upper arm',(s*3.5,.1,21),(s*5,-.8,17.8),1.25,orange,1.05)
+        sphere('Elbow',(s*5,-.8,17.8),(1.12,1.12,1.12),orange)
+        limb('Forearm at chest',(s*5,-.8,17.8),(s*1.4,-2.6,20.2),1,orange,.8)
+        sphere('Hand at heart',(s*1.4,-2.6,20.2),(.9,.65,1.2),face)
+        for i in range(4):limb('Chest holding fingers',(s*(.8+i*.31),-3.1,19.8),(s*(.75+i*.31),-3.12,20.7),.13,face)
+        sphere('Wrist ornament',(s*2.1,-2.3,19.8),(.95,.85,.55),gold)
+        sphere('Upper arm ornament',(s*3.85,-.2,20.1),(1.36,1.35,.5),gold)
+    # Necklace and chest panel evoke the familiar heart-revealing gesture, kept closed and static.
+    tube('Gold necklace',[(-2.8,-1.65,22),(-2,-2.3,18.6),(0,-2.55,17.3),(2,-2.3,18.6),(2.8,-1.65,22)],.20,gold)
+    sphere('Chest pendant',(0,-2.65,18),(.55,.15,.72),gold)
+    cylinder('Neck',0,.1,22,1.3,2.1,orange,24)
+    sphere('Head',(0,0,25.7),(2.3,1.9,2.7),orange,32,20)
+    for s in [-1,1]:
+        sphere('Ear',(s*2.3,-.05,25.5),(.65,.5,1.1),orange)
+        sphere('Gold earring',(s*2.5,-.3,24.6),(.34,.22,.55),gold)
+        sphere('Eye white',(s*.86,-1.72,26.25),(.55,.19,.32),white)
+        sphere('Eye pupil',(s*.80,-1.9,26.25),(.19,.09,.22),black)
+        limb('Dark brow',(s*.35,-1.86,26.75),(s*1.38,-1.67,26.8),.14,black)
+    sphere('Monkey muzzle',(0,-1.66,24.7),(1.55,.85,.9),face)
+    sphere('Nose',(0,-2,25.45),(.65,.54,.42),orange)
+    tube('Mouth',[(-.85,-2.27,24.5),(0,-2.48,24.32),(.85,-2.27,24.5)],.075,black)
+    for x in [-.28,.28]:box('Vertical forehead tilak',(x,-1.9,27.1),(.16,.1,.9),white)
+    box('Tilak centre',(0,-1.97,26.95),(.12,.1,.45),cloth)
+    cylinder('Crown base',0,0,27.7,2.45,.7,gold,40)
+    cylinder('Crown taper',0,0,28.4,2.3,2.8,gold,40,r2=.65)
+    for i in range(12):
+        a=i*2*pi/12;cylinder('Crown fluted peak',1.8*cos(a),1.8*sin(a),28.8,.2,1.9,light,8,r2=.07)
+    sphere('Crown jewel',(0,-2.35,28.2),(.45,.18,.6),cloth)
+    sphere('Crown finial',(0,0,31.4),(.55,.55,.7),gold)
+    # Gada and curved tail are part of the sculptural silhouette, not invented map features.
+    cylinder('Gada shaft',-6,1.1,2.0,.34,20,gold,20)
+    sphere('Gada head',(-6,1.1,23.8),(2.3,2.3,3),gold,24,16)
+    for z in [22.2,23.7,25.2]:cylinder('Gada carved band',-6,1.1,z,2.36,.2,light,32)
+    cylinder('Gada tip',-6,1.1,26.6,.5,1.1,gold,16,r2=.1)
+    tube('Upcurled tail',[(1.5,1.8,13),(4.6,2.4,11.5),(6.1,2.9,14),(6.4,3.0,20),(5.4,3,24),(4.3,3,23.4)],.5,orange)
+
+builders={'india-gate':india_gate,'lotus-temple':lotus,'qutb-minar':qutb,'red-fort':red_fort,'rashtrapati-bhavan':rashtrapati,'supreme-court':supreme_court,'hanuman-jhandewalan':hanuman}
 report=[]
+workshop_x=0
 for f in data['features']:
     p=f['properties']; current=bpy.data.collections.new('NCR_'+p['id']); work.children.link(current)
     bpy.ops.object.select_all(action='DESELECT')
@@ -242,7 +421,9 @@ for f in data['features']:
     report.append({'id':p['id'],'triangles':triangles,'sizeM':target,'bytes':os.path.getsize(os.path.join(OUT,p['id']+'.glb'))})
     ob.select_set(False)
     # Place source objects apart for workshop inspection, after the origin-centred exports.
-    ob.location.x=len(report)*110
+    workshop_x += target[0]/2 + 40
+    ob.location.x=workshop_x
+    workshop_x += target[0]/2
 
 # Library write preserves the user's active .blend path and does not save their unrelated objects.
 source_dir=os.path.join(ROOT,'assets','landmarks')

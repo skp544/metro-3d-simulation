@@ -46,6 +46,7 @@ interface MapState {
     key: number;
     distanceM?: number;
     heightM?: number;
+    viewYaw?: number; // optional model-facing camera angle, in scene radians
   } | null;
   selectedLandmarkId: string | null;
   selectLandmark: (id: string | null) => void;
@@ -75,7 +76,7 @@ interface MapState {
       | "showWater",
     on: boolean,
   ) => void;
-  focusOn: (coordinates: LngLat, distanceM?: number, heightM?: number) => void;
+  focusOn: (coordinates: LngLat, distanceM?: number, heightM?: number, viewYaw?: number) => void;
   fitTo: (bounds: [LngLat, LngLat]) => void;
   followTrain: (trainId: string | null) => void;
   setRouteEnd: (end: "from" | "to", stationId: string | null) => void;
@@ -153,9 +154,9 @@ export const useMapStore = create<MapState>((set, get) => ({
     set((s) => ({ hiddenStationTypes: toggle(s.hiddenStationTypes, t) })),
   setLayer: (layer, on) => set({ [layer]: on }),
   // Moving the view somewhere else ends a train follow.
-  focusOn: (coordinates, distanceM, heightM) =>
+  focusOn: (coordinates, distanceM, heightM, viewYaw) =>
     set((s) => ({
-      focus: { coordinates, distanceM, heightM, key: (s.focus?.key ?? 0) + 1 },
+      focus: { coordinates, distanceM, heightM, viewYaw, key: (s.focus?.key ?? 0) + 1 },
       follow: null,
     })),
   fitTo: (bounds) =>

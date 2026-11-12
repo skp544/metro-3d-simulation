@@ -49,3 +49,15 @@ At runtime, static parts are merged with baked vertex colours into one instanced
 | Kenney City Kit (Commercial / Suburban), Car Kit | CC0, but buildings come from real OSM footprints instead (DECISIONS #41), and road vehicles aren't part of the metro |
 
 Kenney packs were downloaded through the "Continue without donating" link on each official asset page (2026-11-04). CC0 needs no attribution; the app still credits Kenney in the 3D view.
+
+## Delhi landmark batch 2 · 2026-11-12
+
+Rashtrapati Bhavan, Supreme Court of India and Hanuman Statue · Jhandewalan are original project-authored procedural Blender models, CC0 under `public/models/landmarks/LICENSE.txt`. No third-party mesh was imported. Authoring: `scripts/model-landmarks.py`; source library: `assets/landmarks/landmarks.blend`; export environment: Blender Python 5.0.1. Reference photographs informed silhouettes, with no photographs distributed as model textures. See `data/manual/landmark-references.json` for architectural sources and limitations.
+
+| Model | Triangles | GLB bytes |
+| --- | ---: | ---: |
+| rashtrapati-bhavan | 24,196 | 1,158,564 |
+| supreme-court | 14,266 | 634,436 |
+| hanuman-jhandewalan | 23,520 | 696,620 |
+
+Palace: dome, drum railing, portico, chhatris and courtyard wings; court: dome, colonnaded verandah and original main wings; statue: vermilion figure, crown, chest gesture, mace, tail and ornaments. The two buildings use sourced overall extents and official dome heights; their details remain approximate. Hanuman has a directory point rather than a verified footprint, with nominal model width/depth/heading and a rounded 108-foot height. These are lightweight interpretations, not scans or surveyed reconstructions.

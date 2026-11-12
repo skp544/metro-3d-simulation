@@ -28,6 +28,10 @@ const route = (d: Record<string, FC>, id: string) => d.metro_routes.features.fin
 test("real dataset passes", async () => {
   const r = await validate();
   assert.equal(r.summary.errors, 0, JSON.stringify(r.issues.filter((i) => i.severity === "error"), null, 1));
+  assert.equal(r.issues.filter(i => i.code === "NEARBY_STATIONS").length, 0);
+  const walks = r.issues.filter(i => i.code === "WALKING_TRANSFER");
+  assert.equal(walks.length, 5);
+  assert.ok(walks.every(i => i.severity === "info" && i.message.includes("estimated") && i.message.includes("schematic")));
 });
 
 test("pedestrian link to an unknown station is rejected", async () => {
@@ -38,11 +42,31 @@ test("pedestrian link to an unknown station is rejected", async () => {
 test("non-positive walking time is rejected", async () => {
   const r = await validateMutated(d => { d.station_transfers.features[0].properties.walkSeconds = 0; });
   assert.ok(codes(r).has("TRANSFER_INVALID"));
+  assert.ok(r.issues.some(i => i.code === "NEARBY_STATIONS" && i.message.includes("Noida Sector 51")));
+  assert.ok(codes(r).has("NETWORK_DISCONNECTED"));
+});
+
+test("walking connection with displaced geometry retains the proximity warning", async () => {
+  const r = await validateMutated(d => { d.station_transfers.features[0].geometry.coordinates[0][0] += 0.01; });
+  assert.ok(codes(r).has("TRANSFER_INVALID"));
+  assert.ok(r.issues.some(i => i.code === "NEARBY_STATIONS" && i.message.includes("Noida Sector 51")));
+});
+
+test("a reversed walking connection still resolves the nearby pair", async () => {
+  const r = await validateMutated(d => {
+    const f = d.station_transfers.features[0];
+    [f.properties.fromStationId, f.properties.toStationId] = [f.properties.toStationId, f.properties.fromStationId];
+    f.geometry.coordinates.reverse();
+  });
+  assert.equal(r.summary.errors, 0);
+  assert.equal(r.issues.filter(i => i.code === "WALKING_TRANSFER").length, 5);
+  assert.ok(!r.issues.some(i => i.code === "NEARBY_STATIONS"));
 });
 
 test("missing Aqua pedestrian link breaks network connectivity", async () => {
   const r = await validateMutated(d => { d.station_transfers.features = d.station_transfers.features.filter(f => f.properties.id !== "walk_noida_52_51"); });
   assert.ok(codes(r).has("NETWORK_DISCONNECTED"));
+  assert.ok(r.issues.some(i => i.code === "NEARBY_STATIONS" && i.message.includes("Noida Sector 51")));
 });
 
 test("duplicate station id", async () => {

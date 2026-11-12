@@ -11,6 +11,8 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
+**Latest landmark batch:** Seven places including Rashtrapati Bhavan, Supreme Court and Hanuman Statue · Jhandewalan. Read `docs/phase8-landmark-expansion.md` and decisions #78–#80. Relations preserve courtyards; the Hanuman point is directory-sourced, approximate, and has no verified footprint. Model proportions/headings remain nominal. Focus fits full model extents. All 75 tests, TypeScript, lint, data build and production build pass. Stop for owner review before expanding further.
+
 **India Gate repair:** Custom landmark exclusions in `buildCity.ts` check containment both ways. A separate enclosing city outline previously hid the India Gate arch; a real city-tile regression guards this case. See decision #77. Current checks: TypeScript, lint, build and 75 tests passing.
 
 **Merge repair, 2026-11-12:** Train controls and Auto/Surface/Underground are reconciled with regional fleets, sourced speed profiles and the expanded city. Use `groundVisible` for city/ground/transfer visibility; there is no independent `showGround` state. Auto samples actual fleet lengths. TypeScript, lint, production build and 74 tests pass. See CODE_SUMMARY's merge-repair note and decision #76.

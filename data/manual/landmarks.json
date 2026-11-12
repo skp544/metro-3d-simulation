@@ -1,9 +1,78 @@
 {
   "snapshot": "2026-11-12",
   "landmarks": [
-    { "id": "india-gate", "name": "India Gate", "wayId": 361709652, "wikidata": "Q245347", "heightM": 42, "heightEstimated": false, "reference": "https://www.delhitourism.gov.in/tourist_place/india_gate.html", "scope": "Stone arch; architectural details approximated from reference photographs." },
-    { "id": "lotus-temple", "name": "Lotus Temple", "wayId": 44827278, "wikidata": "Q940843", "heightM": 34, "heightEstimated": true, "reference": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html", "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed." },
-    { "id": "qutb-minar", "name": "Qutb Minar", "wayId": 369140381, "wikidata": "Q187635", "heightM": 72.5, "heightEstimated": false, "reference": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html", "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified." },
-    { "id": "red-fort", "name": "Red Fort · Lahori Gate", "wayId": 80429907, "wikidata": "Q16931856", "heightM": 33, "heightEstimated": true, "reference": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/", "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed." }
+    {
+      "id": "india-gate",
+      "name": "India Gate",
+      "wayId": 361709652,
+      "wikidata": "Q245347",
+      "heightM": 42,
+      "heightEstimated": false,
+      "reference": "https://www.delhitourism.gov.in/tourist_place/india_gate.html",
+      "scope": "Stone arch; architectural details approximated from reference photographs."
+    },
+    {
+      "id": "lotus-temple",
+      "name": "Lotus Temple",
+      "wayId": 44827278,
+      "wikidata": "Q940843",
+      "heightM": 34,
+      "heightEstimated": true,
+      "reference": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html",
+      "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed."
+    },
+    {
+      "id": "qutb-minar",
+      "name": "Qutb Minar",
+      "wayId": 369140381,
+      "wikidata": "Q187635",
+      "heightM": 72.5,
+      "heightEstimated": false,
+      "reference": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html",
+      "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified."
+    },
+    {
+      "id": "red-fort",
+      "name": "Red Fort \u00b7 Lahori Gate",
+      "wayId": 80429907,
+      "wikidata": "Q16931856",
+      "heightM": 33,
+      "heightEstimated": true,
+      "reference": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/",
+      "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed."
+    },
+    {
+      "id": "rashtrapati-bhavan",
+      "name": "Rashtrapati Bhavan",
+      "relationId": 5354966,
+      "wikidata": "Q677555",
+      "heightM": 55,
+      "heightEstimated": false,
+      "reference": "https://rashtrapatibhavan.gov.in/index.php/rbtour/central-dome",
+      "scope": "Main palace with central dome, colonnaded portico, courtyard wings and chhatris. Height referenced to the forecourt; facade details and internal layout approximated. Presidential Estate, gardens and Jaipur Column are not reconstructed.",
+      "oriented": true
+    },
+    {
+      "id": "supreme-court",
+      "name": "Supreme Court of India",
+      "relationId": 5492821,
+      "wikidata": "Q213380",
+      "heightM": 27.6,
+      "heightEstimated": false,
+      "reference": "https://www.sci.gov.in/about-department/history/",
+      "scope": "Original main building: central dome, colonnaded verandah and symmetrical wings. Dome height source-backed; wing proportions and details approximate. Additional Building Complex and interior access are not reconstructed.",
+      "oriented": true
+    },
+    {
+      "id": "hanuman-jhandewalan",
+      "name": "Hanuman Statue \u00b7 Jhandewalan",
+      "pointSnapshot": "hanuman-jhandewalan.json",
+      "widthM": 14,
+      "depthM": 12,
+      "heightM": 32.92,
+      "heightEstimated": true,
+      "reference": "https://www.bhaktibharat.com/mandir/108-foot-hanumanji",
+      "scope": "108-foot Hanuman murti at Sankat Mochan Dham near Jhandewalan. Approximate directory location; no verified footprint. Crown, mace, tail and hands at the chest are original stylized geometry. Width, depth, pose details and heading nominal; chest opening is not animated."
+    }
   ]
 }
