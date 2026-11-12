@@ -41,7 +41,7 @@ export function StationPanel({
     [network.stations, id],
   );
   if (!station) return null;
-  const arrivals = service.nextArrivals(station.id, now).slice(0, 8);
+  const arrivals = service.nextArrivals(station.id, now, trainControls).slice(0, 8);
   const walks = network.transfers.features.filter(
     (f) =>
       f.properties.fromStationId === station.id ||

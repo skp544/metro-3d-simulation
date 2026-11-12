@@ -4,6 +4,7 @@ import { simSeconds, useMapStore } from "../../store/useMapStore";
 import type { Service } from "../../utils/trainSim";
 import type { RoutePath3D } from "./geometry";
 import { consistUnderground } from "./trainGeometry";
+import { fleetForLine } from "./trainFleet";
 
 /** Report only transitions. No React updates on each animation frame. Manual modes retain priority. */
 export function UndergroundWatcher({ paths, service }: { paths: RoutePath3D[]; service: Service }) {
@@ -14,7 +15,8 @@ export function UndergroundWatcher({ paths, service }: { paths: RoutePath3D[]; s
     const train = s.follow && trains.get(s.follow.trainId);
     const path = train && routes.get(train.routeId);
     if (!train || !path) return;
-    const underground = consistUnderground(path, service.stateAt(train, simSeconds(s), s.trainControls).km);
+    const fleet = fleetForLine(train.lineId);
+    const underground = consistUnderground(path, service.stateAt(train, simSeconds(s), s.trainControls).km, fleet.formation.length, fleet.carLength);
     if (s.undergroundFollow?.trainId !== train.id || s.undergroundFollow.underground !== underground)
       s.reportUnderground(train.id, underground);
   });

@@ -7,7 +7,7 @@ import {
 } from "../../constants/map";
 import type { Network } from "../../data/loadNetwork";
 import type { InfraType, StationType } from "../../data/types";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 
 const STATION_TYPES: StationType[] = [
   "elevated",
@@ -180,8 +180,8 @@ export function ControlPanel({ network }: { network: Network }) {
             </Row>
             {s.view === "3d" && (
               <Row
-                checked={s.showGround}
-                onChange={(v) => s.setLayer("showGround", v)}
+                checked={!groundVisible(s)}
+                onChange={(v) => s.setUndergroundMode(v ? "underground" : "surface")}
               >
                 X-ray: hide ground, show tunnels
               </Row>

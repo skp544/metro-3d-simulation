@@ -9,7 +9,7 @@ import type { Projection } from "../../utils/projection";
 import { buildCity } from "./buildCity";
 import { facadeTexture, waterTexture } from "./environmentTextures";
 import { selectCityTiles } from "../../utils/cityTiles";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 import { UrbanLife } from "./UrbanLife";
 import { WaterLabels } from "./WaterLabels";
 import type { LandmarksFC } from "../../data/types";
@@ -30,7 +30,7 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
   const cache=useRef(new Map<string,CityData>());
   const last=useRef({time:0,key:""});
   const viewTarget=useRef(new THREE.Vector3());
-  const showGround=useMapStore(s=>s.showGround),showWater=useMapStore(s=>s.showWater);
+  const showGround=useMapStore(groundVisible),showWater=useMapStore(s=>s.showWater);
   const [facade,water]=useMemo(()=>[facadeTexture(),waterTexture()],[]);
   const waterMap=useRef(water);
   useEffect(() => {
@@ -90,7 +90,7 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
         {showWater&&c.banks&&<mesh geometry={c.banks}><meshLambertMaterial vertexColors side={THREE.DoubleSide}/></mesh>}
         {showWater&&c.water&&<mesh geometry={c.water} receiveShadow><meshPhongMaterial vertexColors map={water} shininess={70} specular="#abd5df" side={THREE.DoubleSide}/></mesh>}
       </group>)}
-      {built.chunks.map((c) => (
+      {showGround&&built.chunks.map((c) => (
         <group key={c.key}>
           {showGround&&c.curbs&&<mesh geometry={c.curbs} receiveShadow><meshLambertMaterial vertexColors side={THREE.DoubleSide}/></mesh>}
           {showGround&&c.markings&&<mesh geometry={c.markings}><meshBasicMaterial vertexColors side={THREE.DoubleSide}/></mesh>}

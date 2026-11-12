@@ -25,6 +25,7 @@ import { StationPoints } from "./StationPoints";
 import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
+import { UndergroundWatcher } from "./UndergroundWatcher";
 import { TransferLinks } from "./TransferLinks";
 import { SceneAtmosphere, EnvironmentGround } from "./SceneAtmosphere";
 import { ExploreMovement } from "./ExploreMovement";
@@ -220,6 +221,7 @@ export function MetroScene({
           service={service}
           paths={scene.paths}
         />
+        <UndergroundWatcher paths={scene.paths} service={service} />
         <ExploreMovement />
         <LodWatcher onChange={setNear} />
         {showGround && (

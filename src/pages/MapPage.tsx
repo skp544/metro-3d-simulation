@@ -8,6 +8,7 @@ import { RoutePanel } from "../components/ui/RoutePanel";
 import { SceneControls } from "../components/ui/SceneControls";
 import { StationPanel } from "../components/ui/StationPanel";
 import { TopBar } from "../components/ui/TopBar";
+import { UndergroundControls } from "../components/ui/UndergroundControls";
 import { LandmarkPanel } from "../components/ui/LandmarkPanel";
 import { showLandmark } from "../store/showLandmark";
 import { loadNetwork, type Network } from "../data/loadNetwork";

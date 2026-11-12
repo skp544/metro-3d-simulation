@@ -72,13 +72,21 @@ export function FollowCard({
       <span className="hidden text-[11px] text-slate-400 md:inline">
         simulated
       </span>
+      {s.held && <span className="text-amber-700">Stopped</span>}
+      <button
+        type="button"
+        onClick={() => setTrainsHeld([train.id], !s.held)}
+        className="rounded-full border border-slate-200 px-2.5 py-1 font-medium text-slate-800 hover:bg-slate-100"
+      >
+        {s.held ? "Start train" : "Stop train"}
+      </button>
       <button
         type="button"
         onClick={() => followTrain(null)}
         className="rounded-full bg-slate-900 px-2.5 py-1 font-medium text-white hover:bg-slate-700"
         title="Stop following (Esc, or drag the map)"
       >
-        Stop
+        Stop following
       </button>
     </div>
   );

@@ -33,7 +33,12 @@ interface MapState {
   showStations: boolean;
   showConstruction: boolean;
   showValidation: boolean;
-  showGround: boolean; // 3D: hide the ground to see tunnels and underground trains
+  undergroundMode: UndergroundMode;
+  undergroundFollow: { trainId: string; underground: boolean } | null;
+  setUndergroundMode: (mode: UndergroundMode) => void;
+  reportUnderground: (trainId: string, underground: boolean) => void;
+  trainControls: TrainControls;
+  setTrainsHeld: (ids: readonly string[], held: boolean) => void;
   showWater: boolean;
   // Bumped `key` lets the map re-fly to the same place twice.
   focus: {
@@ -67,7 +72,6 @@ interface MapState {
       | "showStations"
       | "showConstruction"
       | "showValidation"
-      | "showGround"
       | "showWater",
     on: boolean,
   ) => void;
@@ -120,7 +124,12 @@ export const useMapStore = create<MapState>((set, get) => ({
   showStations: true,
   showConstruction: false, // DECISIONS #3: Phase 4 corridors are off by default
   showValidation: false,
-  showGround: true,
+  undergroundMode: undergroundParam === "surface" || undergroundParam === "underground" ? undergroundParam : "auto",
+  undergroundFollow: null,
+  setUndergroundMode: (undergroundMode) => set({ undergroundMode }),
+  reportUnderground: (trainId, underground) => set({ undergroundFollow: { trainId, underground } }),
+  trainControls: {},
+  setTrainsHeld: (ids, held) => set((s) => ({ trainControls: controlTrains(s.trainControls, ids, held, simSeconds(s)) })),
   showWater: true,
   focus: null,
   selectedStationId: null,

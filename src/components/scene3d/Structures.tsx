@@ -2,7 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE, STRUCTURE } from "../../constants/scene";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 import {
   buildStructures,
   sleeperMatrices,

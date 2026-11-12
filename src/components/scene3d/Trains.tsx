@@ -4,7 +4,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { STRUCTURE, TRAIN } from "../../constants/scene";
-import { simSeconds, useMapStore } from "../../store/useMapStore";
+import { groundVisible, simSeconds, useMapStore } from "../../store/useMapStore";
 import type { Service, TrainState } from "../../utils/trainSim";
 import { pointAt, type Scene3DData } from "./geometry";
 import {
@@ -15,6 +15,7 @@ import {
   fleetForLine,
   regionalCarGeometry,
 } from "./trainFleet";
+import { trainPitch, UNDERGROUND_Y } from "./trainGeometry";
 import { TrainSpeed } from "../ui/TrainSpeed";
 
 const CAR_MODELS = FLEETS.dmrc.models;
@@ -176,13 +177,8 @@ export function Trains({
     () => new Float32Array(service.trains.length * 3),
     [service],
   );
-  const dotColors = useMemo(() => {
-    const c = new Float32Array(service.trains.length * 3);
-    service.trains.forEach((t, i) =>
-      new THREE.Color(colors.get(t.lineId)).toArray(c, i * 3),
-    );
-    return c;
-  }, [service, colors]);
+  const dotColors = useMemo(() => new Float32Array(service.trains.length * 3), [service]);
+  const lineColors = useMemo(() => new Map([...colors].map(([id, color]) => [id, new THREE.Color(color)])), [colors]);
 
   const tmp = useMemo(
     () => ({
@@ -212,11 +208,12 @@ export function Trains({
       const position = new THREE.Vector3(...head.position);
       const visible = position.y > UNDERGROUND_Y || !groundVisible(s);
       live.current.set(train.id, { position, state, visible });
-      if (visible)
-        dotPositions.set([position.x, position.y + 6, position.z], 3 * dot++);
+      if (visible) {
+        dotPositions.set([position.x, position.y + 6, position.z], 3 * dot);
+        lineColors.get(train.lineId)!.toArray(dotColors, 3 * dot++);
+      }
       if (
         !near ||
-        !visible ||
         !target ||
         position.distanceTo(target) > RENDER_RADIUS_M
       )
@@ -229,11 +226,8 @@ export function Trains({
       for (let j = 0; j < fleet.formation.length; j++) {
         // The simulated position is the formation's middle; each fleet has its own car count/length.
         const off = carOffset(fleet, j);
-        const at = pointAt(
-          path.points,
-          path.km,
-          Math.min(end, Math.max(0, state.km + (state.dir * off) / 1000)),
-        );
+        const carKm = Math.min(end, Math.max(0, state.km + (state.dir * off) / 1000));
+        const at = pointAt(path.points, path.km, carKm);
         // Cull per car, not the whole train at its midpoint, at tunnel portals.
         if (groundVisible(s) && at.position[1] < UNDERGROUND_Y) continue;
         const [fx, fz] = [
@@ -249,9 +243,10 @@ export function Trains({
           at.position[1] + STRUCTURE.railTop,
           at.position[2] - fx * TRAIN.trackOffset,
         );
+        const pitch = trainPitch(path, carKm, state.dir);
         tmp.m.compose(
           tmp.p,
-          tmp.q.setFromAxisAngle(tmp.up, yaw),
+          tmp.q.setFromEuler(tmp.e.set(j === fleet.formation.length - 1 ? pitch : -pitch, yaw, 0, "YXZ")),
           renderCars.get(train.lineId)![type].scale,
         );
         lineMeshes?.[type]?.setMatrixAt(c[type]++, tmp.m);
@@ -388,7 +383,7 @@ function TrainLabels({
               state.atStationId ? "text-emerald-600" : "text-amber-600"
             }
           >
-            {state.atStationId
+            {state.held ? "Stopped by operator" : state.atStationId
               ? `At ${stationNames.get(state.atStationId)}`
               : `→ ${stationNames.get(state.nextStationId)}`}
           </span>

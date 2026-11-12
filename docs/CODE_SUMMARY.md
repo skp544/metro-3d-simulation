@@ -8,6 +8,12 @@ What exists in the code right now. Update this with every change.
 
 **Latest visual review fix:** Real surrounding buildings expand to 124,105; 109,046 road ways include local streets/paths and continuous arterials. Shared water data contains Yamuna and mapped islands. Actual land use, green areas, facade textures, nearby decorative traffic/lamps, low-angle camera and WASD exploration replace the empty-looking scene. Buildings/trees stream from nearby tiles; the full city is not loaded at startup.
 
+## Merge repair (2026-11-12)
+
+Restored train-control/underground integration after combining local Phase 9 with the regional fleet and city extensions. The store again owns session train holds and Auto/Surface/Underground mode. All position and arrival consumers use the held clock; stopped trains report zero speed. The existing sourced speed caps and acceleration/braking profiles remain in use. Auto X-ray is mounted, samples the actual fleet length, and hides city geometry along with the ground. Regional cars retain their models and now follow track pitch; filtered overview dots retain their line colours. Removed the superseded train table and restored follow-card Start/Stop and active-fleet KPI counts.
+
+Verified: TypeScript, lint, production build and **74 tests** (including regional hold/resume and fleet-length portal regressions). Browser checks cover individual and fleet Start/Stop, following an underground train, and manual/automatic X-ray; screenshots use `scripts/screenshot.mjs`. Real-GPU performance remains unmeasured.
+
 ## Data pipeline
 
 | Path                                                            | What it does                                                                                                                                                                            |

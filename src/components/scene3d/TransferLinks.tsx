@@ -2,7 +2,7 @@ import { Line } from "@react-three/drei";
 import type { Network } from "../../data/loadNetwork";
 import type { StationType } from "../../data/types";
 import { useJourney } from "../../store/useJourney";
-import { useMapStore } from "../../store/useMapStore";
+import { groundVisible, useMapStore } from "../../store/useMapStore";
 import type { Scene3DData, V3 } from "./geometry";
 
 /** Schematic walking connectors; these are overlays, never fabricated physical walkways. */
@@ -10,7 +10,7 @@ export function TransferLinks({ network, scene }: { network: Network; scene: Sce
   const hidden = useMapStore(s => s.hiddenLines);
   const hiddenTypes = useMapStore(s => s.hiddenStationTypes);
   const show = useMapStore(s => s.showStations);
-  const ground = useMapStore(s => s.showGround);
+  const ground = useMapStore(groundVisible);
   const journey = useJourney(network);
   if (!show) return null;
   const at = (id: string) => scene.stations.find(s => s.stationId === id && s.lineId && !hidden.includes(s.lineId) && !hiddenTypes.includes(s.stationType as StationType));

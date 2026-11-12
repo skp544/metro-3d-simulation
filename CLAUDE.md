@@ -11,6 +11,8 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
+**Merge repair, 2026-11-12:** Train controls and Auto/Surface/Underground are reconciled with regional fleets, sourced speed profiles and the expanded city. Use `groundVisible` for city/ground/transfer visibility; there is no independent `showGround` state. Auto samples actual fleet lengths. TypeScript, lint, production build and 74 tests pass. See CODE_SUMMARY's merge-repair note and decision #76.
+
 Read **`docs/HANDOFF.md` first**. Latest: expanded real city surroundings, roads and Yamuna (DECISIONS #72–#75; `docs/phase8-city-environment.md`), following the landmark/station extension. City tiles stream near the view; low-angle camera and WASD support exploration. The user reviews/commits. Blender's original objects/file are preserved; project models remain in `NCR_Landmarks`. Phase 9 and people simulation remain separate.
 
 Phase 8 includes the regional expansion requested 2026-11-12 (DECISIONS #59–#61). Read `docs/phase8-train-speeds.md`, `docs/phase8-fleet-assets.md`, `docs/phase8-regional-expansion.md` and `docs/CODE_SUMMARY.md` first. Aqua, Namo Bharat RRTS and Meerut Metro are now active networks; Rapid Metro Gurugram remains a work-in-progress entry. The extension is ready for review; the user commits it.

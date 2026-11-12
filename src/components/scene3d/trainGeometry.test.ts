@@ -21,6 +21,12 @@ test("car pitch follows grades and reverses correctly with travel direction", ()
   assert.ok(Number.isFinite(trainPitch(path, 0, 1)));
 });
 
+test("Auto X-ray uses the regional fleet's full length at portals", () => {
+  assert.equal(consistUnderground(path, 0.26, 6, 22), true, "RRTS leading end crosses the portal");
+  assert.equal(consistUnderground(path, 0.26, 3, 22), false, "short Meerut formation remains above ground");
+  assert.equal(consistUnderground(path, 0.28, 4, 21.6), true, "Aqua leading end crosses the portal");
+});
+
 test("manual underground modes override Auto; Auto only trusts the currently followed train", () => {
   const s = { follow: { trainId: "A" }, undergroundFollow: { trainId: "A", underground: true } };
   assert.equal(groundVisible({ ...s, undergroundMode: "auto" }), false);

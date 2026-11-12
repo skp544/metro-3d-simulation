@@ -6,6 +6,7 @@ import { TRAIN } from "../constants/scene.ts";
 import type { RoutesFC } from "../data/types.ts";
 import { trainSpeedProfile } from "../constants/trainSpeeds.ts";
 import { buildRun, motionAt, type RunProfile } from "./trainMotion.ts";
+import { isTrainHeld, trainTime, type TrainControls } from "./trainControl.ts";
 
 /** One leg of a route's round trip: a dwell (fromKm === toKm) or a run between two stops. */
 interface Leg {
@@ -36,6 +37,7 @@ export interface SimTrain {
 }
 
 export interface TrainState {
+  held: boolean;
   train: SimTrain;
   km: number; // along the route from its first stop
   dir: 1 | -1; // 1 = towards the last stop
@@ -158,6 +160,7 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
     const last = r.stationIds.length - 1;
     const total = r.stopKm[last] || 1;
     return {
+      held: isTrainHeld(controls[train.id]),
       train,
       km,
       dir: leg.dir,
@@ -165,7 +168,7 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
       nextStationId: r.stationIds[leg.stop],
       terminusId: r.stationIds[leg.dir === 1 ? last : 0],
       progress: leg.dir === 1 ? km / total : 1 - km / total,
-      speedKmh: motion.speedKmh,
+      speedKmh: isTrainHeld(controls[train.id]) ? 0 : motion.speedKmh,
     };
   }
 

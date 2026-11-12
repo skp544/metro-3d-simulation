@@ -39,6 +39,27 @@ test("repeated commands are idempotent; bulk resume does not erase an earlier ho
   assert.equal(trainTime(190, controls.B), 120);
 });
 
+test("regional holds freeze position and speed while retaining each fleet's motion profile on resume", () => {
+  for (const lineId of ["rrts", "aqua", "meerut_metro"]) {
+    const regional = service.trains.find((t) => t.lineId === lineId)!;
+    const route = service.routes.find((r) => r.routeId === regional.routeId)!;
+    const leg = route.legs.find((l) => l.motion)!;
+    const now = (leg.t0 + leg.t1) / 2 - regional.offsetS;
+    const before = service.stateAt(regional, now);
+    assert.ok(before.speedKmh > 0);
+    const held = controlTrains({}, [regional.id], true, now);
+    const during = service.stateAt(regional, now + 600, held);
+    assert.equal(during.held, true);
+    assert.equal(during.km, before.km);
+    assert.equal(during.speedKmh, 0);
+    const resumed = controlTrains(held, [regional.id], false, now + 600);
+    const after = service.stateAt(regional, now + 601, resumed);
+    const expected = service.stateAt(regional, now + 1);
+    assert.ok(Math.abs(after.km - expected.km) < 1e-9);
+    assert.ok(Math.abs(after.speedKmh - expected.speedKmh) < 1e-9);
+  }
+});
+
 test("a held train does not affect others; paused simulation time adds no hold delay", () => {
   const held = controlTrains({}, [train.id], true, 200);
   const other = service.trains[1];

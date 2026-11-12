@@ -4,6 +4,10 @@ Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows /
 
 The landmark/station extension and the user's visual-review requests (buildings, roads and Yamuna) are implemented. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #72–#75 and `docs/phase8-city-environment.md` first, then the frozen landmark report. The pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
 
+## Merge repair (2026-11-12)
+
+The local Phase 9 train-control/underground work is now reconciled with the regional fleet and city extensions. Missing store fields/imports and train state are restored; the Auto watcher is mounted, uses actual fleet lengths and shares `groundVisible` with the city and transfer overlays. Train holds retain the newer speed profiles. Follow-card Start/Stop, fleet counts, arrival predictions, carriage pitch and filtered dot colours are repaired. TypeScript, lint, production build and all 74 tests pass. See decision #76 and `docs/CODE_SUMMARY.md`. Journey-planner enhancements and people simulation remain separate future work.
+
 ## Large generated files (read if you just pulled)
 
 - Pushed to GitHub on 2026-11-12. `data/processed/city_buildings.geojson` (~58 MB) and `city_roads.geojson` (~51 MB) exceed GitHub's 50 MB recommendation (warning only). GitHub rejects any single file over 100 MB; `city_trees.geojson` once hit 104 MB, so keep it and similar files under that limit.

@@ -54,8 +54,8 @@ export function KpiCards({
       />
       <Kpi
         label="Trains running"
-        value={String(service.trains.length)}
-        note={`${atStation} at a station now · simulated`}
+        value={String(playing ? service.trains.length - held : 0)}
+        note={`${held} stopped · ${atStation} at a station · simulated${playing ? "" : " · paused"}`}
         accent
       />
     </div>

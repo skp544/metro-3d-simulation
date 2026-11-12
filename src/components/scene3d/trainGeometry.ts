@@ -4,10 +4,10 @@ import { pointAt, type RoutePath3D } from "./geometry.ts";
 export const UNDERGROUND_Y = -2;
 
 /** Include both ends and every car: Auto X-ray stays on until the entire consist leaves the tunnel. */
-export function consistUnderground(path: RoutePath3D, km: number) {
-  const halfKm = TRAIN.cars * TRAIN.carLength / 2000;
-  for (let i = 0; i <= TRAIN.cars; i++) {
-    const at = km - halfKm + i * TRAIN.carLength / 1000;
+export function consistUnderground(path: RoutePath3D, km: number, cars: number = TRAIN.cars, carLength: number = TRAIN.carLength) {
+  const halfKm = cars * carLength / 2000;
+  for (let i = 0; i <= cars; i++) {
+    const at = km - halfKm + i * carLength / 1000;
     if (pointAt(path.points, path.km, at).position[1] < UNDERGROUND_Y) return true;
   }
   return false;

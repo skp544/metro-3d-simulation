@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Reconcile train controls with regional fleet and city work
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 76 | Merge repair | Restore shared per-train controls and use `groundVisible` for all underground-dependent renderers. Keep the newer speed profiles and regional fleets; sample each fleet's actual consist length for Auto X-ray. Restore follow-card controls and remove the superseded train table. | The merged tree failed TypeScript and seven tests because store fields, imports and UI connections were missing; the watcher was unmounted and city visibility still read the old ground flag. This repairs existing scope. |
+
 ## 2026-11-12: Expanded city, roads and Yamuna
 
 | #   | Topic                        | Decision                                                                                                                                                                                                                                                                                                                                                | Reason                                                                                                                                                                   |

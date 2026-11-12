@@ -4,7 +4,6 @@ import { useMapStore } from "../../store/useMapStore";
 import type { Service } from "../../utils/trainSim";
 import { TrainControlManager } from "./TrainControlManager";
 import { ValidationList } from "./ValidationPanel";
-import { TrainSpeed } from "./TrainSpeed";
 import { LandmarkList } from "./LandmarkPanel";
 
 type Tab = "trains" | "stations" | "places" | "validation";
@@ -82,119 +81,6 @@ export function BottomDock({
         </div>
       )}
     </section>
-  );
-}
-
-function TrainList({
-  network,
-  service,
-}: {
-  network: Network;
-  service: Service;
-}) {
-  const now = useSimNow(1000);
-  const { hiddenLines, focusOn, followTrain, view } = useMapStore();
-  const following = useMapStore((s) => s.follow?.trainId);
-  const lines = useMemo(
-    () =>
-      new Map(
-        network.lines.features.map((f) => [f.properties.id, f.properties]),
-      ),
-    [network.lines],
-  );
-  const names = useMemo(
-    () =>
-      new Map(
-        network.stations.features.map((f) => [
-          f.properties.id,
-          f.properties.name,
-        ]),
-      ),
-    [network.stations],
-  );
-  const routes = useMemo(
-    () => new Map(network.routes.features.map((f) => [f.properties.id, f])),
-    [network.routes],
-  );
-  const states = service.trains
-    .filter((t) => !hiddenLines.includes(t.lineId))
-    .map((t) => service.stateAt(t, now));
-
-  return (
-    <table className="w-full text-left text-xs">
-      <thead className="sticky top-0 bg-white text-[10px] text-slate-400">
-        <tr>
-          <th className="py-1 pl-4 font-normal">Train</th>
-          <th className="font-normal">Line / destination</th>
-          <th className="font-normal">Status</th>
-          <th className="font-normal">Speed · sim.</th>
-          <th className="pr-4 font-normal">Trip</th>
-        </tr>
-      </thead>
-      <tbody>
-        {states.map((s) => (
-          <tr
-            key={s.train.id}
-            onClick={() => {
-              // 3D: follow the train. 2D (no trains drawn): fly once to where it is.
-              if (view === "3d") return followTrain(s.train.id);
-              // The route geometry starts before its first stop; stopKm[0] is that offset.
-              const route = routes.get(s.train.routeId)!;
-              focusOn(
-                along(route, s.km + route.properties.stopKm[0], {
-                  units: "kilometers",
-                }).geometry.coordinates as [number, number],
-              );
-            }}
-            title={
-              view === "3d" ? "Follow this train" : "Show where this train is"
-            }
-            aria-selected={following === s.train.id}
-            className={`cursor-pointer border-b border-slate-50 ${following === s.train.id ? "bg-blue-50" : "hover:bg-slate-50"}`}
-          >
-            <td className="py-1.5 pl-4 font-semibold whitespace-nowrap text-slate-900">
-              {s.train.id}
-            </td>
-            <td className="py-1.5">
-              <span className="inline-flex items-center gap-1.5 text-slate-600">
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ background: lines.get(s.train.lineId)?.color }}
-                />
-                {lines.get(s.train.lineId)?.name.replace(" Line", "")} →{" "}
-                {names.get(s.terminusId)}
-              </span>
-            </td>
-            <td className="py-1.5">
-              <span
-                className={`rounded-full px-2 py-0.5 text-[11px] ${s.atStationId ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700"}`}
-              >
-                {s.atStationId
-                  ? `At ${names.get(s.atStationId)}`
-                  : `Next ${names.get(s.nextStationId)}`}
-              </span>
-            </td>
-            <td className="px-2 py-1.5 whitespace-nowrap">
-              <TrainSpeed state={s} />
-            </td>
-            <td className="w-20 min-w-16 py-1.5 pr-4">
-              <div
-                className="h-1.5 rounded-full bg-slate-100"
-                title={`${Math.round(s.progress * 100)}% of the trip`}
-              >
-                <div
-                  className="h-1.5 rounded-full"
-                  style={{
-                    width: `${s.progress * 100}%`,
-                    background: lines.get(s.train.lineId)?.color,
-                  }}
-                />
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
   );
 }
 
