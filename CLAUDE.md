@@ -11,6 +11,8 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
+**Latest walking-pathway repair:** The five nearby separate-station pairs have outlined amber schematic walking paths and nearby estimated-time labels in both views. Click for station connection details. Validation now records valid links as `WALKING_TRANSFER` info; missing/invalid links keep proximity warnings and cannot join connectivity. No surveyed walkway geometry or station merging is implied. See `docs/phase8-walking-pathways.md` and decision #81. TypeScript, lint, data build, production build and 77 tests pass; validation is 0 errors / 2 warnings / 73 info.
+
 **Latest landmark batch:** Seven places including Rashtrapati Bhavan, Supreme Court and Hanuman Statue · Jhandewalan. Read `docs/phase8-landmark-expansion.md` and decisions #78–#80. Relations preserve courtyards; the Hanuman point is directory-sourced, approximate, and has no verified footprint. Model proportions/headings remain nominal. Focus fits full model extents. All 75 tests, TypeScript, lint, data build and production build pass. Stop for owner review before expanding further.
 
 **India Gate repair:** Custom landmark exclusions in `buildCity.ts` check containment both ways. A separate enclosing city outline previously hid the India Gate arch; a real city-tile regression guards this case. See decision #77. Current checks: TypeScript, lint, build and 75 tests passing.

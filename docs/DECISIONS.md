@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Walking pathways for nearby separate stations
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 81 | Nearby-station screenshot (user: create a walking pathway) | Retain the five explicit sourced pedestrian connections and distinct station identities. Render outlined amber dashed schematic paths with nearby estimated walking-time labels and clickable station details in both views. Classify valid nearby transfers as informational; missing/invalid links retain proximity warnings and invalid links cannot join connectivity. | The validator warned solely on proximity even when the pair already had a routing edge. Existing station-centre connections establish the interchange, but do not establish a surveyed path, station entrances or bridge geometry. Keep that limitation visible. |
+
 ## 2026-11-12: Delhi landmark second batch
 
 | # | Topic | Decision | Reason |

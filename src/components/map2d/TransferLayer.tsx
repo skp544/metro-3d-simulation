@@ -31,7 +31,7 @@ export function TransferLayer({ network }: { network: Network }) {
       <Polyline positions={positions}
         eventHandlers={{ click: () => selectStation(t.fromStationId) }}
         pathOptions={{ color: "#b45309", weight: used ? 5 : 4, dashArray: "6 7", opacity }}>
-        <Tooltip key={String(label)} permanent={label} direction="top" offset={[0, -6]}>
+        <Tooltip key={String(label)} permanent={label} interactive eventHandlers={{ click: () => selectStation(t.fromStationId) }} direction="top" offset={[0, -6]}>
           <span title={`${stations.get(t.fromStationId)!.name} ↔ ${stations.get(t.toStationId)!.name}. ${t.note}`}>
             <b>🚶 Walk · ≈ {Math.round(t.walkSeconds / 60)} min (estimated)</b><br />
             {label ? "Schematic path · click for details" : `${stations.get(t.fromStationId)!.name} ↔ ${stations.get(t.toStationId)!.name} · schematic path`}

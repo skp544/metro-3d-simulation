@@ -2,19 +2,11 @@
 
 Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows / PowerShell).
 
+## Latest: nearby-station walking pathways (2026-11-12)
+
+The five pairs in the owner's validation screenshot already had explicit pedestrian routing edges. They now render as clearly outlined amber dashed paths in both views, with nearby estimated-time labels and clickable station details. Station identities stay separate; paths are schematic, not surveyed walkway/entrance geometry. Validation reports valid pairs as `WALKING_TRANSFER` info, retaining `NEARBY_STATIONS` warnings for missing/invalid links. Only valid transfers join connectivity. Current validation: **0 errors, 2 warnings, 73 info**; TypeScript, lint, production build and **77 tests** pass. See `docs/phase8-walking-pathways.md` and decision #81. This repairs the existing regional scope; journey-planner expansion and people remain separate.
+
 The landmark/station extension and the user's visual-review requests (buildings, roads and Yamuna) are implemented. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #72–#75 and `docs/phase8-city-environment.md` first, then the frozen landmark report. The pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
-
-## Latest: Delhi landmark batch 2 (2026-11-12)
-
-Added Rashtrapati Bhavan, Supreme Court and Hanuman Statue · Jhandewalan. Seven places now work through the shared dataset, search and Places list in both views. Read `docs/phase8-landmark-expansion.md` and decisions #78–#80. The palace/court use OSM building relations with courtyard holes; Hanuman has an approximate published directory point, no verified footprint, and nominal model proportions/heading. Landmark focus now fits wide models and faces their modeled facade. Original Blender source/GLBs are included. TypeScript, lint, data build, production build and 75 tests pass. This batch is ready for owner review/commit; further places require a new scope choice.
-
-## India Gate visibility repair (2026-11-12)
-
-The generic city outline enclosing India Gate is now excluded from rendering so the custom arch is visible. `buildCity.ts` checks containment in both directions; the real-tile regression confirms only the duplicate is removed. Source data/models are unchanged. TypeScript, lint, build and all 75 tests pass. See decision #77 and the Code Summary's India Gate note.
-
-## Merge repair (2026-11-12)
-
-The local Phase 9 train-control/underground work is now reconciled with the regional fleet and city extensions. Missing store fields/imports and train state are restored; the Auto watcher is mounted, uses actual fleet lengths and shares `groundVisible` with the city and transfer overlays. Train holds retain the newer speed profiles. Follow-card Start/Stop, fleet counts, arrival predictions, carriage pitch and filtered dot colours are repaired. TypeScript, lint, production build and all 74 tests pass. See decision #76 and `docs/CODE_SUMMARY.md`. Journey-planner enhancements and people simulation remain separate future work.
 
 ## Large generated files (read if you just pulled)
 

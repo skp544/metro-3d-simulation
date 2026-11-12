@@ -8,6 +8,12 @@ What exists in the code right now. Update this with every change.
 
 **Latest visual review fix:** Real surrounding buildings expand to 124,105; 109,046 road ways include local streets/paths and continuous arterials. Shared water data contains Yamuna and mapped islands. Actual land use, green areas, facade textures, nearby decorative traffic/lamps, low-angle camera and WASD exploration replace the empty-looking scene. Buildings/trees stream from nearby tiles; the full city is not loaded at startup.
 
+## Nearby-station walking pathways (2026-11-12)
+
+All five existing external walking connections now use amber dashes with a white outline in 2D/3D. Nearby labels show walking time (estimated) and explicitly identify schematic paths; clicking opens station details with the connection notes. The 3D overlay projects the shared transfer GeoJSON through `projection.ts`; heights remain schematic. Route highlighting and station/line filters still apply. Stations remain separate.
+
+`validate.ts` recognizes only valid explicit transfers as `WALKING_TRANSFER` info; missing/invalid links retain `NEARBY_STATIONS` warnings and cannot join connectivity. Tests cover real pairs, missing links, invalid timing/geometry and reversed direction. **77 tests**, TypeScript, lint, data build and production build pass. Validation: **0 errors, 2 warnings, 73 info**. See `phase8-walking-pathways.md` and decision #81.
+
 ## Delhi landmark batch 2 (2026-11-12)
 
 Added Rashtrapati Bhavan, Supreme Court of India and Hanuman Statue · Jhandewalan: **7 places** shared across search/Places/2D/3D. OSM building relations retain courtyard holes; the statue uses a captured, approximate directory point with **no fabricated footprint**, nominal proportions/heading and explicit source text. New original Blender GLBs add **61,982 triangles / 2,489,620 bytes**; all seven total **108,580 triangles**. Landmark focus fits the model extents and presents its modeled facade. TypeScript, lint, data build, production build and **75 tests** pass. See `phase8-landmark-expansion.md` and decisions #78–#80. This is the current landmark scope; additional landmarks remain separate.
@@ -32,8 +38,8 @@ Verified: TypeScript, lint, production build and **74 tests** (including regiona
 | `scripts/fetch-landmarks.mjs`, `scripts/build-landmarks.ts`     | Four OSM way/full snapshots, two building relation/full snapshots and one captured directory point + manual source/scope config → shared `landmarks.geojson`; nearest station and straight-line distance derived from data. Included in `data:build` |
 | `data/manual/regional-lines.json`, `data/manual/transfers.json` | Three regional line configs, operator namespaces, references, five explicit bidirectional pedestrian connections                                                                        |
 | `scripts/build-dataset.ts`                                      | Latest raw snapshots + `data/manual/` → `data/processed/*.geojson`, `data/metadata/{sources,data_quality_report}.json`. Exits 1 on errors                                               |
-| `scripts/validate.ts`                                           | 23 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors                                                                                  |
-| `scripts/validate.test.ts`                                      | 13 tests: baseline corruption checks plus pedestrian endpoints/timing and missing-link connectivity                                                                                     |
+| `scripts/validate.ts`                                           | 24 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors; valid nearby walking connections are informational                                                                                  |
+| `scripts/validate.test.ts`                                      | 15 tests: baseline corruption checks plus pedestrian endpoints/timing/geometry, reverse direction, nearby classification and missing-link connectivity                                                                                     |
 | `data/manual/lines.json`                                        | 9 lines: Wikidata colours, OSM route_master, canonical/reverse relation per branch, Wikipedia article                                                                                   |
 | `data/manual/interchanges.json`                                 | Proximity threshold (250 m); `merge`/`separate` lists (empty)                                                                                                                           |
 | `data/manual/station_overrides.json`                            | Per-station name/platform type corrections (empty)                                                                                                                                      |
@@ -41,7 +47,7 @@ Verified: TypeScript, lint, production build and **74 tests** (including regiona
 
 Commands: `npm run data:fetch`, `npm run data:fetch-regional`, `npm run data:build` (build + validate), `npm run data:validate`, `npm test`.
 
-**Validation (latest):** PASSED: 0 errors, 7 warnings (two accepted length differences plus five nearby-station pairs), 68 info. One connected network including walking edges. Regional counts: Aqua 21, RRTS 15 (main + Duhai Depot), Meerut Metro 12. Original nine counts still match Wikipedia.
+**Validation (latest):** PASSED: 0 errors, 2 warnings (accepted length differences), 73 info (including five explicit walking transfers). One connected network including valid walking edges. Regional counts: Aqua 21, RRTS 15 (main + Duhai Depot), Meerut Metro 12. Original nine counts still match Wikipedia.
 
 ## Dataset (DMRC OSM 2026-10-31T12:28Z; regional OSM fetched 2026-11-12T06:02Z)
 
