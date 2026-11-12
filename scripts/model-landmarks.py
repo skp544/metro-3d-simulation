@@ -390,13 +390,229 @@ def hanuman():
     cylinder('Gada tip',-6,1.1,26.6,.5,1.1,gold,16,r2=.1)
     tube('Upcurled tail',[(1.5,1.8,13),(4.6,2.4,11.5),(6.1,2.9,14),(6.4,3.0,20),(5.4,3,24),(4.3,3,23.4)],.5,orange)
 
+# Additional originals: sourced retail silhouettes and nominal architectural details.
+# Planar mall/site meshes use modelFootprints, already projected by projection.ts.
+def signed_area(points):
+    return sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(points,points[1:]+points[:1]))/2
+
+def footprint_solid(name, parts, height, material):
+    curve=bpy.data.curves.new(name,'CURVE');curve.dimensions='2D';curve.fill_mode='BOTH';curve.resolution_u=1;curve.extrude=height/2
+    for part in parts:
+        for is_hole,source in [(False,part['outer'])]+[(True,h) for h in part['holes']]:
+            points=[tuple(p) for p in source[:-1]]
+            if (signed_area(points)>0)==is_hole:points.reverse()
+            spline=curve.splines.new('POLY');spline.points.add(len(points)-1)
+            for v,(x,y) in zip(spline.points,points):v.co=(x,y,0,1)
+            spline.use_cyclic_u=True
+    ob=bpy.data.objects.new(name,curve);current.objects.link(ob);ob.location.z=height/2;curve.materials.append(material)
+    bpy.ops.object.select_all(action='DESELECT');ob.select_set(True);bpy.context.view_layer.objects.active=ob;bpy.ops.object.convert(target='MESH');ob.select_set(False)
+    return ob
+
+def perimeter(name,points,z,height,width,material):
+    for a,b in zip(points,points[1:]):
+        length=math.hypot(b[0]-a[0],b[1]-a[1])
+        if length<.03:continue
+        ob=box(name,((a[0]+b[0])/2,(a[1]+b[1])/2,z+height/2),(length,width,height),material)
+        ob.rotation_euler.z=math.atan2(b[1]-a[1],b[0]-a[0])
+
+def site_outline(p):
+    material=mat('ZooSiteHighlight',(.22,.51,.28)) if p['category']=='zoo' else mat('RetailSiteHighlight',(.48,.30,.66))
+    for part in p['modelFootprints']:
+        # Open contour, not an invented wall, building or habitat plan.
+        perimeter('Mapped site outline (nominal highlight)',part['outer'],0,p['heightM'],2.0,material)
+
+def mall(p):
+    colors={'select-citywalk':(.78,.68,.52),'dlf-avenue':(.67,.56,.45),'dlf-promenade':(.79,.73,.64),'dlf-emporio':(.89,.84,.73),'ambience-vasant-kunj':(.65,.65,.60),'pacific-nsp':(.72,.68,.59)}
+    facade=mat('Retail_'+p['id'],colors[p['id']]);roof=mat('RetailRoof',(.42,.44,.45));glazing=mat('RetailGlazing',(.20,.36,.42),.25)
+    height=p['heightM'];footprint_solid('Source mall silhouette',p['modelFootprints'],height-.6,facade)
+    for part in p['modelFootprints']:
+        for points in [part['outer']]+part['holes']:
+            perimeter('Roof cornice',points,height-.6,.6,.45,light)
+            for floor in range(4):
+                z=2.8+floor*(height-4)/4
+                perimeter('Nominal continuous glazing band',points,z,2.2,.16,glazing)
+                perimeter('Nominal floor fascia',points,z+2.2,.3,.3,marble)
+            for a,b in zip(points,points[1:]):
+                length=math.hypot(b[0]-a[0],b[1]-a[1]);count=int(length/7)
+                for i in range(1,count+1):
+                    t=i/(count+1);box('Nominal facade mullion',(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,height*.48),(.28,.28,height*.88),light)
+    # Text is original mesh lettering, not a downloaded logo or texture.
+    part=max(p['modelFootprints'],key=lambda q:abs(signed_area([tuple(a) for a in q['outer']])))
+    a,b=max(zip(part['outer'],part['outer'][1:]),key=lambda ab:math.dist(ab[0],ab[1]))
+    angle=math.atan2(b[1]-a[1],b[0]-a[0]);length=math.dist(a,b)
+    curve=bpy.data.curves.new('Original retail name lettering','FONT');curve.body=p['name'].split(' · ')[0].replace('Nexus ','').upper();curve.align_x='CENTER';curve.size=min(3.5,length/max(10,len(curve.body)*.7));curve.extrude=.035
+    ob=bpy.data.objects.new('Retail sign (nominal placement)',curve);current.objects.link(ob);curve.materials.append(marble)
+    ob.location=((a[0]+b[0])/2+sin(angle)*.35,(a[1]+b[1])/2-cos(angle)*.35,height-3.1);ob.rotation_euler=(pi/2,0,angle)
+    bpy.ops.object.select_all(action='DESELECT');ob.select_set(True);bpy.context.view_layer.objects.active=ob;bpy.ops.object.convert(target='MESH');ob.select_set(False)
+
+def onion_dome(x,y,z,r,height,material):
+    profile=[(0,1),(.12,1.10),(.34,1.15),(.56,1.02),(.76,.72),(.90,.36),(1,.035)]
+    verts=[];n=48
+    for h,radius in profile:
+        for i in range(n):
+            a=2*pi*i/n;verts.append((x+r*radius*cos(a),y+r*radius*sin(a),z+height*h))
+    mesh('Onion dome',verts,[(j*n+i,j*n+(i+1)%n,(j+1)*n+(i+1)%n,(j+1)*n+i) for j in range(len(profile)-1) for i in range(n)],material)
+    cylinder('Dome finial',x,y,z+height,.12,height*.13,light,12,r2=.01)
+
+def arched_panel(name,x,y,z,width,height,material,sidewall=False):
+    profile=[(-width/2,-height/2),(width/2,-height/2)]
+    profile += [(width/2*cos(pi*i/16),height/2-width/2+width/2*sin(pi*i/16)) for i in range(17)]
+    vertices=[(x,y+u,z+v) if sidewall else (x+u,y,z+v) for u,v in profile]
+    mesh(name,vertices,[tuple(range(len(vertices)))],material)
+
+def tomb(safdarjung=False):
+    box('Mapped plinth',(0,0,1.5),(100,100,3),red)
+    box('Plinth cornice',(0,0,3.2),(98,98,.4),light)
+    size=70 if safdarjung else 62
+    box('Mausoleum central chamber',(0,0,13),(size,size,20),red)
+    box('Mausoleum stone cornice',(0,0,23.3),(size+3,size+3,.7),light)
+    for side in [-1,1]:
+        for a in [-.34,-.17,0,.17,.34]:
+            for z in [9,18]:
+                x=a*size
+                arched_panel('Pale arch surround',x,side*(size/2+.12),z,6,6.5,light)
+                arched_panel('Recessed arched opening',x,side*(size/2+.36),z,4.4,5.4,shadow)
+                arched_panel('Side arch surround',side*(size/2+.12),x,z,6,6.5,light,True)
+                arched_panel('Side arched opening',side*(size/2+.36),x,z,4.4,5.4,shadow,True)
+    cylinder('Dome drum',0,0,24,15,4,marble if safdarjung else red,48)
+    onion_dome(0,0,28,16,18,light if safdarjung else marble)
+    for x in [-size*.43,size*.43]:
+        for y in [-size*.43,size*.43]:
+            cylinder('Corner pavilion drum',x,y,23.5,4.5,3,red,8)
+            for i in range(8):
+                a=i*pi/4;cylinder('Chhatri column',x+3.6*cos(a),y+3.6*sin(a),26.5,.22,4,light,8)
+            cylinder('Chhatri projecting eave',x,y,30.5,5.2,.4,light,16)
+            dome(x,y,31,4.6)
+    for a in range(-40,41,8):
+        for side in [-1,1]:box('Plinth arcade recess',(a,side*50.05,1.6),(4,.12,1.8),shadow)
+
+def purana_gate():
+    rubble=mat('PuranaRubble',(.45,.34,.25))
+    arch('Bara Darwaza vaulted entrance',32,9,4.4,18,16,rubble)
+    for x in [-19,19]:
+        cylinder('Gate octagonal bastion',x,0,0,6.9,18,rubble,8)
+        for z in [5,11,16]:cylinder('Bastion stone band',x,0,z,7,.35,red,8)
+        cylinder('Bastion parapet',x,0,18,7.25,1,red,8)
+        for i in range(8):
+            a=i*pi/4;box('Merlon',(x+6.7*cos(a),6.7*sin(a),19.6),(1.4,1.4,1.2),red)
+    for y in [-8.05,8.05]:
+        arch_trim(4.4,9,y,.35,red,.8)
+        for x in [-10,10]:
+            box('Stone inset arch panel',(x,y,13),(3.5,.3,5),shadow)
+        box('Gate upper cornice',(0,y,18.4),(33,.8,.7),light)
+    for x in range(-14,15,3):box('Gate battlement',(x,0,19.2),(1.4,16,1.4),red)
+
+def in_ring(p,ring):
+    hit=False;x,y=p
+    for a,b in zip(ring,ring[1:]):
+        if (a[1]>y)!=(b[1]>y) and x<(b[0]-a[0])*(y-a[1])/(b[1]-a[1])+a[0]:hit=not hit
+    return hit
+
+def mosque(p):
+    # Exact source ring/courtyard. Ornament stands on the west prayer-hall band.
+    parts=p['modelFootprints'];footprint_solid('Mapped mosque and open courtyard',parts,10,red)
+    yaw=p['yaw'];east=(cos(yaw),-sin(yaw));north=(sin(yaw),cos(yaw))
+    all_points=[q for part in parts for q in part['outer']]
+    es=[q[0]*east[0]+q[1]*east[1] for q in all_points];ns=[q[0]*north[0]+q[1]*north[1] for q in all_points]
+    def at(frac,western_corner=False):
+        n=min(ns)+(max(ns)-min(ns))*frac
+        candidates=[]
+        for i in range(80):
+            e=min(es)+(max(es)-min(es))*(i+.5)/80;q=(e*east[0]+n*north[0],e*east[1]+n*north[1])
+            if any(in_ring(q,part['outer']) and not any(in_ring(q,h) for h in part['holes']) for part in parts):candidates.append(q)
+            elif candidates:break
+        return candidates[min(1,len(candidates)-1) if western_corner else len(candidates)//2] if candidates else all_points[0]
+    for fraction,r in [(.28,7),(.5,9),(.72,7)]:
+        x,y=at(fraction);cylinder('Prayer hall dome drum',x,y,10,r,3,marble,40);onion_dome(x,y,13,r,10,marble)
+    for fraction in [.08,.92]:
+        x,y=at(fraction,True);cylinder('Minaret shaft',x,y,0,2.3,34,red,24,r2=1.4)
+        for z in [12,24,32]:cylinder('Minaret balcony',x,y,z,2.7,.5,marble,24)
+        for i in range(8):
+            a=i*pi/4;cylinder('Minaret pavilion column',x+1.5*cos(a),y+1.5*sin(a),34,.13,3,light,8)
+        onion_dome(x,y,37,1.8,2.6,marble)
+    for part in parts:
+        perimeter('Courtyard stone cornice',part['outer'],9.6,.4,.25,light)
+        for hole in part['holes']:perimeter('Open courtyard cornice',hole,9.6,.4,.25,light)
+
+def akshardham():
+    pink=mat('AkshardhamPinkStone',(.78,.58,.43))
+    for z,w,d in [(1,106,96),(3,100,90),(5,94,84)]:box('Stepped mandir plinth',(0,0,z),(w,d,2),pink)
+    box('Mandir carved base',(0,0,10),(86,76,8),pink)
+    for x in [-30,0,30]:
+        for y in [-24,0,24]:
+            central=x==0 and y==0;r=12 if central else 8.4;z=23 if central else 18
+            cylinder('Mandapa polygonal drum',x,y,14,r*1.15,z-14,pink,16)
+            for i in range(12):
+                a=2*pi*i/12;cylinder('Mandapa column',x+(r+1)*cos(a),y+(r+1)*sin(a),10,.55,8,light,12)
+            for level in range(5):
+                t=level/5;cylinder('Tiered dome stone course',x,y,z+level*2,r*(1-t*.7),2.1,pink,48,r2=r*(1-(t+.2)*.7))
+            onion_dome(x,y,z+9,r*.35,4 if central else 2.5,light)
+    for x in range(-39,40,6):
+        for side in [-1,1]:
+            cylinder('Exterior carved column',x,side*35,6,.6,8,light,12)
+            box('Carved wall niche',(x,side*38.2,10),(2.6,.25,4),shadow)
+    for x in [-39,39]:
+        for y in range(-30,31,6):cylinder('Side colonnade',x,y,6,.6,8,light,12)
+
+def samrat():
+    brick=mat('ObservatoryOchre',(.70,.28,.16))
+    verts=[(x,y,z) for x in [-1.3,1.3] for y,z in [(-11,0),(11,16),(11,0)]]
+    mesh('Triangular Samrat gnomon',verts,[(0,1,2),(3,5,4),(0,3,4,1),(1,4,5,2),(0,2,5,3)],brick)
+    for i in range(32):
+        t=i/32;box('Nominal stair tread',(0,-11+22*t,16*t+.2),(2.8,.7,.4),light)
+    for side in [-1,1]:
+        points=[]
+        for i in range(49):
+            a=-pi/2+pi*i/48;points.append((side*(2+7*cos(a)),7*sin(a)))
+        perimeter('Quadrant retaining arc',points,0,5,.8,brick)
+        perimeter('Quadrant pale scale',points,5,.3,.9,light)
+    for x in [-7,7]:box('Quadrant plinth',(x,0,.15),(11,20,.3),brick)
+
+def raj_ghat():
+    black=mat('MemorialBlackStone',(.045,.05,.045));gold=mat('MemorialFlame',(.97,.47,.08))
+    box('Memorial base',(0,0,.1),(10,10,.2),light)
+    box('Black stone memorial',(0,0,.6),(8,8,.8),black)
+    box('Slab upper lip',(0,0,1.05),(8.2,8.2,.1),black)
+    cylinder('Flame holder',0,3.2,1.1,.28,.12,stone,24)
+    sphere('Simplified eternal flame',(0,3.2,1.4),(.17,.17,.3),gold,16,8)
+
+def baoli():
+    masonry=mat('BaoliMasonry',(.51,.43,.31))
+    box('Cutaway illustration base',(0,0,.15),(73,14,.3),masonry)
+    for side in [-1,1]:
+        box('Open well side wall',(0,side*6.6,4),(73,.8,8),masonry)
+        for z in [2,4.5,7]:
+            for x in [-27,-17,-7,3,13,23]:
+                box('Recessed arcade opening',(x,side*6.13,z),(5,.12,1.7),shadow)
+                box('Arcade stone lintel',(x,side*6.0,z+.9),(5.8,.3,.25),light)
+                for dx in [-2.9,2.9]:box('Arcade pier',(x+dx,side*6.0,z),(.5,.5,2),masonry)
+    for i in range(44):
+        x=-35+i*1.25;h=7.5*(1-i/44)+.35
+        box('Nominal descending stone step',(x,0,h/2),(1.25,11.5,h),masonry)
+        box('Step worn nosing',(x+.55,0,h),( .15,11.5,.08),light)
+    box('Well end wall',(35.8,0,4),(.9,14,8),masonry)
+
+def new_place(p):
+    if p['geometryRole']=='site':site_outline(p)
+    elif p['category']=='mall':mall(p)
+    elif p['id']=='humayuns-tomb':tomb()
+    elif p['id']=='safdarjung-tomb':tomb(True)
+    elif p['id']=='purana-qila':purana_gate()
+    elif p['id']=='jama-masjid':mosque(p)
+    elif p['id']=='akshardham':akshardham()
+    elif p['id']=='jantar-mantar':samrat()
+    elif p['id']=='raj-ghat':raj_ghat()
+    elif p['id']=='agrasen-ki-baoli':baoli()
+    else:raise ValueError('Missing place model: '+p['id'])
+
 builders={'india-gate':india_gate,'lotus-temple':lotus,'qutb-minar':qutb,'red-fort':red_fort,'rashtrapati-bhavan':rashtrapati,'supreme-court':supreme_court,'hanuman-jhandewalan':hanuman}
 report=[]
 workshop_x=0
 for f in data['features']:
     p=f['properties']; current=bpy.data.collections.new('NCR_'+p['id']); work.children.link(current)
     bpy.ops.object.select_all(action='DESELECT')
-    builders[p['id']]()
+    if p['id'] in builders:builders[p['id']]()
+    else:new_place(p)
     objs=list(current.objects)
     corners=[o.matrix_world @ Vector(v) for o in objs for v in o.bound_box]
     # Refresh matrices after construction before measuring / exporting.
@@ -405,11 +621,13 @@ for f in data['features']:
     mn=Vector(tuple(min(v[i] for v in corners) for i in range(3)))
     mx=Vector(tuple(max(v[i] for v in corners) for i in range(3)))
     target=(p['widthM'],p['depthM'],p['heightM']) if p['id']!='qutb-minar' else (14.32,14.32,72.5)
-    scale=Vector(tuple(target[i]/(mx[i]-mn[i]) for i in range(3)))
+    geographic=p['id'] not in builders and (p['category']=='mall' or p['geometryRole']=='site' or p['id']=='jama-masjid')
+    scale=Vector((1,1,target[2]/(mx.z-mn.z))) if geographic else Vector(tuple(target[i]/(mx[i]-mn[i]) for i in range(3)))
+    centre=Vector((0,0,mn.z)) if geographic else Vector(((mx.x+mn.x)/2,(mx.y+mn.y)/2,mn.z))
     for ob in objs:
         for v in ob.data.vertices:
             world=ob.matrix_world @ v.co
-            v.co=Vector(((world.x-(mx.x+mn.x)/2)*scale.x,(world.y-(mx.y+mn.y)/2)*scale.y,(world.z-mn.z)*scale.z))
+            v.co=Vector(((world.x-centre.x)*scale.x,(world.y-centre.y)*scale.y,(world.z-centre.z)*scale.z))
         ob.matrix_world.identity()
         ob.select_set(True)
     bpy.context.view_layer.objects.active=objs[0]

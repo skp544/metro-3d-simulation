@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Delhi malls, zoo and additional monuments
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 82 | Places expansion (user) | Add a curated batch of eight Delhi malls, National Zoological Park and eight further monuments/religious sites through the existing shared Places pipeline. Keep all previous seven places and add category filters/search aliases. | User requested nearby famous Delhi malls, zoos and monuments left out of the map. This is an extension of the current landmark scope, not a new people or journey-planning phase. |
+| 83 | Source geometry and identity | Retain every mapped mall polygon part and courtyard hole. Distinguish building footprints from site outlines; use only boundary highlights for zoo, Vegas and Pacific Tagore Garden and keep their existing city context. Exact OSM names/tags can verify identity when Wikidata is absent or points to a person; record conflicts. Reuse unchanged elements from preserved environment snapshots with explicit original-file provenance. | A land parcel is not a surveyed building or habitat layout. Two Saket malls have multiple outer polygons; Ambience and Jama Masjid have open courtyards. Guessing complete buildings or deleting all city geometry inside a site would misrepresent the sources. |
+| 84 | Model scope and presentation | Author original approximate Blender models; project local geographic authoring coordinates through projection.ts. Label nominal heights/details, gate/instrument-only scopes and Agrasen’s raised cutaway. Akshardham height uses the official 141.3 feet, rounded to 43.07 m, while retaining and disclosing the smaller mapped outline. Widen place framing for broad models. | Keep place locations and known outlines accurate without claiming surveyed architecture, excavations, entrance distances, opening hours or animal simulation. More sites and finer reconstruction remain separate owner-directed scope. |
+
 ## 2026-11-12: Walking pathways for nearby separate stations
 
 | # | Topic | Decision | Reason |

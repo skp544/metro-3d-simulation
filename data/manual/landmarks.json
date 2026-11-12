@@ -9,7 +9,8 @@
       "heightM": 42,
       "heightEstimated": false,
       "reference": "https://www.delhitourism.gov.in/tourist_place/india_gate.html",
-      "scope": "Stone arch; architectural details approximated from reference photographs."
+      "scope": "Stone arch; architectural details approximated from reference photographs.",
+      "category": "monument"
     },
     {
       "id": "lotus-temple",
@@ -19,7 +20,8 @@
       "heightM": 34,
       "heightEstimated": true,
       "reference": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html",
-      "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed."
+      "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed.",
+      "category": "religious"
     },
     {
       "id": "qutb-minar",
@@ -29,17 +31,19 @@
       "heightM": 72.5,
       "heightEstimated": false,
       "reference": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html",
-      "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified."
+      "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified.",
+      "category": "monument"
     },
     {
       "id": "red-fort",
-      "name": "Red Fort \u00b7 Lahori Gate",
+      "name": "Red Fort · Lahori Gate",
       "wayId": 80429907,
       "wikidata": "Q16931856",
       "heightM": 33,
       "heightEstimated": true,
       "reference": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/",
-      "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed."
+      "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed.",
+      "category": "monument"
     },
     {
       "id": "rashtrapati-bhavan",
@@ -50,7 +54,8 @@
       "heightEstimated": false,
       "reference": "https://rashtrapatibhavan.gov.in/index.php/rbtour/central-dome",
       "scope": "Main palace with central dome, colonnaded portico, courtyard wings and chhatris. Height referenced to the forecourt; facade details and internal layout approximated. Presidential Estate, gardens and Jaipur Column are not reconstructed.",
-      "oriented": true
+      "oriented": true,
+      "category": "civic"
     },
     {
       "id": "supreme-court",
@@ -61,18 +66,344 @@
       "heightEstimated": false,
       "reference": "https://www.sci.gov.in/about-department/history/",
       "scope": "Original main building: central dome, colonnaded verandah and symmetrical wings. Dome height source-backed; wing proportions and details approximate. Additional Building Complex and interior access are not reconstructed.",
-      "oriented": true
+      "oriented": true,
+      "category": "civic"
     },
     {
       "id": "hanuman-jhandewalan",
-      "name": "Hanuman Statue \u00b7 Jhandewalan",
+      "name": "Hanuman Statue · Jhandewalan",
       "pointSnapshot": "hanuman-jhandewalan.json",
       "widthM": 14,
       "depthM": 12,
       "heightM": 32.92,
       "heightEstimated": true,
       "reference": "https://www.bhaktibharat.com/mandir/108-foot-hanumanji",
-      "scope": "108-foot Hanuman murti at Sankat Mochan Dham near Jhandewalan. Approximate directory location; no verified footprint. Crown, mace, tail and hands at the chest are original stylized geometry. Width, depth, pose details and heading nominal; chest opening is not animated."
+      "scope": "108-foot Hanuman murti at Sankat Mochan Dham near Jhandewalan. Approximate directory location; no verified footprint. Crown, mace, tail and hands at the chest are original stylized geometry. Width, depth, pose details and heading nominal; chest opening is not animated.",
+      "category": "religious"
+    },
+    {
+      "id": "select-citywalk",
+      "name": "Nexus Select CITYWALK · Saket",
+      "relationId": 19112421,
+      "osmName": "Select Citywalk",
+      "osmTags": {
+        "shop": "mall"
+      },
+      "category": "mall",
+      "heightM": 24,
+      "aliases": [
+        "Select Citywalk",
+        "Select City Walk",
+        "Saket mall"
+      ],
+      "reference": "https://www.delhitourism.gov.in/dt/shop-in-delhi.html",
+      "scope": "Mapped mall outline, including both separate polygon parts. Facades, glass bands, roof details and 24 m height are nominal; shop interiors and the neighbouring hotel are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "dlf-avenue",
+      "name": "DLF Avenue · Saket",
+      "relationId": 19112422,
+      "osmName": "DLF Avenue",
+      "osmTags": {
+        "shop": "mall"
+      },
+      "category": "mall",
+      "heightM": 20,
+      "aliases": [
+        "DLF Place",
+        "Saket mall"
+      ],
+      "reference": "https://www.delhitourism.gov.in/dt/shop_in_delhi/dlf_avenue_mall.html",
+      "scope": "Both mapped mall polygon parts retained. Retail massing, facade, roof details and 20 m height are nominal; internal shops and the outdoor plaza are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "dlf-promenade",
+      "name": "DLF Promenade · Vasant Kunj",
+      "wayId": 191980803,
+      "osmName": "DLF Promenade",
+      "osmTags": {
+        "shop": "mall"
+      },
+      "category": "mall",
+      "heightM": 22,
+      "reference": "https://www.dlfpromenade.com/about",
+      "scope": "Main mapped mall building. Facade glazing, cornices, roof lantern and 22 m height are nominal; adjacent shopping centres remain separate places.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "dlf-emporio",
+      "name": "DLF Emporio · Vasant Kunj",
+      "wayId": 191980797,
+      "osmName": "DLF Emporio",
+      "osmTags": {
+        "shop": "mall"
+      },
+      "category": "mall",
+      "heightM": 22,
+      "reference": "https://www.dlf.in/retail/",
+      "scope": "Mapped luxury mall building with original pale-stone facade interpretation. Windows, facade details and 22 m height are nominal; shop interiors are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "ambience-vasant-kunj",
+      "name": "Ambience Mall · Vasant Kunj",
+      "relationId": 17653225,
+      "osmName": "Ambience Mall",
+      "osmTags": {
+        "building": "retail",
+        "shop": "mall"
+      },
+      "category": "mall",
+      "heightM": 24,
+      "reference": "https://ambiencemalls.com/vasant-kunj/tourist/",
+      "scope": "Mapped Vasant Kunj mall building, retaining its courtyard hole. Glazing, floor bands, rooftop details and 24 m height are nominal. This is not Ambience Mall in Gurugram.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "pacific-nsp",
+      "name": "Pacific Mall · NSP",
+      "wayId": 1208706468,
+      "osmName": "Pacific Mall",
+      "osmTags": {
+        "short_name": "Pacific NSP",
+        "shop": "mall"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-05.json",
+      "category": "mall",
+      "heightM": 24,
+      "aliases": [
+        "Netaji Subhash Place mall",
+        "Pacific NSP"
+      ],
+      "reference": "https://www.pacificmalls.in/nsp",
+      "scope": "Mapped NSP mall building. Facade glazing, floor bands, roof detail and 24 m height are nominal; separate from Pacific Mall at Tagore Garden.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "pacific-tagore-garden",
+      "name": "Pacific Mall · Tagore Garden",
+      "wayId": 265166888,
+      "osmName": "Pacific Mall",
+      "osmTags": {
+        "landuse": "retail",
+        "shop": "mall"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/land-water.json",
+      "category": "mall",
+      "geometryRole": "site",
+      "heightM": 0.4,
+      "aliases": [
+        "Pacific Subhash Nagar"
+      ],
+      "reference": "https://delhitourism.gov.in/dt/delhi_delicacies/pacific_mall.html",
+      "scope": "Mapped retail grounds shown as a site outline. The source is a land parcel, not a verified mall building footprint; no building, entrances or shop layout are invented. Highlight thickness 0.4 m is nominal.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "vegas-dwarka",
+      "name": "Vegas Mall · Dwarka",
+      "wayId": 209492487,
+      "osmName": "Vegas Mall",
+      "osmTags": {
+        "landuse": "commercial",
+        "shop": "mall"
+      },
+      "category": "mall",
+      "geometryRole": "site",
+      "heightM": 0.4,
+      "reference": "https://www.delhitourism.gov.in/dt/shop_in_delhi/vegas_mall.html",
+      "scope": "Mapped mall grounds shown as a site outline. The source identifies a commercial parcel; the checked local map has no verified mall building footprint. No building or piazza geometry is invented. Highlight thickness 0.4 m is nominal.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "delhi-zoo",
+      "name": "National Zoological Park · Delhi Zoo",
+      "wayId": 80439686,
+      "osmName": "National Zoological Park",
+      "wikidata": "Q3364809",
+      "osmTags": {
+        "tourism": "zoo"
+      },
+      "category": "zoo",
+      "geometryRole": "site",
+      "heightM": 0.4,
+      "aliases": [
+        "Delhi Zoo",
+        "National Zoo",
+        "Zoological Park"
+      ],
+      "reference": "https://nzpnewdelhi.gov.in/",
+      "scope": "Actual mapped zoo boundary shown as a green site outline. Existing mapped city context remains visible. Habitats, animals, internal buildings and visitor entrances are not reconstructed; no animal simulation is implied. Highlight thickness 0.4 m is nominal.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "humayuns-tomb",
+      "name": "Humayun’s Tomb",
+      "wayId": 220385654,
+      "osmName": "Humayun's Tomb",
+      "osmTags": {
+        "historic": "monument",
+        "building": "yes"
+      },
+      "category": "monument",
+      "heightM": 45,
+      "aliases": [
+        "Humayun Tomb",
+        "Humayuns Tomb"
+      ],
+      "reference": "https://www.delhitourism.gov.in/tourist_place/humayun_tomb.html",
+      "scope": "Mausoleum and mapped square plinth, with red sandstone arcades, white double dome and chhatris. Overall height 45 m, architectural proportions and details are nominal. The garden, tomb complex and adjacent museum are not reconstructed.",
+      "conflicts": [
+        "OSM Wikidata Q486188 identifies Emperor Humayun rather than the tomb; identity checked by name, historic/building tags and source reference. OSM height=3 on this square outline is not treated as the complete mausoleum height."
+      ],
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "safdarjung-tomb",
+      "name": "Safdarjung’s Tomb",
+      "wayId": 103602249,
+      "osmName": "Safdarjung's Tomb",
+      "osmTags": {
+        "historic": "tomb",
+        "building": "yes"
+      },
+      "category": "monument",
+      "heightM": 30,
+      "aliases": [
+        "Safdarjang Tomb",
+        "Safdarjung Tomb"
+      ],
+      "reference": "https://delhitourism.gov.in/tourist_place/safdarjang_tomb.html",
+      "scope": "Main mapped mausoleum with sandstone facades, corner pavilions and pale dome. Height 30 m and architectural details are nominal; the surrounding garden and enclosure are not reconstructed.",
+      "conflicts": [
+        "OSM Wikidata Q391381 identifies Safdarjung rather than the tomb; identity checked by name, historic/building tags and source reference."
+      ],
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "purana-qila",
+      "name": "Purana Qila · Bara Darwaza",
+      "wayId": 370944284,
+      "osmName": "Bada Darwaza",
+      "osmTags": {
+        "historic": "city_gate"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/landmark-india-gate.json",
+      "category": "monument",
+      "heightM": 20,
+      "aliases": [
+        "Old Fort",
+        "Purana Quila",
+        "Bada Darwaza"
+      ],
+      "reference": "https://www.delhitourism.gov.in/tourist_place/purana_quila.html",
+      "scope": "Western main gate (Bara/Bada Darwaza) only, on its mapped footprint. Bastions, vaulted entrance, chhatris and 20 m height are nominal. The whole fort and its interior monuments are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "jama-masjid",
+      "name": "Jama Masjid · Old Delhi",
+      "relationId": 3926057,
+      "wikidata": "Q233678",
+      "osmName": "Jama Masjid",
+      "osmTags": {
+        "building": "mosque"
+      },
+      "category": "religious",
+      "heightM": 40,
+      "reference": "https://www.delhitourism.gov.in/tourist_place/jama_masjid.html",
+      "scope": "Mapped mosque outline including its open courtyard. Three pale domes, paired minarets, sandstone arcades and the nominal 40 m model height are approximate; interior details and access are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "akshardham",
+      "name": "Swaminarayan Akshardham",
+      "wayId": 400921719,
+      "wikidata": "Q1849858",
+      "osmName": "Swaminarayan's Akshardham Temple",
+      "category": "religious",
+      "heightM": 43.07,
+      "heightEstimated": false,
+      "reference": "https://akshardham.com/explore/mandir/",
+      "scope": "Main mandir only, on its mapped footprint. Overall height rounded from the official 141.3 feet. Nine-domed silhouette, tiered mandapas, columns and carvings are approximate. The full campus, exhibitions and fountain are not reconstructed. The mapped outline is smaller than the official plan dimensions; the model follows the mapped outline.",
+      "oriented": true,
+      "conflicts": [
+        "The OSM outline (about 73 by 63 m) is smaller than the official 316 by 356 foot mandir plan dimensions. The model retains mapped XY geography rather than expanding it to an unverified outline."
+      ]
+    },
+    {
+      "id": "jantar-mantar",
+      "name": "Jantar Mantar · Samrat Yantra",
+      "wayId": 223456540,
+      "osmName": "Samrat Yantra",
+      "osmTags": {
+        "man_made": "observatory"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-06.json",
+      "category": "monument",
+      "heightM": 18,
+      "aliases": [
+        "Delhi Observatory",
+        "Samrat Yantra"
+      ],
+      "reference": "https://delhitourism.gov.in/tourist_place/jantar_mantar.html",
+      "scope": "Samrat Yantra only, on its mapped instrument footprint. Triangular gnomon, stair and quadrants are an architectural interpretation; dimensions and height 18 m are nominal. Other instruments are not reconstructed.",
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "raj-ghat",
+      "name": "Raj Ghat · Gandhi Memorial",
+      "wayId": 1448399385,
+      "osmName": "Raj Ghat",
+      "osmTags": {
+        "historic": "monument"
+      },
+      "category": "monument",
+      "heightM": 1.5,
+      "aliases": [
+        "Rajghat",
+        "Gandhi memorial"
+      ],
+      "reference": "https://www.incredibleindia.gov.in/en/delhi/delhi/raj-ghat",
+      "scope": "Mapped memorial platform with a black stone slab and simplified flame. Height 1.5 m and stone/flame details are nominal; surrounding gardens and other memorials are not reconstructed.",
+      "conflicts": [
+        "OSM Wikidata Q1001 identifies Mahatma Gandhi rather than this memorial; identity checked by name, historic tag and source reference."
+      ],
+      "heightEstimated": true,
+      "oriented": true
+    },
+    {
+      "id": "agrasen-ki-baoli",
+      "name": "Agrasen ki Baoli",
+      "wayId": 500411689,
+      "wikidata": "Q4693773",
+      "osmName": "Agrasen ki Baoli",
+      "category": "monument",
+      "heightM": 8,
+      "aliases": [
+        "Ugrasen ki Baoli",
+        "Uggarsain Baoli"
+      ],
+      "reference": "https://www.delhitourism.gov.in/dt/explore-the-city.html",
+      "scope": "Raised cutaway illustration of the mapped stepwell, showing descending steps and side arcades. The real well is sunken; this 8 m display height, step count, depth and masonry details are nominal. This model does not represent a surveyed excavation or visitor route.",
+      "heightEstimated": true,
+      "oriented": true
     }
   ]
 }

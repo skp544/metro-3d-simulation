@@ -60,6 +60,91 @@
       "url": "https://www.bhaktibharat.com/mandir/108-foot-hanumanji",
       "facts": "Jhandewalan Sankat Mochan Dham identification; 108-foot description and published 28.64497 N, 77.19801 E point. Photographs show orange figure, crown, gada and hands at chest. HTML snapshot retained; location approximate, no surveyed footprint.",
       "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/dt/shop-in-delhi.html",
+      "facts": "Mapped mall outline, including both separate polygon parts. Facades, glass bands, roof details and 24 m height are nominal; shop interiors and the neighbouring hotel are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/dt/shop_in_delhi/dlf_avenue_mall.html",
+      "facts": "Both mapped mall polygon parts retained. Retail massing, facade, roof details and 20 m height are nominal; internal shops and the outdoor plaza are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.dlfpromenade.com/about",
+      "facts": "Main mapped mall building. Facade glazing, cornices, roof lantern and 22 m height are nominal; adjacent shopping centres remain separate places.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.dlf.in/retail/",
+      "facts": "Mapped luxury mall building with original pale-stone facade interpretation. Windows, facade details and 22 m height are nominal; shop interiors are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://ambiencemalls.com/vasant-kunj/tourist/",
+      "facts": "Mapped Vasant Kunj mall building, retaining its courtyard hole. Glazing, floor bands, rooftop details and 24 m height are nominal. This is not Ambience Mall in Gurugram.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.pacificmalls.in/nsp",
+      "facts": "Mapped NSP mall building. Facade glazing, floor bands, roof detail and 24 m height are nominal; separate from Pacific Mall at Tagore Garden.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://delhitourism.gov.in/dt/delhi_delicacies/pacific_mall.html",
+      "facts": "Mapped retail grounds shown as a site outline. The source is a land parcel, not a verified mall building footprint; no building, entrances or shop layout are invented. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/dt/shop_in_delhi/vegas_mall.html",
+      "facts": "Mapped mall grounds shown as a site outline. The source identifies a commercial parcel; the checked local map has no verified mall building footprint. No building or piazza geometry is invented. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://nzpnewdelhi.gov.in/",
+      "facts": "Actual mapped zoo boundary shown as a green site outline. Existing mapped city context remains visible. Habitats, animals, internal buildings and visitor entrances are not reconstructed; no animal simulation is implied. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/humayun_tomb.html",
+      "facts": "Mausoleum and mapped square plinth, with red sandstone arcades, white double dome and chhatris. Overall height 45 m, architectural proportions and details are nominal. The garden, tomb complex and adjacent museum are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://delhitourism.gov.in/tourist_place/safdarjang_tomb.html",
+      "facts": "Main mapped mausoleum with sandstone facades, corner pavilions and pale dome. Height 30 m and architectural details are nominal; the surrounding garden and enclosure are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/purana_quila.html",
+      "facts": "Western main gate (Bara/Bada Darwaza) only, on its mapped footprint. Bastions, vaulted entrance, chhatris and 20 m height are nominal. The whole fort and its interior monuments are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/tourist_place/jama_masjid.html",
+      "facts": "Mapped mosque outline including its open courtyard. Three pale domes, paired minarets, sandstone arcades and the nominal 40 m model height are approximate; interior details and access are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://akshardham.com/explore/mandir/",
+      "facts": "Main mandir only, on its mapped footprint. Overall height rounded from the official 141.3 feet. Nine-domed silhouette, tiered mandapas, columns and carvings are approximate. The full campus, exhibitions and fountain are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://delhitourism.gov.in/tourist_place/jantar_mantar.html",
+      "facts": "Samrat Yantra only, on its mapped instrument footprint. Triangular gnomon, stair and quadrants are an architectural interpretation; dimensions and height 18 m are nominal. Other instruments are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.incredibleindia.gov.in/en/delhi/delhi/raj-ghat",
+      "facts": "Mapped memorial platform with a black stone slab and simplified flame. Height 1.5 m and stone/flame details are nominal; surrounding gardens and other memorials are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.delhitourism.gov.in/dt/explore-the-city.html",
+      "facts": "Raised cutaway illustration of the mapped stepwell, showing descending steps and side arcades. The real well is sunken; this 8 m display height, step count, depth and masonry details are nominal. This model does not represent a surveyed excavation or visitor route.",
+      "distributedImages": false
     }
   ],
   "assetSearch": [
@@ -83,6 +168,13 @@
     "Reference images are not texture licences. Only original generated geometry and materials are distributed.",
     "Rashtrapati Bhavan and Supreme Court use source building outlines including courtyard holes for 2D; 3D architecture and interior wing layout are approximate, not surveyed reconstruction.",
     "Hanuman statue uses a rounded published directory point; no verified OSM statue footprint was found. Width 14 m, depth 12 m, heading, pose and sculptural details are nominal. 108 ft converted to rounded nominal 32.92 m.",
-    "New models are original procedural bpy geometry, generated locally with Blender Python 5.0.1. No paid, downloaded third-party or photo-textured model is included."
+    "New models are original procedural bpy geometry, generated locally with Blender Python 5.0.1. No paid, downloaded third-party or photo-textured model is included.",
+    "This batch adds 17 places: eight Delhi malls, National Zoological Park and eight monuments/religious sites. Place membership is curated, not an exhaustive Delhi attraction inventory.",
+    "Vegas Dwarka and Pacific Tagore Garden sources map retail/commercial land parcels, not surveyed building footprints. They and Delhi Zoo use open site outlines; their actual city context is retained and no internal building, entrance, habitat or animal geometry is invented.",
+    "Select CITYWALK and DLF Avenue each have two source polygon parts. Ambience Vasant Kunj retains its courtyard in both geographic data and the mall model. Retail facade details, signage placement and heights remain nominal.",
+    "Humayun Tomb, Safdarjung Tomb and Raj Ghat source OSM Wikidata tags point to people, not the places. Use exact source names/tags and published place references; conflicts are retained in processed provenance. Humayun outline height=3 is not a complete mausoleum height.",
+    "Purana Qila scope is Bara Darwaza only. Jantar Mantar scope is Samrat Yantra only. Agrasen ki Baoli is an explicitly labelled raised cutaway of a real sunken well; display height, depth, steps and arcades are nominal.",
+    "Footprint-derived mall and site model XY coordinates pass through projection.ts during the data build. No direct latitude/longitude interpretation is added to Blender or frontend model code.",
+    "Akshardham’s mapped footprint is smaller than its officially published plan dimensions; keep the OSM outline and log the mismatch instead of expanding it without surveyed geometry."
   ]
 }

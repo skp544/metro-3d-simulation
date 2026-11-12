@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Html, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
+import { PLACE_CATEGORIES } from "../../constants/places";
 import type { LandmarksFC } from "../../data/types";
 import type { Projection } from "../../utils/projection";
 import { useMapStore } from "../../store/useMapStore";
@@ -16,6 +17,7 @@ function Landmark({ f, projection }: { f: LandmarksFC["features"][number]; proje
   const [x, z] = projection.project(f.geometry.coordinates as [number, number]);
   const [close, setClose] = useState(false);
   const labels = useMapStore(s => s.labels);
+  const category = PLACE_CATEGORIES[f.properties.category];
   useFrame(({ camera, controls }) => {
     const target = (controls as unknown as { target?: { x: number; z: number } })?.target;
     const next = !!target && Math.hypot(target.x - x, target.z - z) < 1800 && Math.hypot(camera.position.x - x, camera.position.z - z) < 4000;
@@ -24,7 +26,7 @@ function Landmark({ f, projection }: { f: LandmarksFC["features"][number]; proje
   return <group position={[x, .05, z]}>
     <group rotation-y={f.properties.yaw} onClick={e => { e.stopPropagation(); showLandmark(f); }}><primitive object={copy} /></group>
     {close && labels !== "off" && <Html position={[0, f.properties.heightM + 3, 0]} center zIndexRange={[450, 0]}>
-      <button type="button" onClick={() => showLandmark(f)} className="whitespace-nowrap rounded-lg border border-amber-200 bg-amber-50/95 px-2 py-1 text-[11px] font-semibold text-amber-900 shadow-sm">{f.properties.name}</button>
+      <button type="button" onClick={() => showLandmark(f)} className="whitespace-nowrap rounded-lg border border-white/80 px-2 py-1 text-[11px] font-semibold shadow-sm" style={{ color: category.color, background: category.fill }}>{f.properties.name}</button>
     </Html>}
   </group>;
 }

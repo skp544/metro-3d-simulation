@@ -1,6 +1,14 @@
-# Handoff: city surroundings, roads and Yamuna implemented
+# Handoff: Delhi malls, zoo and monuments added
 
 Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows / PowerShell).
+
+## Latest: Delhi Places expansion (2026-11-12)
+
+**24 places** now work in shared search, Places, 2D and 3D: the previous seven plus **eight Delhi malls, National Zoological Park and eight monuments/religious sites**. Read `docs/phase8-delhi-places.md` and decisions #82–#84. Places has category filters; search supports aliases/category names. Original Blender sources/GLBs are included. Most architectural dimensions/details are nominal; Akshardham height is rounded from its official source.
+
+Mall multi-polygons and courtyard holes survive both data processing and mall modeling. Zoo, Vegas and Pacific Tagore Garden are mapped **site outlines**, preserving existing city buildings/trees; their sources do not establish complete building/habitat layouts. Purana Qila is **Bara Darwaza only**, Jantar Mantar is **Samrat Yantra only**, and Agrasen is an explicitly labelled **raised cutaway**. Name/tag identity checks handle sources with missing or incorrect Wikidata tags; conflicts remain recorded. `projection.ts` supplies all local model footprint coordinates.
+
+TypeScript, lint, production/data builds and **80 tests** pass; rail validation remains **0 errors, 2 warnings, 73 info**. Browser artifacts are in `docs/review/delhi-places/`. This extends Phase 8; owner review/commit follows. Do not start another phase or expand to more sites without direction.
 
 ## Latest: nearby-station walking pathways (2026-11-12)
 

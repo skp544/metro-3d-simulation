@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { boundsCentre, createProjection, type Projection } from "../../utils/projection.ts";
 import { selectCityTiles, CITY_TILE_LIMIT } from "../../utils/cityTiles.ts";
 import type { City, CityManifest, EnvironmentContext, RoadProps } from "../../data/cityTypes.ts";
-import { areaPolygons, buildCity, insideArea, streetPath, streetPose } from "./buildCity.ts";
+import { areaPolygons, buildCity, insideArea, landmarkExclusions, streetPath, streetPose } from "./buildCity.ts";
 
 const read=async(p:string)=>JSON.parse(await readFile(p,"utf8"));
 const manifest=await read("data/processed/city_tiles.json") as CityManifest;
@@ -70,6 +70,23 @@ test("city: India Gate's enclosing OSM building is excluded without removing sur
   assert.equal(built.stats.buildings, city.buildings.features.length - 1, "only the duplicate outline is removed");
   for (const chunk of built.chunks) for (const [key, value] of Object.entries(chunk))
     if (key !== "key") (value as THREE.BufferGeometry | null)?.dispose();
+});
+
+test("city: mapped sites preserve city context; mall parts exclude duplicates while keeping courtyard trees",()=>{
+  const exclusions=landmarkExclusions(landmarks);
+  for(const id of ["delhi-zoo","vegas-dwarka","pacific-tagore-garden"]){
+    const site=landmarks.features.find((f:{properties:{id:string}})=>f.properties.id===id);
+    assert.ok(!exclusions.some(e=>e.osmId===site.properties.source[0].split("@")[0]));
+  }
+  const mall=landmarks.features.find((f:{properties:{id:string}})=>f.properties.id==="select-citywalk");
+  assert.equal(exclusions.filter(e=>e.osmId===mall.properties.source[0].split("@")[0]).length,2);
+  const city=empty();
+  city.trees.features=[
+    {type:"Feature",geometry:{type:"Point",coordinates:[2,2]},properties:{...source,area:"test:courtyard",variant:0}},
+    {type:"Feature",geometry:{type:"Point",coordinates:[5,5]},properties:{...source,area:"test:courtyard",variant:0}},
+  ];
+  const built=buildCity(city,identity,[{osmId:"test:mall",footprint:[[0,0],[10,0],[10,10],[0,10],[0,0]],holes:[[[4,4],[4,6],[6,6],[6,4],[4,4]]]}]);
+  assert.equal(built.trees.flat().length,1,"tree on mall footprint removed; tree in open courtyard retained");
 });
 
 test("streets: left-hand traffic follows real bends, reverse lanes stay separate, bridge ramps are continuous",()=>{

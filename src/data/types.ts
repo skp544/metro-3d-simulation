@@ -1,10 +1,23 @@
 // Schema of data/processed/*.geojson. Shared by scripts/ (build, validate) and the app.
 import type { Feature, FeatureCollection, LineString, MultiLineString, Point } from "geojson";
 
+export type PlaceCategory = "monument" | "mall" | "zoo" | "religious" | "civic";
+export interface PlaceFootprint {
+  outer: [number, number][];
+  holes: [number, number][][];
+}
+
 export interface LandmarkProps extends Provenance {
   id: string;
   name: string;
+  category: PlaceCategory;
+  aliases: string[];
+  /** A site outline must not suppress the real buildings/trees inside its grounds. */
+  geometryRole: "building" | "site";
   footprint: [number, number][];
+  footprintParts: PlaceFootprint[];
+  /** Source polygons in local Blender XY metres, via projection.ts, for model authoring. */
+  modelFootprints: PlaceFootprint[];
   footprintHoles?: [number, number][][];
   positionSource?: string;
   model: string;

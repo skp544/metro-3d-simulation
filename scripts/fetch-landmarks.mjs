@@ -14,6 +14,14 @@ for (const landmark of config.landmarks) {
   const target = new URL(`${type}-${id}.json`, dir);
   try { await readFile(target); console.log(`Preserved ${type} ${id}`); continue; }
   catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (landmark.snapshotSource) {
+    const snapshot = JSON.parse(await readFile(new URL(`../${landmark.snapshotSource}`, import.meta.url), 'utf8'));
+    const entity = snapshot.elements.find(e => e.type === type && e.id === id);
+    if (!entity?.geometry) throw new Error(`Missing preserved geometry for ${landmark.id}`);
+    await writeFile(target, JSON.stringify({ ...snapshot, sourceSnapshot: landmark.snapshotSource, elements: [entity] }), { flag: 'wx' });
+    console.log(`Extracted preserved ${type} ${id} from ${landmark.snapshotSource}`);
+    continue;
+  }
   const url = `https://www.openstreetmap.org/api/0.6/${type}/${id}/full.json`;
   const response = await fetch(url, { headers: { 'User-Agent': 'NCRRailVisualization/1.0 landmark research' }, signal: AbortSignal.timeout(45000) });
   if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);

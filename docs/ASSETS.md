@@ -2,6 +2,10 @@
 
 Every third-party asset in `public/models/`, with its source and licence. Add a row before adding a file.
 
+## Delhi malls, zoo and monument models (2026-11-12)
+
+17 additional original procedural models bring the library to **24 GLBs**. Source: `scripts/model-landmarks.py`; source library: `assets/landmarks/landmarks.blend`; sizes/triangle counts: `public/models/landmarks/manifest.json`. They cover eight Delhi malls, the zoo and eight monuments/religious sites. The zoo, Vegas and Pacific Tagore Garden assets are open source-derived site contours, not invented buildings/habitats. Mall model silhouettes use every source polygon part and preserve courtyard holes. Facades, lettering and all other architectural details are original nominal interpretations. No reference photographs, textures or third-party models are distributed. CC0 applies to original authoring; geographic geometry separately remains OSM-derived ODbL. See `docs/phase8-delhi-places.md` for the complete scope, sources, figures and browser checks.
+
 ## Environment visuals (2026-11-12)
 
 Facade windows, ground grain and water ripples are original CanvasTexture patterns in `scene3d/environmentTextures.ts` / `SceneAtmosphere.tsx`. Road vehicles (cars, buses and autorickshaws) and streetlights are original merged Three.js primitives in `UrbanLife.tsx`; no external vehicle images/models or photographic textures were added. These are illustrative, not exact vehicle replicas or live traffic. Existing Kenney CC0 trees remain in use, with predominantly green variants. Building/road/land/water geography is separately OSM-derived ODbL data with provenance; heights, facade details, fixture placement, traffic and unsourced dimensions are nominal. See `docs/phase8-city-environment.md`.

@@ -2,6 +2,7 @@
 import * as THREE from "three";
 import type { Polygon, MultiPolygon } from "geojson";
 import type { City, EnvironmentContext, RoadProps } from "../../data/cityTypes.ts";
+import type { LandmarksFC } from "../../data/types.ts";
 import type { Projection } from "../../utils/projection.ts";
 
 type V3=[number,number,number];
@@ -10,6 +11,9 @@ type Acc={pos:number[];col:number[];uv:number[]};
 const acc=():Acc=>({pos:[],col:[],uv:[]});
 const hash=(n:number)=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
 export const areaPolygons=(g:Polygon|MultiPolygon)=>g.type==="Polygon"?[g.coordinates]:g.coordinates;
+export const landmarkExclusions=(landmarks:LandmarksFC)=>landmarks.features
+  .filter(f=>f.properties.geometryRole!=="site")
+  .flatMap(f=>f.properties.footprintParts.map(p=>({footprint:p.outer,holes:p.holes,osmId:f.properties.source[0].split("@")[0]})));
 const color=(s:string)=>new THREE.Color(s);
 function tri(a:Acc,p:V3,q:V3,r:V3,c:THREE.Color,uv?:number[]){a.pos.push(...p,...q,...r);for(let i=0;i<3;i++)a.col.push(c.r,c.g,c.b);a.uv.push(...(uv??[p[0]/30,p[2]/30,q[0]/30,q[2]/30,r[0]/30,r[2]/30]));}
 function quad(a:Acc,p:V3,q:V3,r:V3,s:V3,c:THREE.Color,uv?:number[]){
@@ -78,7 +82,7 @@ function ribbon(a:Acc,path:V3[],width:number,c:THREE.Color,raise=0){
   for(let i=1;i<edge.length;i++)quad(a,edge[i-1][0],edge[i-1][1],edge[i][1],edge[i][0],c);
 }
 
-export function buildCity(city:City,projection:Projection,exclusions:{footprint:XZ[];osmId:string}[]=[],context?:EnvironmentContext){
+export function buildCity(city:City,projection:Projection,exclusions:{footprint:XZ[];holes?:XZ[][];osmId:string}[]=[],context?:EnvironmentContext){
   const chunks=new Map<string,{walls:Acc;roofs:Acc;roads:Acc;curbs:Acc;markings:Acc;land:Acc;water:Acc;banks:Acc}>();
   const chunk=(p:number[])=>{const key=`${Math.floor(p[0]/1000)},${Math.floor(p[1]/1000)}`;if(!chunks.has(key))chunks.set(key,{walls:acc(),roofs:acc(),roads:acc(),curbs:acc(),markings:acc(),land:acc(),water:acc(),banks:acc()});return chunks.get(key)!;};
   const project=(p:number[])=>projection.project(p as XZ);
@@ -87,7 +91,7 @@ export function buildCity(city:City,projection:Projection,exclusions:{footprint:
     // A separate OSM building outline can enclose the landmark without any building corner
     // falling inside its footprint (India Gate). Check containment in both directions.
     if(exclusions.some(e=>f.properties.id===e.osmId||areaPolygons(f.geometry).some(rs=>
-      rs[0].some(p=>insideArea(p,[e.footprint]))||e.footprint.some(p=>insideArea(p,rs)))))continue;
+      rs[0].some(p=>insideArea(p,[e.footprint,...(e.holes??[])]))||e.footprint.some(p=>insideArea(p,rs)))))continue;
     const p=f.properties,id=Number(p.id.split('/')[1]),h=p.height;
     const base=p.color&&(/^#[\da-f]{6}$/i.test(p.color)||p.color in THREE.Color.NAMES)?p.color:p.facadeStyle==="historic"?"#bda584":walls[Math.floor(hash(id)*walls.length)];
     const wall=color(base),roof=color(roofs[Math.floor(hash(id+4)*roofs.length)]);
@@ -135,7 +139,7 @@ export function buildCity(city:City,projection:Projection,exclusions:{footprint:
   }
   const trees:THREE.Matrix4[][]=[[],[],[],[]];
   for(const f of city.trees.features){
-    if(exclusions.some(e=>insideArea(f.geometry.coordinates,[e.footprint])))continue;
+    if(exclusions.some(e=>insideArea(f.geometry.coordinates,[e.footprint,...(e.holes??[])])))continue;
     const [x,z]=project(f.geometry.coordinates),seed=x+z,s=5.4+hash(seed)*3.1;
     trees[f.properties.variant%4].push(new THREE.Matrix4().compose(new THREE.Vector3(x,0,z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),hash(seed+.5)*Math.PI*2),new THREE.Vector3(s,s,s)));
   }
