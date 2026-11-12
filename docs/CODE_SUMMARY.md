@@ -2,9 +2,11 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-12 | **Phase:** 8 including regional networks, fleet/speed work, four landmarks and generic station circulation. See `phase8-landmarks-stations.md` for the latest extension. Full imagery review and real-GPU frame rate remain pending.
+**Last updated:** 2026-11-12 | **Phase:** 8 including regional networks, fleet/speed work, landmarks/stations and expanded city/roads/Yamuna. See `phase8-city-environment.md` for the latest extension. Full imagery review and real-GPU frame rate remain pending.
 
 **Latest implementation:** India Gate, Lotus Temple, Qutb Minar and Red Fort's Lahori Gate, sourced from dated OSM footprints with original procedural Blender GLBs. Search, Places list, markers and details work in both views. 201 eligible elevated platform frames have wider walkable platforms and nominal stair/lift circulation; nearby detail is capped at six stations. Blender's original scene objects and active file path are preserved. Awaiting user review/commit; Phase 9 and people simulation remain separate.
+
+**Latest visual review fix:** Real surrounding buildings expand to 124,105; 109,046 road ways include local streets/paths and continuous arterials. Shared water data contains Yamuna and mapped islands. Actual land use, green areas, facade textures, nearby decorative traffic/lamps, low-angle camera and WASD exploration replace the empty-looking scene. Buildings/trees stream from nearby tiles; the full city is not loaded at startup.
 
 ## Data pipeline
 
@@ -51,19 +53,22 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 - 1 unknown type: Rohini East (OSM `tunnel=building_passage`).
 - 46 stations have no operator code in OSM and use namespaced OSM IDs. All regional station codes are operator-local; NCRTC shares a namespace between RRTS and Meerut Metro.
 
-## City context (3D only)
+## City environment (water shared by 2D/3D)
 
 | Path | What it does |
 |---|---|
-| `scripts/fetch-osm-city.ts` | Overpass: buildings, green areas and roads within 300 m of every DMRC station → `data/raw/osm-city/<date>.json` (snapshot 2026-11-04, 43,422 elements) |
-| `scripts/build-city.ts` | → `data/processed/city_{buildings,roads,green,trees}.geojson` + `data/metadata/city_report.json`: 25,197 buildings (175 with an OSM height, 1,697 from storeys, 23,325 nominal), 12,832 road pieces (service roads dropped), 860 green areas, 11,781 trees inside them. 12.3 MB raw / 1.45 MB gzipped |
+| `scripts/fetch-osm-city.ts` | Historical 300 m DMRC snapshot (`data/raw/osm-city/2026-11-04.json`); retained as baseline |
+| `scripts/fetch-environment.mjs` | 14 immutable Overpass snapshots dated 2026-11-12: all-station neighbourhoods, landmark districts, land/water and arterial roads. Run `npm run data:fetch-environment`; existing captures are reused |
+| `scripts/build-environment.ts`, `scripts/environmentGeometry.ts` | `npm run data:city`: baseline + new snapshots → combined city GeoJSON, shared water, landscape context, tile manifest, `public/city/` and quality/provenance report. Multipolygon holes and reversed member joins retained; incomplete rings rejected. `build-city.ts` delegates here |
+| Outputs | 124,105 buildings (908 OSM height / 3,753 levels / 119,444 nominal), 109,046 roads, 10,618 green areas, 175,644 decorative trees, 19,711 land areas, 3,095 water areas, 5,345 indexed tiles; 0 geometry issues |
+| Runtime | Up to 48 nearest 1 km tiles, 64 cached; max 6,000 nearby trees. Full tile payload totals approximately 179 MB on disk, streamed locally. Shared context 27.37 MB raw / 4.51 MB gzip, water 2.22 MB raw / 413 KB gzip, manifest 1.20 MB raw / 192 KB gzip. Compress hosting responses |
 
 ## App
 
 | Path | State |
 |---|---|
 | `src/App.tsx` → `src/pages/MapPage.tsx` | Loads the network and builds the simulated service; top bar + 2D map or lazy 3D scene + floating cards (KPIs, route, layers, station panel, 3D controls, follow card, bottom dock) |
-| `src/data/loadNetwork.ts`, `src/data/loadCity.ts` | Fetch the network GeoJSON + reports; the city GeoJSON (3D only) |
+| `src/data/loadNetwork.ts`, `src/data/loadCity.ts`, `src/data/cityTypes.ts` | Network loading; cached landscape/water/manifest loading; typed city features. 2D loads shared water only; 3D fetches nearby city tiles |
 | `src/store/useMapStore.ts` | zustand: view, filters, layers (incl. X-ray ground), selected station, label mode, camera/focus/fit commands, followed train, route ends (`?route=from,to`), simulation clock (play/pause, ×1/×2/×4/×8). Also `viewHandoff` (non-reactive: last view, for the 2D/3D switch) |
 | `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
 | `src/store/useCommand.ts` | Runs a focus/fit/follow/camera command once, in whichever view is showing |
@@ -80,9 +85,10 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `public/models/regional/` | Five CC0 3D Assets GLBs, source/licence manifest, approximately 1.68 MB; RRTS, Aqua and Meerut silhouettes |
 | `src/components/scene3d/Landmarks.tsx`, `src/components/map2d/LandmarkLayer.tsx`, `src/components/ui/LandmarkPanel.tsx`, `src/store/showLandmark.ts` | Original models, shared geographic markers/footprints, Places list, searchable focus, source/approximation details and nearest station links; `?place=<id>` review entry |
 | `assets/landmarks/`, `public/models/landmarks/`, `scripts/model-landmarks.py` | Blender source library, original CC0 GLBs/license/manifest and reproducible modeling script; 46,598 triangles and 3,029,544 bytes of GLBs |
-| Tests | 59: previous 54 plus landmark provenance/GLB checks (2) and circulation clearance/opening/level/shared-layout checks (3) |
+| `scene3d/UrbanLife.tsx`, `environmentTextures.ts`, `SceneAtmosphere.tsx`, `ExploreMovement.tsx`, `WaterLabels.tsx`, `map2d/WaterLayer.tsx`, `utils/cityTiles.ts` | Procedural windows/ground/ripples, sky/fog, illustrative road vehicles/lamps, WASD and low views, source-derived water labels and budgeted city selection |
+| Tests | 63: existing rail/landmark/station tests plus 3 city/topology/road-pose checks and 2 OSM multipolygon checks; replaces the old full-city geometry test with local tile budgets |
 
-Build: 2D bundle 450 KB JS (137 KB gzip); 3D chunk 1.082 MB (293 KB gzip), loaded only when the 3D view opens. Network, landmarks and city data are fetched at runtime; landmark GLBs load in 3D only.
+Build: 2D bundle approximately 452 KB JS (137 KB gzip); 3D chunk approximately 1.097 MB (298 KB gzip), loaded only in 3D. Network, landmarks and environment data are fetched at runtime; landmark GLBs and city tiles load in 3D only.
 
 3D scene: city ≈ 473k triangles in 109 chunks (custom landmark footprints exclude duplicate buildings/trees); structures ≈ 764k (12,976 piers, 9,621 station parts; rails, track bed and parapets ≈ 209k of it, drawn close up only; up to 40k instanced sleepers within 900 m). New circulation detail adds about 400 box instances per nearby station, at most six. Landmarks add 46.6k triangles. Trains use 33 instanced meshes and draw models within 5 km of the view, dots further away. DMRC cars are approximately 1.5k triangles each; regional cars approximately 7.8k–9.9k. Formations total 51,520 triangles (RRTS), 32,208 (Aqua), 27,432 (Meerut).
 

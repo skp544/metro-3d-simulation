@@ -4,6 +4,7 @@ import type { Provenance } from "./types.ts";
 export interface BuildingProps extends Provenance {
   id: string; kind: string; height: number; heightSource: string;
   levels: number; roofShape: string; roofHeight: number; color?: string;
+  facadeStyle?: "plain" | "historic";
 }
 export interface RoadProps extends Provenance {
   id: string; class: string; width: number; oneway: boolean; bridge: boolean; name: string;

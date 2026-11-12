@@ -2,6 +2,15 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Expanded city, roads and Yamuna
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 72 | Surroundings (user review) | Replace isolated 300 m DMRC context with captured OSM buildings within 650 m of all network stations, local streets within 800 m, and 2.3 km districts around the four landmarks. Add actual land-use polygons and continuous arterial roads across the network bounds | User's Qutb Minar screenshot showed empty space; they explicitly requested buildings and a more convincing 3D simulation |
+| 73 | River and roads (user) | Render mapped water polygons including Yamuna, banks and interior islands, plus main/residential/service roads and footpaths. One processed water GeoJSON is used in both views, with a River & water toggle and source-derived names | User explicitly requested Yamuna and roads. Preserve source topology and geography; do not draw an invented constant-width river or arbitrary streets |
+| 74 | Render and simulation detail | Add original procedural facade/ground/water textures, varied building/roof colours, curbs and nominal lane markings. Tagged heritage/worship/ruins and service structures avoid office-style window grids. Add illustrative left-hand cars, buses, autorickshaws and streetlights near the camera. Camera has low/oblique views and WASD/Shift movement | Improves the experience without external imagery licences or claiming live road traffic, exact facades, crowds or surveyed elevations |
+| 75 | Streaming budget | Generate content-hashed 1 km city tiles. Load up to 48 nearest tiles, cache 64, retain at most 6,000 closest decorative trees, 180 vehicles and 160 lamps; overview keeps shared land/water/arterial context without loading all buildings. Preserve raw snapshots and provenance | Expanded data has 124,105 buildings; loading the entire city into the browser would defeat the visual improvement. Actual hardware frame rate still requires user review |
+
 ## 2026-11-12: Landmarks and generic station circulation implemented
 
 | # | Topic | Decision | Reason |

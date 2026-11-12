@@ -11,7 +11,7 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
-Read **`docs/HANDOFF.md` first**. The approved landmarks/station extension is implemented: four OSM-positioned Blender landmarks (Red Fort = Lahori Gate only) and nominal circulation for 201 eligible elevated platform frames (DECISIONS #69–#71). See `docs/phase8-landmarks-stations.md`. Await user review; the user commits. Blender's original objects/file are preserved; project models are in `NCR_Landmarks`. Phase 9 and people simulation remain separate.
+Read **`docs/HANDOFF.md` first**. Latest: expanded real city surroundings, roads and Yamuna (DECISIONS #72–#75; `docs/phase8-city-environment.md`), following the landmark/station extension. City tiles stream near the view; low-angle camera and WASD support exploration. The user reviews/commits. Blender's original objects/file are preserved; project models remain in `NCR_Landmarks`. Phase 9 and people simulation remain separate.
 
 Phase 8 includes the regional expansion requested 2026-11-12 (DECISIONS #59–#61). Read `docs/phase8-train-speeds.md`, `docs/phase8-fleet-assets.md`, `docs/phase8-regional-expansion.md` and `docs/CODE_SUMMARY.md` first. Aqua, Namo Bharat RRTS and Meerut Metro are now active networks; Rapid Metro Gurugram remains a work-in-progress entry. The extension is ready for review; the user commits it.
 
@@ -20,7 +20,7 @@ Phase 8 includes the regional expansion requested 2026-11-12 (DECISIONS #59–#6
 **Still open from earlier phases:**
 - The human imagery review (`docs/phase4-leaflet-map.md` §5).
 - Frame rate on real hardware is unmeasured; ask the user.
-- City GeoJSON is 12.3 MB raw (serve compressed; tiling if it grows).
+- Expanded city is tiled (48 selected / 64 cached). Landscape context is 27.37 MB raw / 4.51 MB gzip, water 2.22 MB / 413 KB gzip; serve compressed. Hardware performance review remains pending.
 
 **How to verify visually:** `npm run build && npx vite preview --port 4173`, then `node scripts/screenshot.mjs "http://localhost:4173/?view=3d" /tmp/x.png 1440 900 16000` and read the PNG. Plain `chrome --headless --screenshot` gives a blank WebGL canvas on macOS. Useful URLs:
 - `?view=3d` opens on the hub.
@@ -77,8 +77,9 @@ npm run data:build   # data/raw + data/manual → data/processed + data/metadata
 npm run data:validate  # validation only → data/metadata/validation_report.json
 npm run data:fetch-regional # new regional OSM API snapshot (preserves DMRC baseline)
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
-npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # data, geometry, city, fleet/motion, routing, landmarks and circulation tests (59)
+npm run data:fetch-environment # immutable OSM city/roads/landscape/water snapshots; reuses completed requests
+npm run data:city    # baseline + environment snapshots → combined GeoJSON, context, hashed city tiles + report
+npm test             # data, geometry, city, fleet/motion, routing, landmarks and circulation tests (63)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.

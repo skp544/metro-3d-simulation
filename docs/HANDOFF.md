@@ -1,10 +1,15 @@
-# Handoff: landmarks and station circulation implemented
+# Handoff: city surroundings, roads and Yamuna implemented
 
 Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows / PowerShell).
 
-The authorized landmark/station extension is implemented and awaiting user review. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #69–#71 and `docs/phase8-landmarks-stations.md`. The original pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
+The landmark/station extension and the user's visual-review requests (buildings, roads and Yamuna) are implemented. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #72–#75 and `docs/phase8-city-environment.md` first, then the frozen landmark report. The pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
 
 ## Completed
+
+- Expanded real OSM environment: 124,105 buildings, 109,046 road ways, 19,711 land areas and 3,095 water areas. Station neighbourhoods expand to 650 m, local roads to 800 m, landmark districts to 2.3 km. All 14 new source snapshots are immutable under `data/raw/environment/2026-11-12/`; original city snapshot remains a baseline.
+- Yamuna water/shoreline and islands render from mapped polygons; shared water overlay in both maps and River & water checkbox. No invented river width or alignment. Blue Line crossing was reviewed from source-derived coordinates.
+- Procedural facade/ground/water textures, roof colours, curbs/markings, nearby illustrative cars/buses/autorickshaws and streetlights. Heritage/worship/service tags suppress inappropriate modern office window patterns. Modelled facade details, untagged heights, tree placement, bridge levels and traffic are nominal/illustrative.
+- 5,345 indexed 1 km city tiles, max 48 selected / 64 cached; max 6,000 nearby trees, 180 vehicles and 160 lamps. At overview scales the global landscape/water/arterial layer remains, while detailed city tiles unload. Low-angle eye / oblique camera controls preserve the current place. WASD moves, Shift speeds up; text inputs retain their keys.
 
 - India Gate, Lotus Temple, Qutb Minar and **Red Fort's Lahori Gate only**, at positions derived from four immutable OSM way/full snapshots dated 2026-11-12. One shared processed GeoJSON drives both views. No rail geography was changed.
 - Original procedural Blender GLBs, `.blend` source library and reproducible Python script. Models are architectural approximations, with sourced heights where verified and nominal dimensions labelled. No reference photographs are distributed textures; no paid generation used.
@@ -37,6 +42,8 @@ To regenerate, build the landmark GeoJSON first, then execute `scripts/model-lan
 
 ## Checks and next boundary
 
-`npm run data:build`, `npm test` (59 passing), `npm run lint` and `npm run build` pass. Rail validation remains **0 errors, 7 warnings, 68 info**. See the frozen phase report for visual checks and limitations. Browser screenshot tooling uses SwiftShader, so real GPU frame rate remains unmeasured. Vite preview listens on **localhost** by default; `127.0.0.1` can refuse when it binds IPv6 only.
+`npm run data:city`, `npm run data:build`, `npm test` (63 passing), lint and build are the required checks. Rail validation remains **0 errors, 7 warnings, 68 info**; the city report records 0 polygon assembly issues. See the latest frozen phase report for final visual/check results. Headless Chrome uses SwiftShader, so real GPU frame rate remains unmeasured. Vite preview listens on localhost; 127.0.0.1 can refuse when it binds IPv6 only.
+
+Current city source pipeline: `scripts/build-environment.ts` (`build-city.ts` delegates), `scripts/environmentGeometry.ts`; types `src/data/cityTypes.ts`. Runtime: `loadCity.ts`, `cityTiles.ts`, `City.tsx`/`buildCity.ts`, `UrbanLife.tsx`, `environmentTextures.ts`, `SceneAtmosphere.tsx`, `ExploreMovement.tsx`, `WaterLabels.tsx`, `map2d/WaterLayer.tsx`. Regenerate city tiles from preserved snapshots with `npm run data:city`; generated content-hash filenames change when a tile changes. The full city tile payload is about 179 MB on disk, not a startup download. Landscape/water context is separate; use compressed hosting responses.
 
 The rail work from before this extension is retained: 12 lines / 16 branches / 288 stations / 378 segments / 30 shared interchanges / 5 external walking links, separate regional fleet models and sourced speed caps. Human imagery review and real-hardware performance review remain pending. Phase 9 journey planning and adding people are separate tasks; wait for the user's direction after review.

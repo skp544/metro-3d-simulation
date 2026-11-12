@@ -31,7 +31,7 @@ const area=(g:Polygon|MultiPolygon)=>polygons(g).reduce((sum,rs)=>sum+rs.reduce(
   return s+(j===0?1:-1)*Math.abs(a/2);
 },0),0);
 const rng=(seed:number)=>()=>{seed=(seed+0x6d2b79f5)|0;let t=Math.imul(seed^(seed>>>15),1|seed);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};
-const nominal:Record<string,number>={house:7,detached:7,residential:12,apartments:15,commercial:12,retail:8,office:15,industrial:9,warehouse:9,school:10,college:12,university:12,hospital:15,hotel:18,roof:4,garage:3,garages:3,shed:3,hut:3,temple:10,mosque:12,church:12,yes:9};
+const nominal:Record<string,number>={house:7,detached:7,residential:12,apartments:15,commercial:12,retail:8,office:15,industrial:9,warehouse:9,school:10,college:12,university:12,hospital:15,hotel:18,roof:4,garage:3,garages:3,shed:3,hut:3,temple:10,mosque:12,church:12,ruins:2.5,yes:9};
 const metres=(s:string|undefined)=>{const n=parseFloat(s??"");return /ft|feet|'/.test(s??"")?n*.3048:n;};
 const buildings:City["buildings"]["features"]=[],roads:City["roads"]["features"]=[];
 const land:AreasFC["features"]=[],water:AreasFC["features"]=[],green:AreasFC["features"]=[];
@@ -63,6 +63,8 @@ for(const e of all){
     const height=tagged>0?tagged:levels>0?levels*3.2:(nominal[t.building]??9)*(.75+rng(e.id)()*.5);
     heightSources[heightSource]++;
     const properties:BuildingProps={...provenance(e,heightSource==="nominal"),id:`osm:way/${e.id}`,kind:t.building,height:Math.round(Math.min(height,250)*10)/10,heightSource,levels:levels>0?levels:Math.max(1,Math.round(height/3.2)),roofShape:t['roof:shape']??'flat',roofHeight:metres(t['roof:height'])||0,color:t['building:colour']};
+    if(t.historic||t.ruins==="yes"||t.amenity==="place_of_worship"||["temple","mosque","church","cathedral","chapel","ruins","tomb","shrine"].includes(t.building))properties.facadeStyle="historic";
+    else if(["industrial","warehouse","roof","garage","garages","shed","hut"].includes(t.building))properties.facadeStyle="plain";
     buildings.push({type:"Feature",geometry,properties});
   }
   if(t.highway&&widths[t.highway]&&t.tunnel!=="yes"&&t.area!=="yes"&&e.geometry.length>1){

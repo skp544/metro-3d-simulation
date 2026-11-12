@@ -86,14 +86,14 @@ export function buildCity(city:City,projection:Projection,exclusions:{footprint:
   for(const f of city.buildings.features){
     if(exclusions.some(e=>f.properties.id===e.osmId||areaPolygons(f.geometry).some(rs=>rs[0].some(p=>insideArea(p,[e.footprint])))))continue;
     const p=f.properties,id=Number(p.id.split('/')[1]),h=p.height;
-    const base=p.color&&(/^#[\da-f]{6}$/i.test(p.color)||p.color in THREE.Color.NAMES)?p.color:walls[Math.floor(hash(id)*walls.length)];
+    const base=p.color&&(/^#[\da-f]{6}$/i.test(p.color)||p.color in THREE.Color.NAMES)?p.color:p.facadeStyle==="historic"?"#bda584":walls[Math.floor(hash(id)*walls.length)];
     const wall=color(base),roof=color(roofs[Math.floor(hash(id+4)*roofs.length)]);
     for(const poly of areaPolygons(f.geometry)){
       const rings=poly.map(r=>r.map(project)),ch=chunk(rings[0][0]);
       for(const ring of rings)for(let i=1;i<ring.length;i++){
         const a=ring[i-1],b=ring[i],width=Math.hypot(b[0]-a[0],b[1]-a[1]);
         if(width<.05)continue;
-        quad(ch.walls,[a[0],0,a[1]],[b[0],0,b[1]],[b[0],h,b[1]],[a[0],h,a[1]],wall,[0,0,width/3,0,width/3,h/3.2,0,h/3.2]);
+        quad(ch.walls,[a[0],0,a[1]],[b[0],0,b[1]],[b[0],h,b[1]],[a[0],h,a[1]],wall,p.facadeStyle?[.01,.01,.01,.01,.01,.01,.01,.01]:[0,0,width/3,0,width/3,h/3.2,0,h/3.2]);
       }
       surface(ch.roofs,rings,h,roof);
     }

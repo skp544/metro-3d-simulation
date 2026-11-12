@@ -2,6 +2,10 @@
 
 Every third-party asset in `public/models/`, with its source and licence. Add a row before adding a file.
 
+## Environment visuals (2026-11-12)
+
+Facade windows, ground grain and water ripples are original CanvasTexture patterns in `scene3d/environmentTextures.ts` / `SceneAtmosphere.tsx`. Road vehicles (cars, buses and autorickshaws) and streetlights are original merged Three.js primitives in `UrbanLife.tsx`; no external vehicle images/models or photographic textures were added. These are illustrative, not exact vehicle replicas or live traffic. Existing Kenney CC0 trees remain in use, with predominantly green variants. Building/road/land/water geography is separately OSM-derived ODbL data with provenance; heights, facade details, fixture placement, traffic and unsourced dimensions are nominal. See `docs/phase8-city-environment.md`.
+
 ## Original landmark models (2026-11-12)
 
 Four original procedural Blender interpretations are released under CC0 1.0, with no photographic textures. Architectural reference URLs, checked date and rejected/inaccessible asset candidates are in `data/manual/landmark-references.json`. Geographic positions/footprints remain OSM-derived ODbL data, separate from the model licence. The active Blender file path and original cube/camera/light were preserved; only the project collection `NCR_Landmarks` was created/rebuilt.
