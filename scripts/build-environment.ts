@@ -69,7 +69,7 @@ for(const e of all){
     const measured=metres(t.width),lanes=parseFloat(t.lanes??''),oneway=t.oneway==="yes"||t.oneway==="-1";
     const width=Math.min(40,Math.max(1,measured>0?measured:lanes>0?lanes*3.2+.6:widths[t.highway]*(oneway&&widths[t.highway]>=9?.55:1)));
     const coordinates=ringCoordinates(e.geometry);if(t.oneway==="-1")coordinates.reverse();
-    const properties:RoadProps={...provenance(e,!(measured>0)),id:`osm:way/${e.id}`,class:t.highway,width,oneway,bridge:t.bridge==="yes",name:t["name:en"]??t.name??""};
+    const properties:RoadProps={...provenance(e,!(measured>0)),id:`osm:way/${e.id}`,class:t.highway,width,oneway,bridge:!!t.bridge&&t.bridge!=="no",name:t["name:en"]??t.name??""};
     roads.push({type:"Feature",geometry:{type:"LineString",coordinates},properties});
   }
 }
@@ -88,6 +88,10 @@ for(const b of buildings){
   const coords=polygons(b.geometry).flat(2).map(p=>projection.project(p as [number,number]));
   const xs=coords.map(p=>p[0]),zs=coords.map(p=>p[1]);
   put([Math.min(...xs),Math.min(...zs),Math.max(...xs),Math.max(...zs)],p=>inside(projection.unproject(p as [number,number]),b.geometry));
+}
+for(const waterArea of water)for(const poly of polygons(waterArea.geometry)){
+  const pts=poly[0].map(p=>projection.project(p as [number,number])),xs=pts.map(p=>p[0]),zs=pts.map(p=>p[1]);
+  put([Math.min(...xs),Math.min(...zs),Math.max(...xs),Math.max(...zs)],p=>inside(projection.unproject(p as [number,number]),{type:"Polygon",coordinates:poly}));
 }
 for(const road of roads){
   const pts=road.geometry.coordinates.map(p=>projection.project(p as [number,number])),half=road.properties.width/2+1.5;

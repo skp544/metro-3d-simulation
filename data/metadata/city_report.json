@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-12T09:02:44.244Z",
+  "generatedAt": "2026-11-12T09:11:59.855Z",
   "sources": [
     {
       "file": "data/raw/osm-city/2026-11-04.json",
@@ -66,7 +66,7 @@
     "buildings": 124105,
     "roads": 109046,
     "greenAreas": 10618,
-    "trees": 175646,
+    "trees": 175644,
     "landAreas": 19711,
     "waterAreas": 3095,
     "tiles": 5345
