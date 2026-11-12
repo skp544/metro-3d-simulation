@@ -1,5 +1,5 @@
 // Dated, immutable OSM API snapshot for the regional networks. The main DMRC snapshot stays intact.
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, access, readFile } from "node:fs/promises";
 
 type El = {
   type: string;
@@ -23,8 +23,15 @@ async function get(path: string): Promise<El[]> {
   return json.elements;
 }
 // Canonical and reverse passenger services, including the Duhai Depot branch.
+const config = JSON.parse(
+  await readFile("data/manual/regional-lines.json", "utf8"),
+) as { lines: { branches: { osmRoute: number; osmReverse: number }[] }[] };
 const routes = [
-  9268569, 9268568, 17337287, 17337288, 20268499, 20268500, 16661918, 20268334,
+  ...new Set(
+    config.lines.flatMap((l) =>
+      l.branches.flatMap((b) => [b.osmRoute, b.osmReverse]),
+    ),
+  ),
 ];
 for (const id of routes) {
   await get(`relation/${id}/full`);

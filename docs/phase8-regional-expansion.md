@@ -51,6 +51,8 @@ Station layouts remain unverified where there is no independent station-by-stati
 
 `npm test`: **47/47** pass. TypeScript production build and lint pass. Structures remain below the existing one-million-triangle budget (approximately 744k before locally instanced sleepers). Real-GPU frame rate and a full imagery review remain pending.
 
+Headless Chrome checks on Windows: the 2D Pari Chowk–Bhainsali itinerary shows Aqua, a separate-station walk to Blue, a pedestrian connection to Namo Bharat, and a shared-station change to Meerut Metro. The 3D Sector 52–51 walking-only view renders both endpoint labels, the dashed connection and an Aqua simulated train, without browser exceptions. These checks verify rendering and itinerary presentation, not surveyed pedestrian access or real hardware performance.
+
 Trains and journey times still use the existing generic 45 km/h cruise simulation. They are not NCRTC/NMRC schedules, and the RRTS estimate should not be treated as its real journey time. Trains and stations have generic models; shared corridor meshes may overlap. New-city surroundings were not fetched; existing city coverage remains around original DMRC stations. Rapid Metro Gurugram remains outside the dataset.
 
 ## Reproduce and next step

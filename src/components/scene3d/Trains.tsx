@@ -7,12 +7,9 @@ import { STRUCTURE, TRAIN } from "../../constants/scene";
 import { simSeconds, useMapStore } from "../../store/useMapStore";
 import type { Service, TrainState } from "../../utils/trainSim";
 import { pointAt, type Scene3DData } from "./geometry";
+import { carCapacity, carOffset, FLEETS, FLEET_MODEL_URLS, fleetForLine, regionalCarGeometry } from "./trainFleet";
 
-const CAR_MODELS = [
-  "/models/kenney/train/train-electric-subway-a.glb", // cab car (nose towards +z); used reversed at the rear
-  "/models/kenney/train/train-electric-subway-b.glb",
-  "/models/kenney/train/train-electric-subway-c.glb",
-];
+const CAR_MODELS = FLEETS.dmrc.models;
 const RENDER_RADIUS_M = 5000; // full models only near the view target; further away is sub-pixel anyway
 const UNDERGROUND_Y = -2;
 
@@ -81,13 +78,13 @@ export function Trains({
   stationNames: Map<string, string>;
   near: boolean;
 }) {
-  const models = useGLTF(CAR_MODELS);
-  const cars = useMemo(() => models.map((m) => mergeCar(m.scene)), [models]);
+  const models = useGLTF(FLEET_MODEL_URLS);
+  const cars = useMemo(() => CAR_MODELS.map(url => mergeCar(models[FLEET_MODEL_URLS.indexOf(url)].scene)), [models]);
   const lines = useMemo(() => [...colors.keys()], [colors]);
   const materials = useMemo(
     () =>
       new Map(
-        lines.map((l) => [l, stripeMaterial(cars[0].material, colors.get(l)!)]),
+        lines.filter(l => fleetForLine(l).id === "dmrc").map((l) => [l, stripeMaterial(cars[0].material, colors.get(l)!)]),
       ),
     [lines, cars, colors],
   );
@@ -110,6 +107,23 @@ export function Trains({
       TRAIN.carLength / s.z,
     );
   }, [cars]);
+
+  const renderCars = useMemo(() => new Map(lines.map(lineId => {
+    const fleet = fleetForLine(lineId);
+    if (fleet.id === "dmrc") return [lineId, cars.map(car => ({ geometry: car.geometry, material: materials.get(lineId)!, scale }))] as const;
+    const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.65, metalness: 0.15 });
+    return [lineId, fleet.models.map(url => ({
+      geometry: regionalCarGeometry(models[FLEET_MODEL_URLS.indexOf(url)].scene, fleet),
+      material, scale: new THREE.Vector3(1, 1, 1),
+    }))] as const;
+  })), [lines, cars, materials, scale, models]);
+
+  useEffect(() => () => {
+    for (const [lineId, parts] of renderCars) if (fleetForLine(lineId).id !== "dmrc") {
+      parts.forEach(p => p.geometry.dispose());
+      parts[0].material.dispose();
+    }
+  }, [renderCars]);
 
   const meshes = useRef(new Map<string, (THREE.InstancedMesh | null)[]>());
   const dots = useRef<THREE.Points>(null);
@@ -140,7 +154,7 @@ export function Trains({
     const t = simSeconds(s);
     const target = (controls as unknown as { target?: THREE.Vector3 } | null)
       ?.target;
-    const counts = new Map<string, number[]>(lines.map((l) => [l, [0, 0, 0]]));
+    const counts = new Map<string, number[]>(lines.map((l) => [l, fleetForLine(l).models.map(() => 0)]));
     let dot = 0;
     live.current.clear(); // hidden lines must not leave stale trains behind
     for (const train of service.trains) {
@@ -165,9 +179,10 @@ export function Trains({
       const end = path.km.at(-1)!;
       const c = counts.get(train.lineId)!;
       const lineMeshes = meshes.current.get(train.lineId);
-      for (let j = 0; j < TRAIN.cars; j++) {
-        // The train's km is its middle; car j's centre is (2.5 − j) car lengths ahead along its travel.
-        const off = ((TRAIN.cars - 1) / 2 - j) * TRAIN.carLength;
+      const fleet = fleetForLine(train.lineId);
+      for (let j = 0; j < fleet.formation.length; j++) {
+        // The simulated position is the formation's middle; each fleet has its own car count/length.
+        const off = carOffset(fleet, j);
         const at = pointAt(
           path.points,
           path.km,
@@ -177,15 +192,15 @@ export function Trains({
           Math.cos(at.yaw) * state.dir,
           -Math.sin(at.yaw) * state.dir,
         ];
-        const type = j === 0 || j === TRAIN.cars - 1 ? 0 : j % 2 ? 1 : 2;
-        const yaw = Math.atan2(fx, fz) + (j === TRAIN.cars - 1 ? Math.PI : 0);
+        const type = fleet.formation[j];
+        const yaw = Math.atan2(fx, fz) + (j === fleet.formation.length - 1 ? Math.PI : 0);
         // Left-hand running: shift to the left of travel (left of (fx, fz) is (fz, −fx)).
         tmp.p.set(
           at.position[0] + fz * TRAIN.trackOffset,
           at.position[1] + STRUCTURE.railTop,
           at.position[2] - fx * TRAIN.trackOffset,
         );
-        tmp.m.compose(tmp.p, tmp.q.setFromAxisAngle(tmp.up, yaw), scale);
+        tmp.m.compose(tmp.p, tmp.q.setFromAxisAngle(tmp.up, yaw), renderCars.get(train.lineId)![type].scale);
         lineMeshes?.[type]?.setMatrixAt(c[type]++, tmp.m);
       }
     }
@@ -204,19 +219,19 @@ export function Trains({
   return (
     <>
       {lines.map((lineId) =>
-        cars.map((car, type) => (
+        renderCars.get(lineId)!.map((car, type) => (
           <instancedMesh
             key={`${lineId}-${type}`}
             ref={(m) => {
-              const list = meshes.current.get(lineId) ?? [null, null, null];
+              const list = meshes.current.get(lineId) ?? [];
               list[type] = m;
               meshes.current.set(lineId, list);
             }}
-            // Capacity: every train of the line, 2 cars of each type per 6-car train.
+            // Capacity follows each formation: RRTS needs four intermediate cars per train.
             args={[
               car.geometry,
-              materials.get(lineId)!,
-              (perLine.get(lineId) ?? 0) * 2,
+              car.material,
+              carCapacity(fleetForLine(lineId), type, perLine.get(lineId) ?? 0),
             ]}
             frustumCulled={false}
             castShadow
@@ -328,4 +343,4 @@ function TrainLabels({
   ));
 }
 
-CAR_MODELS.forEach((u) => useGLTF.preload(u));
+FLEET_MODEL_URLS.forEach((u) => useGLTF.preload(u));

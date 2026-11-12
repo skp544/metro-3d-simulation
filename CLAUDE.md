@@ -9,9 +9,9 @@ Interactive NCR rail map (DMRC, NMRC and NCRTC): a Leaflet 2D view (the geograph
 Phases 1 (research), 2 (dataset build), 3 (validation: 0 errors), 4 (Leaflet 2D map), 5 (3D foundations), 6 (3D infrastructure), 7 (3D look, OSM city, simulated trains, reference-style UI) and 8 (remaining UI: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting) are **done**. The human imagery review in `docs/phase4-leaflet-map.md` §5 is pending. Phase 9 (journey planner) has **not started** and is waiting for the user's go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
-## Next session: start here (handoff, 2026-11-09)
+## Next session: start here (handoff, 2026-11-12)
 
-Phase 8 is finished, including a revision for realistic track, sleepers and stations (Phase 8 doc §9, DECISIONS #57–#58), and is waiting for the user's approval (and their commit). Read `docs/phase8-remaining-ui.md` (§6 open issues, §9 revision, §10 next) and `docs/CODE_SUMMARY.md` first.
+Phase 8 includes the regional expansion requested 2026-11-12 (DECISIONS #59–#61). Read `docs/phase8-fleet-assets.md`, `docs/phase8-regional-expansion.md` and `docs/CODE_SUMMARY.md` first. Aqua, Namo Bharat RRTS and Meerut Metro are now active networks; Rapid Metro Gurugram remains a work-in-progress entry. The extension is ready for review; the user commits it.
 
 **Phase 9 scope** (proposed, Phase 8 doc §10): From/To station fields; per-line speeds only where sourced (Airport Express); better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. The graph already exists: `src/utils/routePlanner.ts` (DECISIONS #52–#53).
 
@@ -58,7 +58,7 @@ Phase 8 is finished, including a revision for realistic track, sleepers and stat
 
 ## Scope (see `docs/DECISIONS.md`)
 
-- In: Noida Metro Aqua Line, Delhi?Meerut Namo Bharat RRTS, Meerut Metro, and DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
+- In: Noida Metro Aqua Line, Delhi–Meerut Namo Bharat RRTS, Meerut Metro, and DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
 - Phase 4 corridors: a separate "under construction" layer, off by default.
 - Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram.
 
@@ -76,7 +76,7 @@ npm run data:validate  # validation only → data/metadata/validation_report.jso
 npm run data:fetch-regional # new regional OSM API snapshot (preserves DMRC baseline)
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (47)
+npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (49)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.

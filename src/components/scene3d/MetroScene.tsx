@@ -131,7 +131,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         {!near && <StationPoints stations={scene.stations} colors={colors} />}
       </Canvas>
       <p className="pointer-events-none absolute right-3 bottom-2 z-[500] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
-        Map data © OpenStreetMap contributors (ODbL) · models Kenney (CC0) · trains simulated · heights and sizes nominal
+        Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D Assets (CC0) · trains simulated · heights and sizes nominal
       </p>
     </div>
   );

@@ -30,6 +30,7 @@ export interface Network {
   construction: ConstructionFC;
   validation: ValidationReport;
   osmSnapshot: string;
+  regionalSnapshot: string;
 }
 
 async function get<T>(url: string): Promise<T> {
@@ -39,7 +40,17 @@ async function get<T>(url: string): Promise<T> {
 }
 
 export async function loadNetwork(): Promise<Network> {
-  const [lines, routes, segments, stations, interchanges, transfers, construction, validation, sources] = await Promise.all([
+  const [
+    lines,
+    routes,
+    segments,
+    stations,
+    interchanges,
+    transfers,
+    construction,
+    validation,
+    sources,
+  ] = await Promise.all([
     get<LinesFC>(linesUrl),
     get<RoutesFC>(routesUrl),
     get<SegmentsFC>(segmentsUrl),
@@ -50,6 +61,20 @@ export async function loadNetwork(): Promise<Network> {
     get<ValidationReport>(validationUrl),
     get<{ sources: { id: string; snapshot?: string }[] }>(sourcesUrl),
   ]);
-  const osmSnapshot = sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
-  return { lines, routes, segments, stations, interchanges, transfers, construction, validation, osmSnapshot };
+  const osmSnapshot =
+    sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
+  const regionalSnapshot =
+    sources.sources.find((s) => s.id === "osm-regional")?.snapshot ?? "unknown";
+  return {
+    lines,
+    routes,
+    segments,
+    stations,
+    interchanges,
+    transfers,
+    construction,
+    validation,
+    osmSnapshot,
+    regionalSnapshot,
+  };
 }

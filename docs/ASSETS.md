@@ -2,6 +2,20 @@
 
 Every third-party asset in `public/models/`, with its source and licence. Add a row before adding a file.
 
+## Regional train assets (2026-11-12)
+
+The user requested train silhouettes distinct from the Delhi Metro model. These are generic stand-ins, not exact NCRTC/CRRC replicas. Five original, AI-generated assets by **3D Assets** from the [Modern Rail and Metro Network pack](https://3dassets.dev/packs/modern-rail-and-metro-network) are released by the publisher under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Sources, original bounds, mesh counts and licence metadata are retained in `public/models/regional/manifest.json`.
+
+| Local file | Publisher asset | Licence | Use |
+|---|---|---|---|
+| `regional/rrts-cab.glb` | https://3dassets.dev/assets/modern-rail-and-metro-network-high-speed-power-car-a6dc258e (13675) | CC0 1.0 | Streamlined RRTS cab; 9,872 triangles |
+| `regional/rrts-middle.glb` | https://3dassets.dev/assets/modern-rail-and-metro-network-high-speed-trailer-car-e82de8c5 (13670) | CC0 1.0 | RRTS intermediate; 7,944 rendered triangles |
+| `regional/aqua-cab.glb` | Asset 13672, metro driving car; canonical URL in manifest | CC0 1.0 | Aqua cab; 8,272 rendered triangles |
+| `regional/metro-middle.glb` | Asset 13674, metro intermediate car; canonical URL in manifest | CC0 1.0 | Aqua/Meerut intermediate; 7,832 rendered triangles |
+| `regional/meerut-cab.glb` | Asset 13673, commuter electric driving car; canonical URL in manifest | CC0 1.0 | Meerut cab with pantograph; 9,800 triangles |
+
+At runtime, static parts are merged with baked vertex colours into one instanced mesh per car type and line. Counts above are measured after traversing the downloaded scenes; publisher metadata counts are retained separately in the manifest. Existing Delhi Metro assets remain in use. Regional liveries are approximate: RRTS silver/red, Aqua silver/aqua, Meerut silver/green with blue/orange details. Generic source details, including door arrangements and electrical equipment, are not operator-specific replicas. Car dimensions are nominal; six/four/three-car formation counts come from [Alstom/NCRTC](https://ncrtc.in/wp-content/uploads/2023/04/Alstom-Brochure-D2-3.pdf) and [NMRC's fleet document](https://www.nmrcnoida.com/writereaddata/Portal/Tender/141_1/2_RFP.pdf) (indexed document; current URL may redirect).
+
 | File(s) | Pack | Source | Licence | Notes |
 |---|---|---|---|---|
 | `kenney/train/train-electric-subway-a.glb` (front car), `-b.glb` (middle car), `-c.glb` (rear car), `kenney/train/Textures/colormap.png` (shared palette) | Kenney **Train Kit** 1.1 (2024-09-22) | https://kenney.nl/assets/train-kit | **CC0 1.0** (`kenney/train/License.txt`) | ~1.3–1.6k triangles per car. Stainless body; the stripe palette cell (column 5, bottom row) is recoloured per line at runtime. Scaled to DMRC car dimensions (≈21.6 × 3.2 × 3.9 m, nominal) |

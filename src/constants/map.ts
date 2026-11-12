@@ -47,8 +47,8 @@ export const STATION_TYPE_LABEL: Record<StationType, string> = {
 
 export const SEVERITY_COLOR: Record<Severity, string> = { error: "#dc2626", warning: "#f59e0b", info: "#2563eb" };
 
-// DECISIONS #1: other rail systems in the Delhi area are out of scope for now and appear in the UI only as
-// "work in progress". Names and search words only: no stations, geometry or colours.
+// DECISIONS #59: Rapid Metro Gurugram remains outside the active dataset after the regional expansion.
+// Names and search words only for systems that are still work in progress.
 export const WORK_IN_PROGRESS_SYSTEMS: { name: string; keywords: string[] }[] = [
   { name: "Rapid Metro Gurugram", keywords: ["rapid metro", "gurugram rapid", "gurgaon rapid"] },
 ];

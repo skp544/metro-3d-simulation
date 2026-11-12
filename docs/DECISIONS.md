@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Distinct regional train models
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 62 | Different rolling stock (user) | Use separate CC0 3D Assets models for streamlined Namo Bharat, metro-style Aqua and commuter-style Meerut cabs; retain Kenney subway models for DMRC. Store all five downloaded GLBs locally with source/licence manifest. Generic models and liveries are illustrative, not official replicas | The user explicitly requested assets that look different from Delhi Metro |
+| 63 | Formations and rendering | RRTS six cars, Aqua four, Meerut three, based on operator/manufacturer references. Per-fleet nominal dimensions/livery and actual formation capacities replace the universal six-car layout. Merge source materials into vertex-coloured geometry; preserve pantograph height; use one instanced draw per car type and line | Distinction includes silhouette, length and livery; RRTS needs four intermediate instances per train. Service speed/timing is unchanged |
+
 ## 2026-11-12: Phase 8 regional expansion
 
 The user requested the remaining regional systems, specifically Noida Aqua Line, Delhi–Meerut RRTS and Meerut Metro, with proper interchanges. This revises decision #1 for those three systems. Rapid Metro Gurugram remains a work-in-progress entry.

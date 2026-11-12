@@ -95,7 +95,7 @@ Run with `npm run data:fetch` (network) and then `npm run data:build` (offline, 
 
 | Severity | Checks |
 |---|---|
-| **Error** (blocks the next phase) | GEOJSON_INVALID, SCHEMA, OUT_OF_BOUNDS (NCR box 28.2–28.9 N, 76.7–77.6 E), DUPLICATE_ID, MISSING_GEOMETRY, BROKEN_REFERENCE, SEGMENT_GAP (> 1 m), LENGTH_INCONSISTENT, STATION_ORDER, INTERCHANGE_MISMATCH, NETWORK_DISCONNECTED |
+| **Error** (blocks the next phase) | GEOJSON_INVALID, SCHEMA, OUT_OF_BOUNDS (NCR–Meerut box 28.2–29.2 N, 76.7–77.9 E), DUPLICATE_ID, MISSING_GEOMETRY, BROKEN_REFERENCE, SEGMENT_GAP (> 1 m), LENGTH_INCONSISTENT, STATION_ORDER, INTERCHANGE_MISMATCH, TRANSFER_INVALID, NETWORK_DISCONNECTED |
 | **Warning** (document or fix) | DEGENERATE_GEOMETRY, STOP_KM_DRIFT (> 100 m), STATION_FAR_FROM_LINE (> 150 m; 300 m for interchanges), PLATFORM_FAR_FROM_TRACK (> 30 m), DUPLICATE_NAME, NEARBY_STATIONS (< 300 m), REFERENCE_COUNT and REFERENCE_LENGTH (> ±5%) against the Wikipedia infobox |
 | **Info** | SOURCE_CONFLICT, UNVERIFIED_STATION, CORRIDOR_OVERLAP |
 
@@ -152,7 +152,7 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | Viaduct and piers | Deck slab (10 m) with line-coloured edge faces on a 5.6 m box girder, wherever the track is above +2 m, ramps included; parapets close up. Instanced round piers every 30 m with a pier cap turned across the track | ✅ Phase 6, realistic in Phase 8 |
 | Tunnel | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it | ✅ Phase 6 |
 | Stations | Per line at a stop, 180 m long, oriented along the track (`stationParts`, instanced): two side platforms with yellow edge strips, a glazed gabled roof on columns with a line-coloured fascia, a concourse box below high track. Underground: translucent slate box (X-ray). All parts clickable | ✅ Phase 6, realistic in Phase 8 |
-| Trains | Kenney subway cars merged per car type, instanced per line (27 instanced meshes); stripe recoloured per line; positions from `trainSim` along the route path each frame, left-hand running; far away one dot per train | ✅ Phase 7 |
+| Trains | Kenney subway cars for DMRC; separate CC0 3D Assets regional stock and six/four/three-car RRTS/Aqua/Meerut formations (`trainFleet.ts`), 33 instanced meshes. Source material colours are baked for regional cars. Positions from `trainSim`, left-hand running; far away one dot per train | ✅ Phases 7–8 |
 | City | Real OSM buildings, roads and green areas (`scripts/build-city.ts`), merged into 3 km chunks (`buildCity.ts`); Kenney trees instanced inside green areas | ✅ Phase 7 |
 | Look | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale | ✅ Phase 7 |
 | Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
@@ -177,6 +177,8 @@ The Phase 8 expansion adds Aqua (21 stations), Namo Bharat RRTS (15 stations acr
 The loader exposes `network.transfers`. The planner returns oriented `journey.walks` with the preceding ride index; costs include walking plus a nominal half-headway wait, omitted for a walking-only finish. The itinerary and station panel expose separate-station transfers; dashed overlays appear in both views. Walk-only journeys are supported. RRTS and Meerut retain different stopping patterns on their shared corridor. All simulated train speeds and models remain generic (45 km/h cruise, no operator timetable). Existing city coverage remains around the original DMRC stations only.
 
 See `phase8-regional-expansion.md` for the frozen validation and source record.
+
+The subsequent rolling-stock revision uses separate generic CC0 models for each regional fleet, retaining the DMRC Kenney stock. See `phase8-fleet-assets.md` and `ASSETS.md` for licences, formation references, measured geometry and visual limitations. Service speeds remain nominal.
 
 ## Roadmap
 

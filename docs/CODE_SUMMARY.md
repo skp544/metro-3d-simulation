@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-12 ? **Phase:** 8 including the regional expansion (Aqua, RRTS, Meerut Metro and explicit walking transfers), ready for review. Full imagery review and real-GPU frame rate remain pending. See `phase8-regional-expansion.md`.
+**Last updated:** 2026-11-12 · **Phase:** 8 including the regional expansion (Aqua, RRTS, Meerut Metro and explicit walking transfers), including distinct rolling-stock assets (see `phase8-fleet-assets.md`), ready for review. Full imagery review and real-GPU frame rate remain pending. See `phase8-regional-expansion.md`.
 
 ## Data pipeline
 
@@ -10,7 +10,7 @@ What exists in the code right now. Update this with every change.
 |---|---|
 | `scripts/fetch-osm.ts` | Downloads the Overpass snapshot → `data/raw/osm/<date>.json` (retries on 429/5xx) |
 | `scripts/fetch-wikipedia.ts` | Downloads station tables and infobox figures (stations, length) for the 9 line articles → `data/raw/wikipedia/<date>.json` |
-| `scripts/fetch-regional.ts` | Main OSM API: eight route directions and stop areas ? immutable `data/raw/regional/<timestamp>.json`; preserves the DMRC snapshot |
+| `scripts/fetch-regional.ts` | Main OSM API: eight route directions and stop areas → immutable `data/raw/regional/<timestamp>.json`; preserves the DMRC snapshot |
 | `data/manual/regional-lines.json`, `data/manual/transfers.json` | Three regional line configs, operator namespaces, references, five explicit bidirectional pedestrian connections |
 | `scripts/build-dataset.ts` | Latest raw snapshots + `data/manual/` → `data/processed/*.geojson`, `data/metadata/{sources,data_quality_report}.json`. Exits 1 on errors |
 | `scripts/validate.ts` | 23 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors |
@@ -64,21 +64,22 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
 | `src/store/useCommand.ts` | Runs a focus/fit/follow/camera command once, in whichever view is showing |
 | `src/store/useJourney.ts` | The planned journey for the chosen route ends (one planner per network) |
-| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (302 trains; generic nominal speeds/models), `stateAt`, `nextArrivals` |
+| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (302 trains; nominal speeds, separate visual fleet profiles), `stateAt`, `nextArrivals` |
 | `src/utils/routePlanner.ts` | `buildRoutePlanner(routes, segments, cfg, transfers).plan(from, to)`: fastest estimated journey on a (station, route) graph; legs with stations, segment ids and km spans; nominal 5-min same-station change (`TRANSFER_S`), plus oriented walking steps with nominal walk/wait costs |
 | `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; 2D zoom ↔ metres per pixel ↔ 3D camera distance; nominal height profile with ramps |
 | `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles, `WORK_IN_PROGRESS_SYSTEMS` (names only); 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
 | `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `TransferLayer` (schematic dashed pedestrian links), `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `TransferLinks` (schematic pedestrian overlay), `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
+| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `TransferLinks` (schematic pedestrian overlay), `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` + `trainFleet.ts` (Kenney DMRC and separate CC0 regional assets, fleet-specific formations/liveries, clickable follow labels, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
 | `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
-| Tests | 47: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4) |
+| `public/models/regional/` | Five CC0 3D Assets GLBs, source/licence manifest, approximately 1.68 MB; RRTS, Aqua and Meerut silhouettes |
+| Tests | 49: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4), fleet formations/geometry (2) |
 
-Build: 2D bundle 441 KB JS (134 KB gzip); 3D chunk 1.07 MB (289 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
+Build: 2D bundle 441 KB JS (134 KB gzip); 3D chunk 1.074 MB (290 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
-3D scene: city ≈ 473k triangles in 109 chunks; structures ≈ 522k (8,429 piers, 6,595 station parts; rails, track bed and parapets ≈ 150k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view); trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
+3D scene: city ≈ 473k triangles in 109 chunks; structures ≈ 744k (12,976 piers, 8,013 station parts; rails, track bed and parapets ≈ 209k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view). Trains use 33 instanced meshes and draw models within 5 km of the view, dots further away. DMRC cars are approximately 1.5k triangles each; regional cars approximately 7.8k–9.9k. Formations total 51,520 triangles (RRTS), 32,208 (Aqua), 27,432 (Meerut).
 
-The new corridors reuse generic 3D models and the original 45 km/h simulated cruise; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
+Regional trains now have distinct generic models and six/four/three-car RRTS/Aqua/Meerut formations; DMRC retains its existing six-car representation. The original 45 km/h simulated cruise remains; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
 
 ## Dependencies
 

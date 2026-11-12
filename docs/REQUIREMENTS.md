@@ -4,7 +4,7 @@ Source: the project brief (`text.txt`), narrowed by the decisions in `DECISIONS.
 
 ## Scope
 
-- **In:** Noida Metro Aqua Line, Delhi?Meerut Namo Bharat RRTS, Meerut Metro, and DMRC operational lines: Red, Yellow, Blue (main branch + Vaishali branch), Green (main + Kirti Nagar branch), Violet, Pink, Magenta, Grey, Airport Express.
+- **In:** Noida Metro Aqua Line, Delhi–Meerut Namo Bharat RRTS, Meerut Metro, and DMRC operational lines: Red, Yellow, Blue (main branch + Vaishali branch), Green (main + Kirti Nagar branch), Violet, Pink, Magenta, Grey, Airport Express.
 - **Under construction:** Phase 4 corridors, in a separate layer that is off by default. Geometry is drawn only where a verified source exists.
 - **Work in progress (UI listing only, no data):** Rapid Metro Gurugram.
 
