@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-09T06:06:03.745Z",
+  "generatedAt": "2026-11-12T09:25:19.191Z",
   "input": "data/processed",
   "passed": true,
   "summary": {
     "errors": 0,
-    "warnings": 2,
-    "info": 22
+    "warnings": 7,
+    "info": 68
   },
   "checks": [
     {
@@ -25,7 +25,7 @@
     {
       "code": "OUT_OF_BOUNDS",
       "severity": "error",
-      "description": "Every coordinate lies inside the NCR bounding box (28.2–28.9 N, 76.7–77.6 E)",
+      "description": "Every coordinate lies inside the NCR–Meerut bounding box (28.2–29.2 N, 76.7–77.9 E)",
       "issues": 0,
       "status": "pass"
     },
@@ -86,6 +86,13 @@
       "status": "pass"
     },
     {
+      "code": "TRANSFER_INVALID",
+      "severity": "error",
+      "description": "Pedestrian transfers have distinct existing endpoints, positive walking times, sources and schematic geometry joining their stations",
+      "issues": 0,
+      "status": "pass"
+    },
+    {
       "code": "DEGENERATE_GEOMETRY",
       "severity": "warning",
       "description": "No repeated consecutive positions in lines",
@@ -124,8 +131,8 @@
       "code": "NEARBY_STATIONS",
       "severity": "warning",
       "description": "No two separate stations within 300 m (possible missed interchange)",
-      "issues": 0,
-      "status": "pass"
+      "issues": 5,
+      "status": "fail"
     },
     {
       "code": "REFERENCE_COUNT",
@@ -145,54 +152,55 @@
       "code": "SOURCE_CONFLICT",
       "severity": "info",
       "description": "Features whose sources disagree (recorded in conflicts[])",
-      "issues": 11,
+      "issues": 12,
       "status": "noted"
     },
     {
       "code": "UNVERIFIED_STATION",
       "severity": "info",
       "description": "Stations not confirmed by a second source",
-      "issues": 11,
+      "issues": 55,
       "status": "noted"
     },
     {
       "code": "CORRIDOR_OVERLAP",
       "severity": "info",
       "description": "Different lines running within 5 m of each other for over 200 m",
-      "issues": 0,
-      "status": "pass"
+      "issues": 1,
+      "status": "noted"
     }
   ],
   "stats": {
-    "lines": 9,
-    "routes": 12,
-    "stations": 244,
-    "interchanges": 26,
+    "lines": 12,
+    "routes": 16,
+    "stations": 288,
+    "interchanges": 30,
+    "walkingTransfers": 5,
     "interchangesByEvidence": {
-      "osm-ref": 23,
+      "osm-ref": 27,
       "proximity": 3,
       "manual": 0
     },
-    "segments": 312,
+    "segments": 378,
     "underConstructionWays": 12,
-    "trackKm": 364.305,
+    "trackKm": 525.592,
     "trackKmByType": {
-      "elevated": 255.667,
-      "underground": 100.938,
-      "at_grade": 7.51,
+      "elevated": 393.222,
+      "underground": 122.038,
+      "at_grade": 10.142,
       "unknown": 0.19
     },
-    "trackKmEstimatedPct": 2.2,
-    "trackKmUnknownPct": 0.1,
+    "trackKmEstimatedPct": 1.7,
+    "trackKmUnknownPct": 0,
     "stationsByType": {
-      "elevated": 176,
-      "underground": 57,
-      "at_grade": 2,
+      "elevated": 215,
+      "underground": 61,
+      "at_grade": 3,
       "unknown": 1,
       "mixed": 8
     },
     "stationsVerified": 233,
-    "stationsVerifiedPct": 95.5,
+    "stationsVerifiedPct": 80.9,
     "networkComponents": 1,
     "perLine": {
       "red": {
@@ -275,6 +283,33 @@
           "at_grade": 0,
           "unknown": 0
         }
+      },
+      "aqua": {
+        "stations": 21,
+        "km": {
+          "elevated": 28.031,
+          "underground": 0,
+          "at_grade": 0,
+          "unknown": 0
+        }
+      },
+      "rrts": {
+        "stations": 15,
+        "km": {
+          "elevated": 93.977,
+          "underground": 16.192,
+          "at_grade": 1.869,
+          "unknown": 0
+        }
+      },
+      "meerut_metro": {
+        "stations": 12,
+        "km": {
+          "elevated": 15.547,
+          "underground": 4.908,
+          "at_grade": 0.763,
+          "unknown": 0
+        }
       }
     }
   },
@@ -350,9 +385,98 @@
       "lengthKm": 23.733,
       "wikipediaLengthKm": 22.7,
       "lengthDiffPct": 4.6
+    },
+    {
+      "lineId": "aqua",
+      "stations": 21,
+      "wikipediaStations": null,
+      "lengthKm": 28.03,
+      "wikipediaLengthKm": null,
+      "lengthDiffPct": null
+    },
+    {
+      "lineId": "rrts",
+      "stations": 15,
+      "wikipediaStations": null,
+      "lengthKm": 112.037,
+      "wikipediaLengthKm": null,
+      "lengthDiffPct": null
+    },
+    {
+      "lineId": "meerut_metro",
+      "stations": 12,
+      "wikipediaStations": null,
+      "lengthKm": 21.217,
+      "wikipediaLengthKm": null,
+      "lengthDiffPct": null
     }
   ],
   "issues": [
+    {
+      "severity": "warning",
+      "code": "NEARBY_STATIONS",
+      "message": "Anand Vihar and Anand Vihar (Namo Bharat) are 135 m apart but separate stations",
+      "featureIds": [
+        "stn_anvr",
+        "stn_ncrtc_a02"
+      ],
+      "location": [
+        77.315703,
+        28.646725
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "NEARBY_STATIONS",
+      "message": "New Ashok Nagar and New Ashok Nagar (Namo Bharat) are 267 m apart but separate stations",
+      "featureIds": [
+        "stn_nagr",
+        "stn_ncrtc_a01"
+      ],
+      "location": [
+        77.301509,
+        28.589089
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "NEARBY_STATIONS",
+      "message": "Ghaziabad (Namo Bharat) and Shaheed Sthal are 272 m apart but separate stations",
+      "featureIds": [
+        "stn_ncrtc_a04",
+        "stn_osm_n9144051094"
+      ],
+      "location": [
+        77.413732,
+        28.672555
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "NEARBY_STATIONS",
+      "message": "Sarai Kale Khan (Namo Bharat) and Sarai Kale Khan - Nizamuddin are 93 m apart but separate stations",
+      "featureIds": [
+        "stn_ncrtc_z00",
+        "stn_nizm"
+      ],
+      "location": [
+        77.258065,
+        28.589189
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "NEARBY_STATIONS",
+      "message": "Noida Sector 51 and Noida Sector 52 are 253 m apart but separate stations",
+      "featureIds": [
+        "stn_nmrc_osm_n4950923222",
+        "stn_osm_n6539894866"
+      ],
+      "location": [
+        77.375259,
+        28.585719
+      ]
+    },
     {
       "severity": "warning",
       "code": "REFERENCE_LENGTH",
@@ -423,6 +547,14 @@
       "message": "Grey Line: OSM colour #838996 differs from wikidata:Q47100305#P465 #9A9B9E",
       "featureIds": [
         "grey"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "SOURCE_CONFLICT",
+      "message": "Noida Metro Aqua Line: OSM colour aqua differs from osm:relation/9268569#colour=aqua (CSS colour) #00FFFF",
+      "featureIds": [
+        "aqua"
       ]
     },
     {
@@ -524,6 +656,534 @@
     {
       "severity": "info",
       "code": "UNVERIFIED_STATION",
+      "message": "New Ashok Nagar (Namo Bharat) (stn_ncrtc_a01)",
+      "featureIds": [
+        "stn_ncrtc_a01"
+      ],
+      "location": [
+        77.302521,
+        28.591321
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Anand Vihar (Namo Bharat) (stn_ncrtc_a02)",
+      "featureIds": [
+        "stn_ncrtc_a02"
+      ],
+      "location": [
+        77.316799,
+        28.647471
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Sahibabad (Namo Bharat) (stn_ncrtc_a03)",
+      "featureIds": [
+        "stn_ncrtc_a03"
+      ],
+      "location": [
+        77.367968,
+        28.667556
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Ghaziabad (Namo Bharat) (stn_ncrtc_a04)",
+      "featureIds": [
+        "stn_ncrtc_a04"
+      ],
+      "location": [
+        77.413732,
+        28.672555
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Guldhar (Namo Bharat) (stn_ncrtc_a05)",
+      "featureIds": [
+        "stn_ncrtc_a05"
+      ],
+      "location": [
+        77.44575,
+        28.699543
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Duhai (Namo Bharat) (stn_ncrtc_a06)",
+      "featureIds": [
+        "stn_ncrtc_a06"
+      ],
+      "location": [
+        77.471407,
+        28.727017
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Murad Nagar (Namo Bharat) (stn_ncrtc_a07)",
+      "featureIds": [
+        "stn_ncrtc_a07"
+      ],
+      "location": [
+        77.510704,
+        28.770382
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Modinagar South (Namo Bharat) (stn_ncrtc_a08)",
+      "featureIds": [
+        "stn_ncrtc_a08"
+      ],
+      "location": [
+        77.556741,
+        28.817729
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Modinagar North (Namo Bharat) (stn_ncrtc_a09)",
+      "featureIds": [
+        "stn_ncrtc_a09"
+      ],
+      "location": [
+        77.583196,
+        28.843488
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Meerut South (stn_ncrtc_a10)",
+      "featureIds": [
+        "stn_ncrtc_a10"
+      ],
+      "location": [
+        77.632839,
+        28.904729
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Partapur (stn_ncrtc_a11)",
+      "featureIds": [
+        "stn_ncrtc_a11"
+      ],
+      "location": [
+        77.650585,
+        28.922018
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Rithani (stn_ncrtc_a12)",
+      "featureIds": [
+        "stn_ncrtc_a12"
+      ],
+      "location": [
+        77.660548,
+        28.932038
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Shatabdi Nagar (stn_ncrtc_a13)",
+      "featureIds": [
+        "stn_ncrtc_a13"
+      ],
+      "location": [
+        77.673876,
+        28.947748
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Brahmapuri (stn_ncrtc_a14)",
+      "featureIds": [
+        "stn_ncrtc_a14"
+      ],
+      "location": [
+        77.684812,
+        28.960296
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Meerut Central (stn_ncrtc_a15)",
+      "featureIds": [
+        "stn_ncrtc_a15"
+      ],
+      "location": [
+        77.690603,
+        28.972872
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Bhainsali (stn_ncrtc_a16)",
+      "featureIds": [
+        "stn_ncrtc_a16"
+      ],
+      "location": [
+        77.700317,
+        28.988092
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Begumpul (stn_ncrtc_a17)",
+      "featureIds": [
+        "stn_ncrtc_a17"
+      ],
+      "location": [
+        77.705602,
+        28.996738
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "MES Colony (stn_ncrtc_a18)",
+      "featureIds": [
+        "stn_ncrtc_a18"
+      ],
+      "location": [
+        77.704621,
+        29.015964
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Daurli (stn_ncrtc_a19)",
+      "featureIds": [
+        "stn_ncrtc_a19"
+      ],
+      "location": [
+        77.706856,
+        29.040706
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Meerut North (stn_ncrtc_a20)",
+      "featureIds": [
+        "stn_ncrtc_a20"
+      ],
+      "location": [
+        77.708017,
+        29.053349
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Modipuram (stn_ncrtc_a21)",
+      "featureIds": [
+        "stn_ncrtc_a21"
+      ],
+      "location": [
+        77.708884,
+        29.072329
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Duhai Depot Station (Namo Bharat) (stn_ncrtc_as2)",
+      "featureIds": [
+        "stn_ncrtc_as2"
+      ],
+      "location": [
+        77.467641,
+        28.742282
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Sarai Kale Khan (Namo Bharat) (stn_ncrtc_z00)",
+      "featureIds": [
+        "stn_ncrtc_z00"
+      ],
+      "location": [
+        77.258065,
+        28.589189
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Rainbow (stn_nmrc_osm_n10074648933)",
+      "featureIds": [
+        "stn_nmrc_osm_n10074648933"
+      ],
+      "location": [
+        77.378235,
+        28.574358
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 143 (stn_nmrc_osm_n4165777365)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165777365"
+      ],
+      "location": [
+        77.422377,
+        28.494256
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 148 (stn_nmrc_osm_n4165777372)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165777372"
+      ],
+      "location": [
+        77.476604,
+        28.448055
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Alpha 1 (stn_nmrc_osm_n4165778689)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165778689"
+      ],
+      "location": [
+        77.512737,
+        28.471035
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Delta 1 (stn_nmrc_osm_n4165778690)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165778690"
+      ],
+      "location": [
+        77.525731,
+        28.478477
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "GNIDA Office (stn_nmrc_osm_n4165778691)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165778691"
+      ],
+      "location": [
+        77.536504,
+        28.484683
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 147 (stn_nmrc_osm_n4165778709)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165778709"
+      ],
+      "location": [
+        77.466115,
+        28.459355
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 144 (stn_nmrc_osm_n4165778734)",
+      "featureIds": [
+        "stn_nmrc_osm_n4165778734"
+      ],
+      "location": [
+        77.433077,
+        28.486288
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 83 (stn_nmrc_osm_n4267913896)",
+      "featureIds": [
+        "stn_nmrc_osm_n4267913896"
+      ],
+      "location": [
+        77.396446,
+        28.522269
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 137 (stn_nmrc_osm_n4267913913)",
+      "featureIds": [
+        "stn_nmrc_osm_n4267913913"
+      ],
+      "location": [
+        77.403607,
+        28.510769
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 146 (stn_nmrc_osm_n4678434989)",
+      "featureIds": [
+        "stn_nmrc_osm_n4678434989"
+      ],
+      "location": [
+        77.455208,
+        28.468819
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 145 (stn_nmrc_osm_n4678434990)",
+      "featureIds": [
+        "stn_nmrc_osm_n4678434990"
+      ],
+      "location": [
+        77.44241,
+        28.478996
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "NSEZ (stn_nmrc_osm_n4849443432)",
+      "featureIds": [
+        "stn_nmrc_osm_n4849443432"
+      ],
+      "location": [
+        77.394754,
+        28.532404
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Depot Station (stn_nmrc_osm_n4849447792)",
+      "featureIds": [
+        "stn_nmrc_osm_n4849447792"
+      ],
+      "location": [
+        77.544009,
+        28.489014
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 101 (stn_nmrc_osm_n4950920120)",
+      "featureIds": [
+        "stn_nmrc_osm_n4950920120"
+      ],
+      "location": [
+        77.384949,
+        28.556048
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 51 (stn_nmrc_osm_n4950923222)",
+      "featureIds": [
+        "stn_nmrc_osm_n4950923222"
+      ],
+      "location": [
+        77.375259,
+        28.585719
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 76 (stn_nmrc_osm_n4950923223)",
+      "featureIds": [
+        "stn_nmrc_osm_n4950923223"
+      ],
+      "location": [
+        77.379658,
+        28.565331
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 81 (stn_nmrc_osm_n4950923224)",
+      "featureIds": [
+        "stn_nmrc_osm_n4950923224"
+      ],
+      "location": [
+        77.389949,
+        28.549299
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Noida Sector 142 (stn_nmrc_osm_w1008841199)",
+      "featureIds": [
+        "stn_nmrc_osm_w1008841199"
+      ],
+      "location": [
+        77.41274,
+        28.499002
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Knowledge Park II (stn_nmrc_osm_w696190204)",
+      "featureIds": [
+        "stn_nmrc_osm_w696190204"
+      ],
+      "location": [
+        77.500318,
+        28.457058
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
+      "message": "Pari Chowk (stn_nmrc_osm_w696191675)",
+      "featureIds": [
+        "stn_nmrc_osm_w696191675"
+      ],
+      "location": [
+        77.50822,
+        28.463235
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "UNVERIFIED_STATION",
       "message": "North Pitampura - Prashant Vihar (stn_osm_n5215706525)",
       "featureIds": [
         "stn_osm_n5215706525"
@@ -603,6 +1263,19 @@
       "location": [
         77.266814,
         28.669817
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "CORRIDOR_OVERLAP",
+      "message": "meerut_metro_main and rrts_main share about 10200 m of corridor",
+      "featureIds": [
+        "meerut_metro_main",
+        "rrts_main"
+      ],
+      "location": [
+        77.637938,
+        28.909207
       ]
     }
   ]

@@ -18,10 +18,10 @@ export const VERTICAL_EXAGGERATION = 1;
 
 // Low-poly palette, matched to ref_image.png: warm light ground, cream buildings, soft shadows.
 export const PALETTE = {
-  background: "#e7e2da",
-  ground: "#dcd6cc",
-  road: "#c9c3b8",
-  green: "#c3d19f",
+  background: "#dce8ed",
+  ground: "#c1c5ad",
+  road: "#56616a",
+  green: "#92ae78",
   wall: "#f5f2ec",
   roof: "#e6e1d7",
   deck: "#d4d0c9", // concrete
@@ -38,8 +38,8 @@ export const PALETTE = {
   stationAbove: "#ffffff",
   stationBelow: "#475569",
   sun: "#fff3e0",
-  sky: "#ffffff",
-  bounce: "#c8c0b2",
+  sky: "#e1edf3",
+  bounce: "#b8bea6",
 };
 export const TRACK_WIDTH_PX = 3;
 export const STATION_SIZE_PX = 7;
@@ -63,7 +63,14 @@ export const STRUCTURE = {
   // Track: two tracks, each two rails on concrete sleepers over a concrete bed (ballast where at grade).
   trackSpacing: 4, // between track centres; trains run on the left one (TRAIN.trackOffset = half this)
   plinthHalfWidth: 1.4, // track bed
-  sleeper: { length: 2.6, width: 0.26, bottom: 0.3, top: 0.5, spacing: 0.65, radius: 900 }, // drawn within `radius` of the view
+  sleeper: {
+    length: 2.6,
+    width: 0.26,
+    bottom: 0.3,
+    top: 0.5,
+    spacing: 0.65,
+    radius: 900,
+  }, // drawn within `radius` of the view
   railHalfGauge: 0.75,
   railHalfWidth: 0.09,
   ballastHalfWidth: 4.2,
@@ -75,8 +82,37 @@ export const STRUCTURE = {
   stationLength: 180, // 8-car platform
   platform: { inner: 3.8, outer: 8.2, top: 1.9 }, // across from the track centre line; top = rail + 1.1 m
   edgeStrip: { across: 4.1, halfWidth: 0.3 }, // yellow tactile strip near the platform edge
-  roof: { halfWidth: 10, eave: 7.4, ridge: 8.9, thickness: 0.35, columnAcross: 7.8, columnSpacing: 15, columnSize: 0.5, opacity: 0.45 }, // glazed, like the reference's see-through roof
-  concourse: { halfWidth: 10, bottom: 4, top: 7.5, lengthShare: 0.6 }, // absolute heights above ground
+  roof: {
+    halfWidth: 10,
+    eave: 7.4,
+    ridge: 8.9,
+    thickness: 0.35,
+    columnAcross: 7.8,
+    columnSpacing: 15,
+    columnSize: 0.5,
+    opacity: 0.45,
+  }, // glazed, like the reference's see-through roof
+  concourse: { halfWidth: 13.5, bottom: 5.65, top: 6, lengthShare: 0.6 }, // open floor slab, absolute heights above ground
+  // Generic circulation for isolated elevated platforms. All dimensions NOMINAL, not surveyed access.
+  circulation: {
+    outer: 11.8,
+    roofHalfWidth: 13.5,
+    columnAcross: 11.4,
+    wellAcross: 9.4,
+    wellWidth: 3,
+    wellLength: 18,
+    wellAlong: 45,
+    stairRun: 17,
+    maxRiser: 0.18,
+    liftAlong: 65,
+    liftAcross: 14.4,
+    liftWidth: 2.8,
+    groundStairAcross: 16,
+    groundStairRun: 13.5,
+    railHeight: 1.1,
+    clearLaneAcross: 6.1,
+    clearLaneWidth: 3,
+  },
   stationHalfWidth: 13, // underground station boxes (X-ray)
   stationBelowTrack: 4,
   stationAboveTrack: 6,
@@ -91,7 +127,9 @@ export const TRAIN = {
   carLength: 21.6, // m (DMRC broad-gauge car, nominal)
   carWidth: 3.2,
   carHeight: 3.9,
-  cruiseKmh: 45, // nominal hop-average speed; eased motion peaks at ≤60 km/h, unchanged travel durations
+  cruiseKmh: 60, // nominal cap for regular metros; published express limits live in trainSpeeds.ts
+  accelerationMps2: 0.8, // nominal simplified motion, not operator performance measurements
+  brakingMps2: 0.9,
   dwellS: 30,
   terminalDwellS: 180,
   headwayS: 360, // one train every 6 min per direction

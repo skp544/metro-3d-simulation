@@ -54,7 +54,7 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
 
   useCommand("focus", focus?.key, !!controls, () => {
     const [x, z] = projection.project(focus!.coordinates);
-    flyTo(around(new THREE.Vector3(x, 0, z), FOCUS_DISTANCE_M));
+    flyTo(around(new THREE.Vector3(x, focus!.heightM ?? 0, z), focus!.distanceM ?? FOCUS_DISTANCE_M));
   });
 
   useCommand("fit", fit?.key, !!controls, () => {
@@ -82,6 +82,11 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
     if (command!.command === "zoomOut") flyTo(around(centre, d / 0.6), anchor);
     if (command!.command === "network") flyTo(network);
     if (command!.command === "hub") flyTo(hub);
+    if(command!.command==="low"||command!.command==="oblique"){
+      const low=command!.command==="low",target=new THREE.Vector3(centre.x,anchor?anchor.y+2:low?4:0,centre.z);
+      const offset=camera.position.clone().sub(controls!.target).setY(0).normalize().multiplyScalar(low?240:430);offset.y=low?18:320;
+      flyTo({target,position:target.clone().add(offset)},anchor);
+    }
   });
 
   useFrame(() => {
@@ -146,7 +151,7 @@ export function Sun() {
     <directionalLight
       ref={light}
       color={PALETTE.sun}
-      intensity={2.1}
+      intensity={1.5}
       castShadow
       shadow-mapSize={[SHADOW.mapSize, SHADOW.mapSize]}
       shadow-camera-left={-SHADOW.size}

@@ -5,7 +5,9 @@
 // timetable and not DMRC's fare-route rules.
 // Explicit .ts imports: this module is also loaded directly by Node's test runner.
 import { TRAIN } from "../constants/scene.ts";
-import type { RoutesFC, SegmentsFC } from "../data/types.ts";
+import type { RoutesFC, SegmentsFC, TransferProps, TransfersFC } from "../data/types.ts";
+import { trainSpeedProfile } from "../constants/trainSpeeds.ts";
+import { buildRun } from "./trainMotion.ts";
 
 /** Nominal cost of changing trains: platform walk plus half a headway of waiting (DECISIONS #53). */
 export const TRANSFER_S = 120 + TRAIN.headwayS / 2;
@@ -26,6 +28,7 @@ export interface Journey {
   fromId: string;
   toId: string;
   legs: Leg[];
+  walks: (TransferProps & { afterLeg: number })[]; // oriented in travel order; -1 means before the first ride
   km: number;
   stops: number; // stations travelled to, excluding the origin
   transfers: number;
@@ -39,10 +42,10 @@ interface Edge {
   toKm?: number;
   segmentIds?: string[];
   cost: number;
+  walk?: TransferProps;
 }
 
-export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = TRAIN) {
-  const speed = (cfg.cruiseKmh * 1000) / 3600; // m/s
+export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = TRAIN, transfers?: TransfersFC) {
   // Segments between two stops; a hop can have several (split where the track type changes).
   const segmentIds = new Map<string, string[]>();
   for (const { properties: s } of segments.features) {
@@ -70,18 +73,26 @@ export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = 
 
   for (const f of routes.features) {
     const r = f.properties;
+    const maxSpeedKmh = trainSpeedProfile(r.lineId, cfg.cruiseKmh).simulationMaxKmh;
     const km = r.stopKm.map((k) => k - r.stopKm[0]);
     for (let i = 0; i + 1 < r.stationIds.length; i++) {
       const [a, b] = [node(r.stationIds[i], r.id), node(r.stationIds[i + 1], r.id)];
       const segs = segmentIds.get(`${r.id}|${r.stationIds[i]}|${r.stationIds[i + 1]}`) ?? [];
       // Run time plus the dwell at the stop being left.
-      const cost = (Math.abs(km[i + 1] - km[i]) * 1000) / speed + cfg.dwellS;
+      const cost = buildRun(Math.abs(km[i + 1] - km[i]) * 1000, maxSpeedKmh, cfg.accelerationMps2, cfg.brakingMps2).durationS + cfg.dwellS;
       addEdge(a, { to: b, routeId: r.id, fromKm: km[i], toKm: km[i + 1], segmentIds: segs, cost });
       addEdge(b, { to: a, routeId: r.id, fromKm: km[i + 1], toKm: km[i], segmentIds: segs, cost });
     }
   }
   for (const list of nodesAt.values())
     for (const a of list) for (const b of list) if (a !== b) addEdge(a, { to: b, cost: TRANSFER_S });
+  for (const { properties: t } of transfers?.features ?? []) {
+    for (const a of nodesAt.get(t.fromStationId) ?? []) for (const b of nodesAt.get(t.toStationId) ?? []) {
+      const cost = t.walkSeconds + cfg.headwayS / 2;
+      addEdge(a, { to: b, cost, walk: t });
+      addEdge(b, { to: a, cost, walk: { ...t, fromStationId: t.toStationId, toStationId: t.fromStationId } });
+    }
+  }
 
   /** Fastest estimated journey between two stations, or null if either is unknown, they are the same, or unconnected. */
   function plan(fromId: string, toId: string): Journey | null {
@@ -105,9 +116,10 @@ export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = 
       done[u] = 1;
       for (const e of edges[u] ?? []) {
         // Changing trains at the origin or into the destination is never useful.
-        if (!e.routeId && (starts.includes(u) || goals.has(e.to))) continue;
-        if (dist[u] + e.cost < dist[e.to]) {
-          dist[e.to] = dist[u] + e.cost;
+        if (!e.routeId && !e.walk && (starts.includes(u) || goals.has(e.to))) continue;
+        const cost = e.walk && goals.has(e.to) ? e.walk.walkSeconds : e.cost;
+        if (dist[u] + cost < dist[e.to]) {
+          dist[e.to] = dist[u] + cost;
           prev[e.to] = { from: u, edge: e };
         }
       }
@@ -116,9 +128,11 @@ export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = 
     const steps: { from: number; edge: Edge }[] = [];
     for (let n = goal; prev[n]; n = prev[n]!.from) steps.unshift(prev[n]!);
     const legs: Leg[] = [];
+    const walks: Journey["walks"] = [];
     let change = true;
     for (const { from, edge } of steps) {
       if (!edge.routeId) {
+        if (edge.walk) walks.push({ ...edge.walk, afterLeg: legs.length - 1 });
         change = true; // a change of trains: the next ride starts a new leg
         continue;
       }
@@ -141,9 +155,10 @@ export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = 
       fromId,
       toId,
       legs,
+      walks,
       km: legs.reduce((a, l) => a + l.km, 0),
       stops: legs.reduce((a, l) => a + l.stationIds.length - 1, 0),
-      transfers: legs.length - 1,
+      transfers: Math.max(0, legs.length - 1),
       timeS: dist[goal],
     };
   }

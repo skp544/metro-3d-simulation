@@ -1,27 +1,86 @@
 {
-  "generatedAt": "2026-11-04T16:51:33.963Z",
-  "source": {
-    "file": "data/raw/osm-city/2026-11-04.json",
-    "osmSnapshot": "2026-11-04T16:46:22Z",
-    "radiusM": 300,
-    "licence": "ODbL-1.0",
-    "attribution": "© OpenStreetMap contributors"
-  },
+  "generatedAt": "2026-11-12T09:20:12.809Z",
+  "sources": [
+    {
+      "file": "data/raw/osm-city/2026-11-04.json",
+      "snapshot": "2026-11-04T16:46:22Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/arterial-roads.json",
+      "snapshot": "2026-11-12T08:58:18Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/land-water.json",
+      "snapshot": "2026-11-12T08:37:51Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/landmark-india-gate.json",
+      "snapshot": "2026-11-12T08:40:51Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/landmark-lotus-temple.json",
+      "snapshot": "2026-11-12T08:43:59Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/landmark-qutb-minar.json",
+      "snapshot": "2026-11-12T08:45:01Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/landmark-red-fort.json",
+      "snapshot": "2026-11-12T08:46:01Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-00.json",
+      "snapshot": "2026-11-12T08:46:01Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-01.json",
+      "snapshot": "2026-11-12T08:49:05Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-02.json",
+      "snapshot": "2026-11-12T08:50:06Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-03.json",
+      "snapshot": "2026-11-12T08:53:08Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-04.json",
+      "snapshot": "2026-11-12T08:53:08Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-05.json",
+      "snapshot": "2026-11-12T08:54:10Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-06.json",
+      "snapshot": "2026-11-12T08:55:14Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-07.json",
+      "snapshot": "2026-11-12T08:55:14Z"
+    }
+  ],
   "counts": {
-    "buildings": 25197,
-    "roads": 12832,
-    "greenAreas": 860,
-    "trees": 11781
+    "buildings": 124105,
+    "roads": 109046,
+    "greenAreas": 10618,
+    "trees": 175644,
+    "landAreas": 19711,
+    "waterAreas": 3095,
+    "tiles": 5345
   },
   "buildingHeightSources": {
-    "osm:height": 175,
-    "osm:levels": 1697,
-    "nominal": 23325
+    "osm:height": 908,
+    "osm:levels": 3753,
+    "nominal": 119444
   },
+  "issues": [],
   "notes": [
-    "Context for the 3D view only; not validated network data.",
-    "Untagged building heights are nominal by type ±25% (heightSource: nominal).",
-    "Trees are generated positions inside real OSM green areas (decorative placement, real areas).",
-    "Station buildings (building=transportation/train_station, railway=station) are skipped; the network's station boxes stand in for them."
+    "Station context expanded to 650 m; landmark districts to 2.3 km. Continuous arterial roads, real land-use and water across network bounds.",
+    "Geometry from OSM; untagged heights/road widths and facade details nominal. Trees decorative inside mapped green areas, excluded from mapped buildings/roads.",
+    "Multipolygon islands and courtyards retained. Incomplete source rings omitted and logged, never joined by invented edges.",
+    "City tiles stream near the camera; water and background landscape are shared static context. No rail geography changes."
   ]
 }

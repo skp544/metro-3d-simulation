@@ -1,0 +1,5 @@
+Models by 3D Assets, Modern Rail and Metro Network.
+Publisher release: CC0 1.0 Universal
+https://creativecommons.org/publicdomain/zero/1.0/
+https://3dassets.dev/packs/modern-rail-and-metro-network
+Generic models, not official operator replicas. See manifest.json for individual sources.

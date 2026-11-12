@@ -1,6 +1,6 @@
-# Delhi Metro 2D/3D Visualization
+# NCR Rail 2D/3D Visualization
 
-Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation layer) and a Three.js 3D view, both driven by the same GeoJSON.
+Interactive NCR rail map (DMRC, NMRC and NCRTC): a Leaflet 2D view (the geographic validation layer) and a Three.js 3D view, both driven by the same GeoJSON.
 
 **Priorities, in order:** geographic accuracy → 2D validation → 3D quality.
 
@@ -9,20 +9,22 @@ Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation
 Phases 1–8 are committed. Phase 9 (train control and underground visibility) is implemented; owner review and commit pending. The owner replaced the proposed journey-planner scope with this work. Do not start another phase without their go-ahead.
 Track progress in `docs/CODE_SUMMARY.md`.
 
-## Next session: start here (handoff, 2026-11-11)
+## Next session: start here (handoff, 2026-11-12)
 
-Read `docs/HANDOFF.md`, `docs/CODE_SUMMARY.md`, `docs/phase9-train-control.md` and `docs/phase9-plan.md`. Phase 9 adds a Train Control Manager for all 218 simulated trains, individual/fleet Start/Stop, session hold offsets shared by all consumers and station predictions, Auto/Surface/Underground X-ray modes, nominal eased motion, and carriage pitch. The owner chose Auto X-ray while following plus a manual toggle. Decisions #59–#65 explain the choices.
+Read **`docs/HANDOFF.md` first**. Latest: expanded real city surroundings, roads and Yamuna (DECISIONS #72–#75; `docs/phase8-city-environment.md`), following the landmark/station extension. City tiles stream near the view; low-angle camera and WASD support exploration. The user reviews/commits. Blender's original objects/file are preserved; project models remain in `NCR_Landmarks`. Phase 9 and people simulation remain separate.
 
-The manager works in either view; Follow opens 3D and reveals its line. On phones, Follow collapses the manager to expose the train; the follow card also has Start/Stop. “Stop following” only ends camera tracking. Holds survive 2D/3D switches and reset on reload. Global clock pause is separate. No operational signalling or collision avoidance.
+Phase 8 includes the regional expansion requested 2026-11-12 (DECISIONS #59–#61). Read `docs/phase8-train-speeds.md`, `docs/phase8-fleet-assets.md`, `docs/phase8-regional-expansion.md` and `docs/CODE_SUMMARY.md` first. Aqua, Namo Bharat RRTS and Meerut Metro are now active networks; Rapid Metro Gurugram remains a work-in-progress entry. The extension is ready for review; the user commits it.
 
-**Next scope:** wait for the owner. Journey-planner enhancements (From/To search, sourced line speeds, change times, alternatives, simulated departures) remain a proposal for Phase 10, not started.
+**Phase 9 remaining scope:** From/To station fields; better change times, sourced or marked nominal; alternatives (fastest vs fewest changes); trains to catch from the simulated service. Per-line express speeds and current simulated speed displays were added by the user's request on 2026-11-12 (DECISIONS #64–#65). The graph already exists: `src/utils/routePlanner.ts`.
 
 **Still open from earlier phases:**
+
 - The human imagery review (`docs/phase4-leaflet-map.md` §5).
 - Frame rate on real hardware is unmeasured; ask the user.
-- City GeoJSON is 12.3 MB raw (serve compressed; tiling if it grows).
+- Expanded city is tiled (48 selected / 64 cached). Landscape context is 27.37 MB raw / 4.51 MB gzip, water 2.22 MB / 413 KB gzip; serve compressed. Hardware performance review remains pending.
 
 **How to verify visually:** `npm run build && npx vite preview --port 4173`, then `node scripts/screenshot.mjs "http://localhost:4173/?view=3d" /tmp/x.png 1440 900 16000` and read the PNG. Plain `chrome --headless --screenshot` gives a blank WebGL canvas on macOS. Useful URLs:
+
 - `?view=3d` opens on the hub.
 - `?view=3d&cam=network` shows the whole network.
 - `?view=3d&at=lat,lng,dist` aims at a place.
@@ -33,6 +35,7 @@ The manager works in either view; Follow opens 3D and reveals its line. On phone
 - `?view=3d&underground=underground` forces X-ray; omit the parameter for Auto.
 
 **Gotchas:**
+
 - macOS disks are case-insensitive. Never create files whose names differ only in case (`Structures.tsx` vs the old `structures.ts` broke the dev server).
 - Modules that Node tests import directly (`src/utils/*`, `scene3d/geometry.ts`, `buildStructures.ts`, `buildCity.ts`, `constants/scene.ts`) must use explicit `.ts` import extensions and must not import `src/data/loadNetwork.ts` or `loadCity.ts`, whose Vite `?url` imports break Node and the Node tsconfig.
 - The public Overpass server is often busy (HTTP 429/502/504); the fetch scripts retry with backoff and can take minutes.
@@ -63,9 +66,9 @@ The manager works in either view; Follow opens 3D and reveals its line. On phone
 
 ## Scope (see `docs/DECISIONS.md`)
 
-- In: DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
+- In: Noida Metro Aqua Line, Delhi–Meerut Namo Bharat RRTS, Meerut Metro, and DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
 - Phase 4 corridors: a separate "under construction" layer, off by default.
-- Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram, Noida Aqua Line, Namo Bharat/RapidX.
+- Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram.
 
 ## Stack and commands
 
@@ -78,9 +81,11 @@ npm run lint         # oxlint
 npm run data:fetch   # new OSM + Wikipedia snapshots → data/raw/ (network; Overpass may be busy)
 npm run data:build   # data/raw + data/manual → data/processed + data/metadata, then validates (offline; exit 1 on errors)
 npm run data:validate  # validation only → data/metadata/validation_report.json
+npm run data:fetch-regional # new regional OSM API snapshot (preserves DMRC baseline)
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
-npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (49)
+npm run data:fetch-environment # immutable OSM city/roads/landscape/water snapshots; reuses completed requests
+npm run data:city    # baseline + environment snapshots → combined GeoJSON, context, hashed city tiles + report
+npm test             # data, geometry, city, fleet/motion, routing, landmarks and circulation tests (63)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.
@@ -89,24 +94,24 @@ Scripts run directly with Node 24 (`node scripts/x.ts`, no build step). Schema t
 
 ## Docs
 
-| File | Purpose |
-|---|---|
-| `docs/HANDOFF.md` | Self-contained handoff for another model or developer (also linked from `AGENTS.md`) |
-| `docs/REQUIREMENTS.md` | What the app must do |
-| `docs/ARCHITECTURE.md` | Structure, data schema, pipeline, projection, roadmap |
-| `docs/DECISIONS.md` | Dated decision log |
-| `docs/CODE_SUMMARY.md` | What exists in the code right now |
-| `docs/phase1-research-and-plan.md` | Phase 1 research snapshot (2026-10-31): sources, licences, OSM measurements, 3D assets |
-| `docs/phase2-dataset-build.md` | Phase 2 summary: pipeline, outputs, per-line figures, open quality items |
-| `docs/phase3-validation.md` | Phase 3 summary: checks, bugs found, reference comparison, documented warnings |
-| `docs/phase4-leaflet-map.md` | Phase 4 summary: 2D map, review workflow, imagery findings, review checklist |
-| `docs/phase5-3d-foundations.md` | Phase 5 summary: projection, height profile, 3D scene, alignment check |
-| `docs/phase6-3d-infrastructure.md` | Phase 6 summary: viaducts, tunnels, stations, LOD, continuity tests |
-| `docs/phase7-3d-look-trains-ui.md` | Phase 7 summary: OSM city, Kenney models, simulated trains, reference-style UI |
-| `docs/phase8-remaining-ui.md` | Phase 8 summary: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting |
-| `docs/ASSETS.md` | Every third-party 3D asset: source, licence, notes, rejected candidates |
-| `docs/phase9-plan.md` | Research, sources and implementation plan for the owner’s revised Phase 9 scope |
-| `docs/phase9-train-control.md` | Phase 9 train control, underground visibility, motion, checks and limitations |
-| `docs/phaseN-*.md` | One frozen summary per later phase |
-| `text.txt` | The original project brief |
-| `ref_image.png` | Visual style reference for the UI and the 3D view |
+| File                               | Purpose                                                                                         |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `docs/HANDOFF.md`                  | Self-contained handoff for another model or developer (also linked from `AGENTS.md`)            |
+| `docs/REQUIREMENTS.md`             | What the app must do                                                                            |
+| `docs/ARCHITECTURE.md`             | Structure, data schema, pipeline, projection, roadmap                                           |
+| `docs/DECISIONS.md`                | Dated decision log                                                                              |
+| `docs/CODE_SUMMARY.md`             | What exists in the code right now                                                               |
+| `docs/phase1-research-and-plan.md` | Phase 1 research snapshot (2026-10-31): sources, licences, OSM measurements, 3D assets          |
+| `docs/phase2-dataset-build.md`     | Phase 2 summary: pipeline, outputs, per-line figures, open quality items                        |
+| `docs/phase3-validation.md`        | Phase 3 summary: checks, bugs found, reference comparison, documented warnings                  |
+| `docs/phase4-leaflet-map.md`       | Phase 4 summary: 2D map, review workflow, imagery findings, review checklist                    |
+| `docs/phase5-3d-foundations.md`    | Phase 5 summary: projection, height profile, 3D scene, alignment check                          |
+| `docs/phase6-3d-infrastructure.md` | Phase 6 summary: viaducts, tunnels, stations, LOD, continuity tests                             |
+| `docs/phase7-3d-look-trains-ui.md` | Phase 7 summary: OSM city, Kenney models, simulated trains, reference-style UI                  |
+| `docs/phase8-remaining-ui.md`      | Phase 8 summary: work-in-progress entries, train follow, 2D/3D view handoff, route highlighting |
+| `docs/ASSETS.md`                   | Every third-party 3D asset: source, licence, notes, rejected candidates                         |
+| `docs/phase9-plan.md`              | Research, sources and implementation plan for the owner’s revised Phase 9 scope                 |
+| `docs/phase9-train-control.md`     | Phase 9 train control, underground visibility, motion, checks and limitations                   |
+| `docs/phaseN-*.md`                 | One frozen summary per later phase                                                              |
+| `text.txt`                         | The original project brief                                                                      |
+| `ref_image.png`                    | Visual style reference for the UI and the 3D view                                               |

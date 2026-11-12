@@ -8,12 +8,16 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts",
-    "data:build": "node scripts/build-dataset.ts && node scripts/validate.ts",
+    "data:fetch": "node scripts/fetch-osm.ts && node scripts/fetch-wikipedia.ts && node scripts/fetch-regional.ts",
+    "data:build": "node scripts/build-dataset.ts && node scripts/build-landmarks.ts && node scripts/validate.ts",
     "data:validate": "node scripts/validate.ts",
     "test": "node --test \"scripts/*.test.ts\" \"src/**/*.test.ts\"",
     "data:fetch-city": "node scripts/fetch-osm-city.ts",
-    "data:city": "node scripts/build-city.ts"
+    "data:city": "node scripts/build-environment.ts",
+    "data:fetch-environment": "node scripts/fetch-environment.mjs",
+    "data:fetch-regional": "node scripts/fetch-regional.ts",
+    "data:fetch-landmarks": "node scripts/fetch-landmarks.mjs",
+    "data:landmarks": "node scripts/build-landmarks.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",

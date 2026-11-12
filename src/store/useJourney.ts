@@ -13,7 +13,16 @@ export function useJourney(network: Network) {
   return useMemo(() => {
     if (!from || !to) return null;
     let planner = planners.get(network.routes);
-    if (!planner) planners.set(network.routes, (planner = buildRoutePlanner(network.routes, network.segments)));
+    if (!planner)
+      planners.set(
+        network.routes,
+        (planner = buildRoutePlanner(
+          network.routes,
+          network.segments,
+          undefined,
+          network.transfers,
+        )),
+      );
     return planner.plan(from, to);
   }, [network, from, to]);
 }

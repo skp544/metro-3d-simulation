@@ -1,6 +1,24 @@
 // Schema of data/processed/*.geojson. Shared by scripts/ (build, validate) and the app.
 import type { Feature, FeatureCollection, LineString, MultiLineString, Point } from "geojson";
 
+export interface LandmarkProps extends Provenance {
+  id: string;
+  name: string;
+  footprint: [number, number][];
+  model: string;
+  widthM: number;
+  depthM: number;
+  heightM: number;
+  heightEstimated: boolean;
+  yaw: number;
+  orientationSource: string;
+  scope: string;
+  nearestStation: { stationId: string; name: string; distanceM: number };
+  reference: string;
+  snapshot: string;
+}
+export type LandmarksFC = FeatureCollection<Point, LandmarkProps>;
+
 export type InfraType = "elevated" | "underground" | "at_grade" | "unknown";
 // "mixed": an interchange whose platforms differ, e.g. Kashmere Gate (Red elevated, Yellow/Violet underground).
 export type StationType = InfraType | "mixed";
@@ -73,6 +91,15 @@ export interface InterchangeProps {
   evidence: "osm-ref" | "proximity" | "manual";
 }
 
+/** Bidirectional pedestrian connection between distinct stations. Geometry is a schematic connector. */
+export interface TransferProps extends Provenance {
+  id: string;
+  fromStationId: string;
+  toStationId: string;
+  walkSeconds: number; // nominal walking time, excludes the wait for the next train
+  note: string;
+}
+
 export interface ConstructionProps extends Provenance {
   id: string;
   name: string | null;
@@ -103,5 +130,6 @@ export type RoutesFC = FeatureCollection<LineString, RouteProps>;
 export type SegmentsFC = FeatureCollection<LineString, SegmentProps>;
 export type StationsFC = FeatureCollection<Point, StationProps>;
 export type InterchangesFC = FeatureCollection<Point, InterchangeProps>;
+export type TransfersFC = FeatureCollection<LineString, TransferProps>;
 export type ConstructionFC = FeatureCollection<LineString, ConstructionProps>;
 export type StationFeature = Feature<Point, StationProps>;

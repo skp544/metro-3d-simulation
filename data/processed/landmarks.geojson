@@ -1,0 +1,485 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.22949251898997,
+          28.612932316296533
+        ]
+      },
+      "properties": {
+        "id": "india-gate",
+        "name": "India Gate",
+        "footprint": [
+          [
+            77.2294076,
+            28.6130578
+          ],
+          [
+            77.229468,
+            28.6130562
+          ],
+          [
+            77.2295263,
+            28.613054
+          ],
+          [
+            77.2295875,
+            28.6130523
+          ],
+          [
+            77.2295845,
+            28.6129691
+          ],
+          [
+            77.2295799,
+            28.6128869
+          ],
+          [
+            77.2295768,
+            28.6128067
+          ],
+          [
+            77.2295144,
+            28.6128086
+          ],
+          [
+            77.2294537,
+            28.6128102
+          ],
+          [
+            77.2293964,
+            28.612813
+          ],
+          [
+            77.2294017,
+            28.6128974
+          ],
+          [
+            77.2294046,
+            28.612969
+          ],
+          [
+            77.2294076,
+            28.6130578
+          ]
+        ],
+        "model": "/models/landmarks/india-gate.glb",
+        "widthM": 27.41695766346309,
+        "depthM": 17.752913888008017,
+        "heightM": 42,
+        "heightEstimated": false,
+        "yaw": 1.5352549136994207,
+        "orientationSource": "OSM footprint long axis (front/back symmetric approximation)",
+        "scope": "Stone arch; architectural details approximated from reference photographs.",
+        "nearestStation": {
+          "stationId": "stn_km",
+          "name": "Khan Market",
+          "distanceM": 1189
+        },
+        "reference": "https://www.delhitourism.gov.in/tourist_place/india_gate.html",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:way/361709652@13",
+          "https://www.delhitourism.gov.in/tourist_place/india_gate.html"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.25862420925762,
+          28.553364383442513
+        ]
+      },
+      "properties": {
+        "id": "lotus-temple",
+        "name": "Lotus Temple",
+        "footprint": [
+          [
+            77.2582667,
+            28.5533484
+          ],
+          [
+            77.2582944,
+            28.5534004
+          ],
+          [
+            77.258331,
+            28.5534435
+          ],
+          [
+            77.2583283,
+            28.5534973
+          ],
+          [
+            77.2583386,
+            28.5535539
+          ],
+          [
+            77.2583979,
+            28.5535782
+          ],
+          [
+            77.2584575,
+            28.5535905
+          ],
+          [
+            77.2584948,
+            28.5536333
+          ],
+          [
+            77.2585442,
+            28.5536708
+          ],
+          [
+            77.2586073,
+            28.553656
+          ],
+          [
+            77.258662,
+            28.5536317
+          ],
+          [
+            77.2587218,
+            28.5536435
+          ],
+          [
+            77.2587872,
+            28.5536443
+          ],
+          [
+            77.2588246,
+            28.5535973
+          ],
+          [
+            77.2588488,
+            28.5535478
+          ],
+          [
+            77.2589032,
+            28.5535231
+          ],
+          [
+            77.2589539,
+            28.5534868
+          ],
+          [
+            77.2589482,
+            28.5534297
+          ],
+          [
+            77.2589305,
+            28.5533781
+          ],
+          [
+            77.2589541,
+            28.5533284
+          ],
+          [
+            77.2589664,
+            28.553272
+          ],
+          [
+            77.2589202,
+            28.5532315
+          ],
+          [
+            77.2588689,
+            28.553202
+          ],
+          [
+            77.2588506,
+            28.5531506
+          ],
+          [
+            77.2588187,
+            28.5531005
+          ],
+          [
+            77.2587537,
+            28.5530955
+          ],
+          [
+            77.2586928,
+            28.5531018
+          ],
+          [
+            77.2586411,
+            28.5530728
+          ],
+          [
+            77.2585801,
+            28.5530524
+          ],
+          [
+            77.2585266,
+            28.5530853
+          ],
+          [
+            77.2584846,
+            28.5531245
+          ],
+          [
+            77.2584238,
+            28.5531314
+          ],
+          [
+            77.2583621,
+            28.5531503
+          ],
+          [
+            77.2583452,
+            28.5532057
+          ],
+          [
+            77.2583417,
+            28.5532595
+          ],
+          [
+            77.2583002,
+            28.5532991
+          ],
+          [
+            77.2582667,
+            28.5533484
+          ]
+        ],
+        "model": "/models/landmarks/lotus-temple.glb",
+        "widthM": 68.93145744154029,
+        "depthM": 67.94067065754973,
+        "heightM": 34,
+        "heightEstimated": true,
+        "yaw": 0,
+        "orientationSource": "nominal; radial model",
+        "scope": "27 petal shells; shell curvature and height nominal. Surrounding pools and grounds are not reconstructed.",
+        "nearestStation": {
+          "stationId": "stn_kjmd",
+          "name": "Kalkaji Mandir",
+          "distanceM": 388
+        },
+        "reference": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:way/44827278@19",
+          "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.18545012634038,
+          28.52441720779106
+        ]
+      },
+      "properties": {
+        "id": "qutb-minar",
+        "name": "Qutb Minar",
+        "footprint": [
+          [
+            77.1854212,
+            28.5244758
+          ],
+          [
+            77.1854438,
+            28.5244809
+          ],
+          [
+            77.1854671,
+            28.5244794
+          ],
+          [
+            77.1854886,
+            28.5244715
+          ],
+          [
+            77.1855062,
+            28.524458
+          ],
+          [
+            77.1855181,
+            28.5244403
+          ],
+          [
+            77.1855229,
+            28.5244203
+          ],
+          [
+            77.1855203,
+            28.5243999
+          ],
+          [
+            77.1855104,
+            28.5243813
+          ],
+          [
+            77.1854943,
+            28.5243664
+          ],
+          [
+            77.1854737,
+            28.5243567
+          ],
+          [
+            77.1854507,
+            28.5243533
+          ],
+          [
+            77.1854276,
+            28.5243565
+          ],
+          [
+            77.1854101,
+            28.5243639
+          ],
+          [
+            77.1853955,
+            28.5243751
+          ],
+          [
+            77.1853847,
+            28.5243894
+          ],
+          [
+            77.1853787,
+            28.5244057
+          ],
+          [
+            77.1853778,
+            28.5244227
+          ],
+          [
+            77.185382,
+            28.5244394
+          ],
+          [
+            77.1853912,
+            28.5244545
+          ],
+          [
+            77.1854045,
+            28.5244669
+          ],
+          [
+            77.1854212,
+            28.5244758
+          ]
+        ],
+        "model": "/models/landmarks/qutb-minar.glb",
+        "widthM": 14.141502942618938,
+        "depthM": 14.072607887590303,
+        "heightM": 72.5,
+        "heightEstimated": false,
+        "yaw": 0,
+        "orientationSource": "nominal; radial model",
+        "scope": "Five-storey tower with fluting, stone bands and balconies; carvings simplified.",
+        "nearestStation": {
+          "stationId": "stn_qm",
+          "name": "Qutab Minar",
+          "distanceM": 1279
+        },
+        "reference": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:way/369140381@11",
+          "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          77.2387251203529,
+          28.65589602854492
+        ]
+      },
+      "properties": {
+        "id": "red-fort",
+        "name": "Red Fort · Lahori Gate",
+        "footprint": [
+          [
+            77.2388234,
+            28.6556722
+          ],
+          [
+            77.2386053,
+            28.6556782
+          ],
+          [
+            77.238607,
+            28.6557146
+          ],
+          [
+            77.2386161,
+            28.6559082
+          ],
+          [
+            77.2386272,
+            28.6561199
+          ],
+          [
+            77.2388452,
+            28.6561139
+          ],
+          [
+            77.2388408,
+            28.6560255
+          ],
+          [
+            77.2388346,
+            28.6558996
+          ],
+          [
+            77.2388288,
+            28.6557806
+          ],
+          [
+            77.2388234,
+            28.6556722
+          ]
+        ],
+        "model": "/models/landmarks/red-fort.glb",
+        "widthM": 49.46842549350586,
+        "depthM": 21.37138811139633,
+        "heightM": 33,
+        "heightEstimated": true,
+        "yaw": -1.6139830912313131,
+        "orientationSource": "OSM footprint long axis (front/back symmetric approximation)",
+        "scope": "Lahori Gate only, on its mapped footprint; towers, chhatris and battlements approximated. The full fort is not reconstructed.",
+        "nearestStation": {
+          "stationId": "stn_llqa",
+          "name": "Lal Quila",
+          "distanceM": 268
+        },
+        "reference": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/",
+        "snapshot": "2026-11-12",
+        "source": [
+          "osm:way/80429907@11",
+          "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/"
+        ],
+        "verified": false,
+        "estimated": true,
+        "conflicts": []
+      }
+    }
+  ]
+}

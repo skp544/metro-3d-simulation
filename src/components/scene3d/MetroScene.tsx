@@ -5,10 +5,18 @@ import * as THREE from "three";
 import { LOD_METRES_PER_PIXEL, PALETTE } from "../../constants/scene";
 import type { Network } from "../../data/loadNetwork";
 import { useJourney } from "../../store/useJourney";
-import { groundVisible, useMapStore, viewHandoff } from "../../store/useMapStore";
-import { distanceForMetresPerPixel, metresPerPixel } from "../../utils/projection";
+import {
+  groundVisible,
+  useMapStore,
+  viewHandoff,
+} from "../../store/useMapStore";
+import {
+  distanceForMetresPerPixel,
+  metresPerPixel,
+} from "../../utils/projection";
 import type { Service } from "../../utils/trainSim";
 import { City } from "./City";
+import { Landmarks } from "./Landmarks";
 import { buildScene3D } from "./geometry";
 import { RouteOverlay } from "./RouteOverlay";
 import { CameraRig, StationLabels, Sun, type View3D } from "./SceneRig";
@@ -17,16 +25,23 @@ import { StationPoints } from "./StationPoints";
 import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
-import { UndergroundWatcher } from "./UndergroundWatcher";
+import { TransferLinks } from "./TransferLinks";
+import { SceneAtmosphere, EnvironmentGround } from "./SceneAtmosphere";
+import { ExploreMovement } from "./ExploreMovement";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.
 function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
   const near = useRef<boolean | null>(null);
   useFrame(({ camera, controls, size }) => {
-    const target = (controls as unknown as { target?: THREE.Vector3 } | null)?.target;
+    const target = (controls as unknown as { target?: THREE.Vector3 } | null)
+      ?.target;
     if (!target) return;
     const fov = (camera as THREE.PerspectiveCamera).fov;
-    const mpp = (2 * camera.position.distanceTo(target) * Math.tan((fov * Math.PI) / 360)) / size.height;
+    const mpp =
+      (2 *
+        camera.position.distanceTo(target) *
+        Math.tan((fov * Math.PI) / 360)) /
+      size.height;
     const next = mpp < LOD_METRES_PER_PIXEL * (near.current ? 1.2 : 1); // hysteresis: no flicker at the threshold
     if (next !== near.current) onChange((near.current = next));
   });
@@ -38,17 +53,50 @@ const HUB_OFFSET = new THREE.Vector3(390, 360, 450); // ≈ 700 m from the hub
 const FOV = 40; // vertical, degrees
 const MIN_DISTANCE_M = 40;
 
-export function MetroScene({ network, service }: { network: Network; service: Service }) {
+export function MetroScene({
+  network,
+  service,
+}: {
+  network: Network;
+  service: Service;
+}) {
   const scene = useMemo(() => buildScene3D(network), [network]);
-  const colors = useMemo(() => new Map(network.lines.features.map((f) => [f.properties.id, f.properties.color])), [network.lines]);
-  const names = useMemo(() => new Map(network.stations.features.map((f) => [f.properties.id, f.properties.name])), [network.stations]);
+  const colors = useMemo(
+    () =>
+      new Map(
+        network.lines.features.map((f) => [
+          f.properties.id,
+          f.properties.color,
+        ]),
+      ),
+    [network.lines],
+  );
+  const names = useMemo(
+    () =>
+      new Map(
+        network.stations.features.map((f) => [
+          f.properties.id,
+          f.properties.name,
+        ]),
+      ),
+    [network.stations],
+  );
   const showGround = useMapStore(groundVisible);
   const journey = useJourney(network);
   const [near, setNear] = useState(false);
+  const [environmentStatus, setEnvironmentStatus] = useState("");
   // Close up, the opaque ground hides tunnels; keep underground routes readable as dashed lines on the
   // surface, like a map overlay (the brief: "make underground routes visually understandable").
   const surfaceRuns = useMemo(
-    () => scene.runs.filter((r) => r.type === "underground").map((r) => ({ ...r, points: r.points.map(([x, , z]) => [x, 0.6, z] as [number, number, number]) })),
+    () =>
+      scene.runs
+        .filter((r) => r.type === "underground")
+        .map((r) => ({
+          ...r,
+          points: r.points.map(
+            ([x, , z]) => [x, 0.6, z] as [number, number, number],
+          ),
+        })),
     [scene.runs],
   );
 
@@ -56,13 +104,29 @@ export function MetroScene({ network, service }: { network: Network; service: Se
   const size = Math.max(maxX - minX, maxZ - minZ);
   const views = useMemo(() => {
     // The hub: the station served by the most lines (Kashmere Gate today), chosen from the data.
-    const hubStation = [...network.stations.features].sort((a, b) => b.properties.lines.length - a.properties.lines.length)[0];
-    const [hx, hz] = scene.projection.project(hubStation.geometry.coordinates as [number, number]);
+    const hubStation = [...network.stations.features].sort(
+      (a, b) => b.properties.lines.length - a.properties.lines.length,
+    )[0];
+    const [hx, hz] = scene.projection.project(
+      hubStation.geometry.coordinates as [number, number],
+    );
     const hubTarget = new THREE.Vector3(hx, 0, hz);
-    const netTarget = new THREE.Vector3((minX + maxX) / 2, 0, (minZ + maxZ) / 2);
+    const netTarget = new THREE.Vector3(
+      (minX + maxX) / 2,
+      0,
+      (minZ + maxZ) / 2,
+    );
     return {
-      hub: { target: hubTarget, position: hubTarget.clone().add(HUB_OFFSET) } as View3D,
-      network: { target: netTarget, position: netTarget.clone().add(new THREE.Vector3(0, size * 0.85, size * 0.8)) } as View3D,
+      hub: {
+        target: hubTarget,
+        position: hubTarget.clone().add(HUB_OFFSET),
+      } as View3D,
+      network: {
+        target: netTarget,
+        position: netTarget
+          .clone()
+          .add(new THREE.Vector3(0, size * 0.85, size * 0.8)),
+      } as View3D,
     };
   }, [network.stations, scene, minX, maxX, minZ, maxZ, size]);
 
@@ -74,27 +138,60 @@ export function MetroScene({ network, service }: { network: Network; service: Se
     if (handoff) {
       const [x, z] = scene.projection.project(handoff.center);
       const target = new THREE.Vector3(x, 0, z);
-      const d = distanceForMetresPerPixel(metresPerPixel(handoff.center[1], handoff.zoom), FOV, handoff.heightPx);
-      return { target, position: target.clone().add(HUB_OFFSET.clone().setLength(Math.min(Math.max(d, MIN_DISTANCE_M), size * 3))) };
+      const d = distanceForMetresPerPixel(
+        metresPerPixel(handoff.center[1], handoff.zoom),
+        FOV,
+        handoff.heightPx,
+      );
+      return {
+        target,
+        position: target
+          .clone()
+          .add(
+            HUB_OFFSET.clone().setLength(
+              Math.min(Math.max(d, MIN_DISTANCE_M), size * 3),
+            ),
+          ),
+      };
     }
     const params = new URLSearchParams(location.search);
     const at = params.get("at")?.split(",").map(Number);
     if (at?.length === 3 && at.every(Number.isFinite)) {
       const [x, z] = scene.projection.project([at[1], at[0]]);
       const target = new THREE.Vector3(x, 0, z);
-      return { target, position: target.clone().add(HUB_OFFSET.clone().setLength(at[2])) };
+      return {
+        target,
+        position: target.clone().add(HUB_OFFSET.clone().setLength(at[2])),
+      };
     }
-    if (params.get("cam") === "top") return { target: views.network.target, position: views.network.target.clone().add(new THREE.Vector3(0, size * 1.15, 1)) };
+    if (params.get("cam") === "top")
+      return {
+        target: views.network.target,
+        position: views.network.target
+          .clone()
+          .add(new THREE.Vector3(0, size * 1.15, 1)),
+      };
     return params.get("cam") === "network" ? views.network : views.hub;
   }, [scene, views, size]);
 
   // Stable objects: new ones on every render make React Three Fiber re-apply them (a new camera, new
   // controls), snapping the view back to the start whenever the scene re-renders (LOD switch, X-ray, route).
   const startTarget = useMemo(() => start.target.toArray(), [start]);
-  const cameraOptions = useMemo(() => ({ position: start.position.toArray(), fov: FOV, near: 1, far: size * 6 }), [start, size]);
+  const cameraOptions = useMemo(
+    () => ({
+      position: start.position.toArray(),
+      fov: FOV,
+      near: 1,
+      far: size * 6,
+    }),
+    [start, size],
+  );
 
   return (
-    <div className="relative h-full w-full" style={{ background: PALETTE.background }}>
+    <div
+      className="relative h-full w-full"
+      style={{ background: PALETTE.background }}
+    >
       <Canvas
         shadows
         flat // no tone mapping: palette colours render as specified, like the reference's flat look
@@ -105,33 +202,91 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         aria-label="3D view of the Delhi Metro network"
       >
         <color attach="background" args={[PALETTE.background]} />
-        <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, 1.15]} />
+        <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, 0.9]} />
+        <SceneAtmosphere />
         <Sun />
-        <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
-        <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
-        <UndergroundWatcher paths={scene.paths} service={service} />
+        <MapControls
+          makeDefault
+          target={startTarget}
+          enableDamping
+          maxPolarAngle={Math.PI * 0.49}
+          minDistance={MIN_DISTANCE_M}
+          maxDistance={size * 3}
+        />
+        <CameraRig
+          projection={scene.projection}
+          hub={views.hub}
+          network={views.network}
+          service={service}
+          paths={scene.paths}
+        />
+        <ExploreMovement />
         <LodWatcher onChange={setNear} />
         {showGround && (
-          <mesh rotation-x={-Math.PI / 2} position={[(minX + maxX) / 2, 0, (minZ + maxZ) / 2]} receiveShadow>
-            <planeGeometry args={[maxX - minX + 20000, maxZ - minZ + 20000]} />
-            <meshLambertMaterial color={PALETTE.ground} />
-          </mesh>
+          <EnvironmentGround
+            width={maxX - minX + 20000}
+            depth={maxZ - minZ + 20000}
+            x={(minX + maxX) / 2}
+            z={(minZ + maxZ) / 2}
+          />
         )}
         <Suspense fallback={null}>
-          <group visible={showGround}><City projection={scene.projection} /></group>
+          <City
+            projection={scene.projection}
+            landmarks={network.landmarks}
+            onStatus={setEnvironmentStatus}
+          />
+          <Landmarks data={network.landmarks} projection={scene.projection} />
         </Suspense>
         <Structures scene={scene} colors={colors} near={near} />
         <Suspense fallback={null}>
-          <Trains scene={scene} service={service} colors={colors} stationNames={names} near={near} />
+          <Trains
+            scene={scene}
+            service={service}
+            colors={colors}
+            stationNames={names}
+            near={near}
+          />
         </Suspense>
         <StationLabels stations={scene.stations} names={names} near={near} />
-        {journey && <RouteOverlay journey={journey} paths={scene.paths} stations={scene.stations} colors={colors} names={names} />}
+        <TransferLinks network={network} scene={scene} />
+        {journey && (
+          <RouteOverlay
+            journey={journey}
+            paths={scene.paths}
+            stations={scene.stations}
+            colors={colors}
+            names={names}
+          />
+        )}
         {!near && <TrackLines runs={scene.runs} colors={colors} />}
-        {near && showGround && <TrackLines runs={surfaceRuns} colors={colors} dashSize={14} gapSize={10} />}
+        {near && showGround && (
+          <TrackLines
+            runs={surfaceRuns}
+            colors={colors}
+            dashSize={14}
+            gapSize={10}
+          />
+        )}
         {!near && <StationPoints stations={scene.stations} colors={colors} />}
       </Canvas>
-      <p className="pointer-events-none absolute right-3 bottom-2 z-[500] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
-        Map data © OpenStreetMap contributors (ODbL) · models Kenney (CC0) · trains simulated · heights and sizes nominal
+      {environmentStatus && (
+        <div
+          role="status"
+          className="pointer-events-none absolute right-14 bottom-12 z-[500] rounded-lg bg-white/90 px-3 py-1 text-xs text-slate-600"
+        >
+          {environmentStatus}
+        </div>
+      )}
+      <p className="pointer-events-none absolute right-3 bottom-2 z-[500] max-w-[95vw] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
+        <span className="sm:hidden">
+          © OpenStreetMap contributors (ODbL) · illustrative scene
+        </span>
+        <span className="hidden sm:inline">
+          Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D
+          Assets (CC0) · trains simulated · road traffic illustrative ·
+          architecture nominal
+        </span>
       </p>
     </div>
   );

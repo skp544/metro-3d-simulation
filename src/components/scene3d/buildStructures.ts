@@ -53,6 +53,8 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
   );
   const aboveStations = stations.filter((s) => s.position[1] >= -level);
   const belowStations = stations.filter((s) => s.position[1] < -level);
+  // Count all platform frames before filters: hiding a line must not invent a new access layout.
+  const sharedIds = new Set(scene.stations.filter(s => s.lineId && scene.stations.filter(o => o.stationId === s.stationId && o.lineId).length > 1).map(s => s.stationId));
   const deckBottom = S.deckSlab + S.girderDepth + S.pierCap.depth;
   const piers = showElevated ? pillarMatrices(above.map((s) => s.points), S.pillarSpacing, S.pillarSize, deckBottom, level) : [];
 
@@ -79,7 +81,8 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
     ballast: extrudeRect(runs.filter((r) => r.type === "at_grade" || r.type === "unknown").map((r) => ({ points: r.points, color: plain })), S.ballastHalfWidth, -0.15, S.sleeper.top - 0.08, upper),
     rails: extrudeRect(rails, S.railHalfWidth, S.sleeper.top, S.railTop, upper),
     // Stations.
-    aboveParts: stationParts(aboveStations, colors),
+    aboveParts: stationParts(aboveStations, colors, sharedIds),
+    circulationStations: aboveStations.filter(s => !sharedIds.has(s.stationId) && hasCirculation(s)),
     belowStations: belowStations.map((s) => boxMatrix(s.position, s.yaw!, S.stationLength, S.stationHalfWidth, -S.stationBelowTrack * VE, S.stationAboveTrack * VE)),
     belowStationIds: belowStations.map((s) => s.stationId),
   };
@@ -90,7 +93,7 @@ export function buildStructures(scene: Scene3DData, colors: Map<string, string>,
  * a yellow edge strip, an open gabled glazed roof on columns with a line-coloured fascia, and, where the track is
  * high enough, a concourse box below. Generic and nominal (DMRC elevated stations mostly have side platforms).
  */
-export function stationParts(stations: Station[], colors: Map<string, string>): StationPart[] {
+export function stationParts(stations: Station[], colors: Map<string, string>, sharedIds = new Set<string>()): StationPart[] {
   const { platform: P, edgeStrip: E, roof: R, concourse: C, stationLength: L } = S;
   const parts: Record<string, StationPart> = {};
   const add = (key: string, shape: StationPart["shape"], color: string, s: Station, m: THREE.Matrix4, instanceColor?: THREE.Color) => {
@@ -104,20 +107,117 @@ export function stationParts(stations: Station[], colors: Map<string, string>): 
   for (const s of stations) {
     const box = (o: LocalBox) => localBox(s.position, s.yaw!, o);
     const line = new THREE.Color(colors.get(s.lineId!));
+    const access = hasCirculation(s) && !sharedIds.has(s.stationId);
+    const A = S.circulation;
+    const outer = access ? A.outer : P.outer;
+    const roofWidth = access ? A.roofHalfWidth : R.halfWidth;
+    const roofTilt = access ? Math.atan2(R.ridge - R.eave, roofWidth) : tilt;
     for (const side of [1, -1]) {
-      const mid = (P.inner + P.outer) / 2;
-      add("platform", "box", PALETTE.platform, s, box({ across: side * mid, length: L, halfWidth: (P.outer - P.inner) / 2, bottom: -S.deckSlab, top: P.top }));
+      const slab = (lo: number, hi: number, start = -L / 2, end = L / 2) => add("platform", "box", PALETTE.platform, s, box({ across: side * (lo + hi) / 2, along: (start + end) / 2, length: end - start, halfWidth: (hi - lo) / 2, bottom: -S.deckSlab, top: P.top }));
+      if (access) {
+        // A continuous 3 m lane beside the tactile strip, plus two real holes in the outer band.
+        const lo = A.wellAcross - A.wellWidth / 2, hi = A.wellAcross + A.wellWidth / 2;
+        slab(P.inner, lo); slab(hi, outer);
+        let start = -L / 2;
+        for (const along of [-A.wellAlong, A.wellAlong]) { slab(lo, hi, start, along - A.wellLength / 2); start = along + A.wellLength / 2; }
+        slab(lo, hi, start, L / 2);
+      } else slab(P.inner, outer);
       add("edgeStrip", "box", PALETTE.edgeStrip, s, box({ across: side * E.across, length: L, halfWidth: E.halfWidth, bottom: P.top - 0.05, top: P.top + 0.03 }));
       // Roof slab from the ridge (centre line) down to the eave, tilted about the station's long axis.
-      add("roof", "box", PALETTE.stationRoof, s, box({ across: (side * R.halfWidth) / 2, length: L, halfWidth: R.halfWidth / 2 / Math.cos(tilt), bottom: (R.eave + R.ridge) / 2 - R.thickness / 2, top: (R.eave + R.ridge) / 2 + R.thickness / 2, roll: side * tilt }));
-      add("fascia", "box", "#ffffff", s, box({ across: side * R.halfWidth, length: L, halfWidth: 0.15, bottom: R.eave - 0.7, top: R.eave + 0.1 }), line);
+      add("roof", "box", PALETTE.stationRoof, s, box({ across: (side * roofWidth) / 2, length: L, halfWidth: roofWidth / 2 / Math.cos(roofTilt), bottom: (R.eave + R.ridge) / 2 - R.thickness / 2, top: (R.eave + R.ridge) / 2 + R.thickness / 2, roll: side * roofTilt }));
+      add("fascia", "box", "#ffffff", s, box({ across: side * roofWidth, length: L, halfWidth: 0.15, bottom: R.eave - 0.7, top: R.eave + 0.1 }), line);
       for (let i = 0; i < columnsPerSide; i++)
-        add("column", "box", PALETTE.column, s, box({ along: (i - (columnsPerSide - 1) / 2) * R.columnSpacing, across: side * R.columnAcross, length: R.columnSize, halfWidth: R.columnSize / 2, bottom: P.top, top: R.eave }));
+        add("column", "box", PALETTE.column, s, box({ along: (i - (columnsPerSide - 1) / 2) * R.columnSpacing, across: side * (access ? A.columnAcross : R.columnAcross), length: R.columnSize, halfWidth: R.columnSize / 2, bottom: P.top, top: R.eave }));
     }
     // The concourse sits below the platforms, so only under elevated track that leaves room for it.
     const y = s.position[1];
-    if (y - S.deckSlab - S.girderDepth > C.top + 1)
+    if (access)
       add("concourse", "box", PALETTE.wall, s, box({ length: L * C.lengthShare, halfWidth: C.halfWidth, bottom: C.bottom - y, top: C.top - y }));
+    else if (y - S.deckSlab - S.girderDepth > C.top + 1)
+      add("concourse", "box", PALETTE.wall, s, box({ length: L * C.lengthShare, halfWidth: 10, bottom: C.bottom - y, top: C.top - y }));
+  }
+  return Object.values(parts);
+}
+
+/** Eligible for the generic circulation layout; ramps and underground platforms need site-specific plans. */
+export function hasCirculation(s: Station) {
+  return s.position[1] - S.deckSlab - S.girderDepth > S.concourse.top + 2.5 && s.stationType !== "mixed";
+}
+
+/** Local floor/connection metadata for future people. Schematic station-local coordinates, not a surveyed navmesh. */
+export function circulationLayout(s: Station) {
+  const A = S.circulation, platformY = s.position[1] + S.platform.top;
+  const flights = [1, -1].flatMap(side => [-A.wellAlong, A.wellAlong].map(along => ({ side, along, across: side * A.wellAcross, fromY: S.concourse.top, toY: platformY, run: A.stairRun, width: A.wellWidth, steps: Math.ceil((platformY - S.concourse.top) / A.maxRiser) })));
+  return { nominal: true, platformY, concourseY: S.concourse.top, groundY: 0, clearLaneWidth: A.clearLaneWidth, flights,
+    lifts: [1, -1].map(side => ({ along: A.liftAlong, across: side * A.liftAcross, stops: [0, S.concourse.top, platformY] })),
+    lanes: [1, -1].map(side => ({ across: side * A.clearLaneAcross, start: -S.stationLength / 2 + 3, end: S.stationLength / 2 - 3, y: platformY })),
+  };
+}
+
+/** Nearby station detail only: steps, handrails, external access, lift shafts and furniture. */
+export function stationDetailParts(stations: Station[]): StationPart[] {
+  const A = S.circulation, C = S.concourse, P = S.platform;
+  const parts: Record<string, StationPart> = {};
+  for (const s of stations) {
+    const layout = circulationLayout(s), y = s.position[1];
+    const add = (key: string, color: string, o: LocalBox, opacity?: number) => {
+      const p = parts[key] ??= { key, shape: "box", color, matrices: [], ids: [], opacity };
+      p.matrices.push(localBox(s.position, s.yaw!, o)); p.ids.push(s.stationId);
+    };
+    const slab = (key: string, along: number, across: number, length: number, width: number, topY: number) => add(key, PALETTE.platform, { along, across, length, halfWidth: width / 2, bottom: topY - y - .25, top: topY - y });
+    for (const along of [-75,-45,-15,15,45,75]) for (const side of [1,-1]) {
+      const tilt=Math.atan2(S.roof.ridge-S.roof.eave,A.roofHalfWidth);
+      add("roofRafters", PALETTE.column, { along, across:side*A.roofHalfWidth/2, length:.18, halfWidth:A.roofHalfWidth/2/Math.cos(tilt), bottom:(S.roof.eave+S.roof.ridge)/2-.22, top:(S.roof.eave+S.roof.ridge)/2-.05, roll:side*tilt });
+    }
+    // Open railing posts leave the circulation lane clear; supports sit outboard of it.
+    for (const side of [1, -1]) {
+      for (let along = -87; along <= 87; along += 6) {
+        if (Math.abs(along - A.liftAlong) < 1.5) continue;
+        add("guardPosts", PALETTE.column, { along, across: side * (A.outer - .08), length: .09, halfWidth: .045, bottom: P.top, top: P.top + A.railHeight });
+      }
+      for (const height of [.5, A.railHeight]) for (const [start,end] of [[-90,A.liftAlong-1.5],[A.liftAlong+1.5,90]]) add("guardRails", PALETTE.column, { along:(start+end)/2, across: side * (A.outer - .08), length:end-start, halfWidth: .045, bottom: P.top + height - .04, top: P.top + height + .04 });
+      // Concourse support columns stay outside the tracks and the continuous platform lane.
+      for (const along of [-48,-24,0,24,48]) add("supports", PALETTE.pillar, { along, across: side * 11.5, length: .7, halfWidth: .35, bottom: -y, top: P.top - .5 });
+      for (const along of [-75,75]) {
+        add("benches", "#717c84", { along, across: side * 10, length: 4, halfWidth: .35, bottom: P.top + .4, top: P.top + .55 });
+        add("benchBack", "#717c84", { along, across: side * 10.3, length: 4, halfWidth: .07, bottom: P.top + .5, top: P.top + 1.1 });
+        for (const offset of [-1.5,1.5]) add("benchLegs", PALETTE.column, { along: along+offset, across:side*10, length:.12,halfWidth:.3,bottom:P.top,top:P.top+.4 });
+      }
+      // Street → concourse stairs outside the station envelope, with a level top landing into the floor.
+      const steps = Math.ceil(C.top / A.maxRiser), tread = A.groundStairRun / steps;
+      for (let i = 0; i < steps; i++) add("streetSteps", PALETTE.platform, { along: -A.groundStairRun / 2 + (i + .5) * tread, across: side * A.groundStairAcross, length: tread, halfWidth: 1.5, bottom: i * C.top / steps - y - .2, top: (i + 1) * C.top / steps - y });
+      slab("streetLanding", A.groundStairRun / 2 + 1.5, side * 14.75, 3, 5.5, C.top);
+      for (const edge of [-1,1]) {
+        const pos=new THREE.Vector3().setFromMatrixPosition(localBox(s.position,s.yaw!,{along:0,across:side*A.groundStairAcross+edge*1.5,length:1,halfWidth:.5,bottom:C.top/2-y+1,top:C.top/2-y+1}));
+        const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),s.yaw!).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),Math.atan2(C.top,A.groundStairRun)));
+        const p=parts.streetHandrail ??= {key:"streetHandrail",shape:"box",color:PALETTE.column,matrices:[],ids:[]};
+        p.matrices.push(new THREE.Matrix4().compose(pos,q,new THREE.Vector3(Math.hypot(C.top,A.groundStairRun),.1,.1))); p.ids.push(s.stationId);
+      }
+      // Lift landings connect the outboard shaft to platform and concourse without crossing the tracks.
+      for (const level of [C.top, layout.platformY]) slab("liftLanding", A.liftAlong, side * 12.6, 3, 6.4, level);
+      slab("concourseWing", 60, side * 10.9, 13, 5.2, C.top);
+      add("liftGlass", "#b0cbd4", { along: A.liftAlong, across: side * A.liftAcross, length: A.liftWidth, halfWidth: A.liftWidth / 2, bottom: -y, top: P.top + 3 }, .35);
+      for (const along of [A.liftAlong-A.liftWidth/2,A.liftAlong+A.liftWidth/2]) for (const across of [side*A.liftAcross-A.liftWidth/2,side*A.liftAcross+A.liftWidth/2]) add("liftFrame", PALETTE.column, { along, across, length: .13, halfWidth: .065, bottom: -y, top: P.top + 3 });
+      // Perimeter on concourse leaves a three-metre opening at the street-stair landing.
+      for (const [start,end] of [[-54,6.75],[9.75,54]]) add("concourseGuard", PALETTE.column, { along: (start+end)/2, across: side*C.halfWidth, length: end-start, halfWidth: .06, bottom: C.top-y+.9, top: C.top-y+1.1 });
+    }
+    for (const f of layout.flights) {
+      const tread = f.run / f.steps, rise = (f.toY-f.fromY)/f.steps;
+      for (let i=0;i<f.steps;i++) add("platformSteps", PALETTE.platform, { along: f.along-f.run/2+(i+.5)*tread, across: f.across, length: tread, halfWidth: f.width/2, bottom: f.fromY-y+i*rise-.2, top: f.fromY-y+(i+1)*rise });
+      // Guard the well's sides; rising handrails follow the stair slope.
+      const angle = Math.atan2(f.toY-f.fromY,f.run);
+      for (const edge of [-1,1]) {
+        const across = f.across + edge*(f.width/2+.04);
+        add("wellRails", PALETTE.column, { along: f.along, across, length: A.wellLength, halfWidth: .05, bottom: P.top+.95, top: P.top+1.1 });
+        const pos=new THREE.Vector3().setFromMatrixPosition(localBox(s.position,s.yaw!,{along:f.along,across,length:1,halfWidth:.5,bottom:(f.fromY+f.toY)/2-y+1,top:(f.fromY+f.toY)/2-y+1}));
+        const q=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),s.yaw!);
+        q.multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1),angle));
+        const p=parts.stairHandrail ??= {key:"stairHandrail",shape:"box",color:PALETTE.column,matrices:[],ids:[]};
+        p.matrices.push(new THREE.Matrix4().compose(pos,q,new THREE.Vector3(Math.hypot(f.run,f.toY-f.fromY),.1,.1))); p.ids.push(s.stationId);
+      }
+      slab("wellBottomLanding", f.along-f.run/2-1.5, f.across, 3, f.width, f.fromY);
+      slab("wellTopLanding", f.along+f.run/2+.75, f.across, 1.5, f.width, f.toY);
+    }
   }
   return Object.values(parts);
 }

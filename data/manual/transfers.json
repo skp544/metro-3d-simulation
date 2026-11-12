@@ -1,0 +1,10 @@
+{
+  "_doc": "Explicit bidirectional pedestrian links, never inferred from proximity. Times are nominal estimates, not surveyed. Lines between station centres are schematic, not walkway alignments. A planned FOB is not asserted to be open.",
+  "transfers": [
+    {"id":"walk_noida_52_51","from":{"lineId":"blue","name":"Noida Sector 52"},"to":{"lineId":"aqua","name":"Noida Sector 51"},"walkSeconds":480,"source":["https://www.nmrcnoida.com/Content/pdf/186/RFP.pdf"],"note":"Walk between separate DMRC and NMRC stations; exit and re-enter. Separate ticketing. Walking time estimated; skywalk availability not assumed."},
+    {"id":"walk_sarai_kale_khan","from":{"lineId":"pink","name":"Sarai Kale Khan - Nizamuddin"},"to":{"lineId":"rrts","name":"Sarai Kale Khan"},"walkSeconds":300,"source":["https://ncrtc.in/wp-content/uploads/2025/12/Namo-Bharat-Times-Oct-Nov_compressed.pdf"],"note":"Walk between Pink Line and Namo Bharat; separate ticketing. Walking time estimated."},
+    {"id":"walk_new_ashok_nagar","from":{"lineId":"blue","name":"New Ashok Nagar"},"to":{"lineId":"rrts","name":"New Ashok Nagar"},"walkSeconds":240,"source":["https://ncrtc.in/wp-content/uploads/2025/12/Namo-Bharat-Times-Oct-Nov_compressed.pdf"],"note":"FOB connection between Blue Line and Namo Bharat; separate ticketing. Walking time estimated."},
+    {"id":"walk_anand_vihar","from":{"lineId":"blue","name":"Anand Vihar"},"to":{"lineId":"rrts","name":"Anand Vihar"},"walkSeconds":300,"source":["https://ncrtc.in/interactive-map/"],"note":"Walk between Blue/Pink Lines and Namo Bharat; separate ticketing. Walking time estimated."},
+    {"id":"walk_ghaziabad","from":{"lineId":"red","name":"Shaheed Sthal"},"to":{"lineId":"rrts","name":"Ghaziabad"},"walkSeconds":360,"source":["https://ncrtc.in/wp-content/uploads/2025/10/Namo-Bharat-Times-Volume_4_NCRTC_Commuter.pdf"],"note":"Pedestrian transfer to Shaheed Sthal (New Bus Adda); separate ticketing. Walking time estimated; travelator availability not assumed."}
+  ]
+}

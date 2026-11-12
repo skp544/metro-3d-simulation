@@ -5,9 +5,12 @@ import routesUrl from "../../data/processed/metro_routes.geojson?url";
 import segmentsUrl from "../../data/processed/metro_segments.geojson?url";
 import stationsUrl from "../../data/processed/metro_stations.geojson?url";
 import interchangesUrl from "../../data/processed/interchange_stations.geojson?url";
+import transfersUrl from "../../data/processed/station_transfers.geojson?url";
 import constructionUrl from "../../data/processed/metro_under_construction.geojson?url";
 import sourcesUrl from "../../data/metadata/sources.json?url";
 import validationUrl from "../../data/metadata/validation_report.json?url";
+import landmarksUrl from "../../data/processed/landmarks.geojson?url";
+import type { LandmarksFC } from "./types";
 import type {
   ConstructionFC,
   InterchangesFC,
@@ -16,17 +19,21 @@ import type {
   SegmentsFC,
   StationsFC,
   ValidationReport,
+  TransfersFC,
 } from "./types";
 
 export interface Network {
+  landmarks: LandmarksFC;
   lines: LinesFC;
   routes: RoutesFC;
   segments: SegmentsFC;
   stations: StationsFC;
   interchanges: InterchangesFC;
+  transfers: TransfersFC;
   construction: ConstructionFC;
   validation: ValidationReport;
   osmSnapshot: string;
+  regionalSnapshot: string;
 }
 
 async function get<T>(url: string): Promise<T> {
@@ -36,16 +43,44 @@ async function get<T>(url: string): Promise<T> {
 }
 
 export async function loadNetwork(): Promise<Network> {
-  const [lines, routes, segments, stations, interchanges, construction, validation, sources] = await Promise.all([
+  const [
+    lines,
+    routes,
+    segments,
+    stations,
+    interchanges,
+    transfers,
+    construction,
+    validation,
+    sources,
+    landmarks,
+  ] = await Promise.all([
     get<LinesFC>(linesUrl),
     get<RoutesFC>(routesUrl),
     get<SegmentsFC>(segmentsUrl),
     get<StationsFC>(stationsUrl),
     get<InterchangesFC>(interchangesUrl),
+    get<TransfersFC>(transfersUrl),
     get<ConstructionFC>(constructionUrl),
     get<ValidationReport>(validationUrl),
     get<{ sources: { id: string; snapshot?: string }[] }>(sourcesUrl),
+    get<LandmarksFC>(landmarksUrl),
   ]);
-  const osmSnapshot = sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
-  return { lines, routes, segments, stations, interchanges, construction, validation, osmSnapshot };
+  const osmSnapshot =
+    sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
+  const regionalSnapshot =
+    sources.sources.find((s) => s.id === "osm-regional")?.snapshot ?? "unknown";
+  return {
+    landmarks,
+    lines,
+    routes,
+    segments,
+    stations,
+    interchanges,
+    transfers,
+    construction,
+    validation,
+    osmSnapshot,
+    regionalSnapshot,
+  };
 }

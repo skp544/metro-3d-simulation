@@ -1,22 +1,64 @@
-// node --test: the real OSM surroundings build into chunked low-poly geometry within budget.
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { boundsCentre, createProjection } from "../../utils/projection.ts";
-import { buildCity } from "./buildCity.ts";
+import * as THREE from "three";
+import { boundsCentre, createProjection, type Projection } from "../../utils/projection.ts";
+import { selectCityTiles, CITY_TILE_LIMIT } from "../../utils/cityTiles.ts";
+import type { City, CityManifest, EnvironmentContext, RoadProps } from "../../data/cityTypes.ts";
+import { buildCity, streetPath, streetPose } from "./buildCity.ts";
 
-const read = async (f: string) => JSON.parse(await readFile(`data/processed/${f}.geojson`, "utf8"));
-const city = { buildings: await read("city_buildings"), roads: await read("city_roads"), green: await read("city_green"), trees: await read("city_trees") };
-const projection = createProjection(boundsCentre(await read("metro_lines")));
+const read=async(p:string)=>JSON.parse(await readFile(p,"utf8"));
+const manifest=await read("data/processed/city_tiles.json") as CityManifest;
+const projection=createProjection(boundsCentre(await read("data/processed/metro_lines.geojson")));
+const landmarks=await read("data/processed/landmarks.geojson");
+const empty=():City=>({buildings:{type:"FeatureCollection",features:[]},roads:{type:"FeatureCollection",features:[]},green:{type:"FeatureCollection",features:[]},trees:{type:"FeatureCollection",features:[]}});
+const identity:Projection={origin:[0,0],project:p=>p,unproject:p=>p};
+const source={source:["test:fixture"],verified:false,estimated:true,conflicts:[]};
 
-test("city builds into chunks, every building extruded, within the triangle budget", () => {
-  const built = buildCity(city, projection.project);
-  const tris = built.chunks.reduce((a, c) => a + [c.buildings, c.roads, c.green].reduce((n, g) => n + (g ? g.getAttribute("position").count / 3 : 0), 0), 0);
-  console.log(`  ${built.stats.chunks} chunks, ${city.buildings.features.length} buildings (${built.stats.buildingTris} tris), ${tris} tris total, ${built.stats.trees} trees`);
-  assert.ok(built.stats.chunks > 10, "split into several culling chunks");
-  assert.ok(built.stats.buildingTris >= city.buildings.features.length * 6, "every building has walls and a roof");
-  assert.ok(tris < 2_000_000, "under 2M triangles for the whole city");
-  assert.equal(built.trees.flat().length, city.trees.features.length);
-  for (const c of built.chunks)
-    for (const g of [c.buildings, c.roads, c.green]) if (g) assert.ok(Number.isFinite(g.boundingSphere!.radius), `chunk ${c.key} has finite bounds`);
+test("city: expanded landmark coverage and bounded streaming selection, finite geometry with facade UVs",async()=>{
+  for(const f of landmarks.features){
+    const selected=selectCityTiles(manifest,projection,projection.project(f.geometry.coordinates),2500);
+    assert.ok(selected.length>4&&selected.length<=CITY_TILE_LIMIT);
+    assert.ok(selected.reduce((n,t)=>n+t.buildings,0)>200,`${f.properties.name} has a surrounding city, beyond its model`);
+  }
+  assert.equal(selectCityTiles(manifest,projection,[0,0],100000).length,0,"overview retains landscape without loading the entire city's buildings");
+  const dense=[...manifest.tiles].sort((a,b)=>b.buildings-a.buildings).slice(0,3);
+  for(const tile of dense){
+    const city=await read(`public${tile.url}`) as City,built=buildCity(city,projection);
+    assert.equal(built.stats.buildings,city.buildings.features.length);
+    let triangles=0;
+    for(const c of built.chunks)for(const [key,g]of Object.entries(c))if(key!=="key"&&g){
+      const geom=g as THREE.BufferGeometry;triangles+=geom.getAttribute("position").count/3;
+      assert.ok(Number.isFinite(geom.boundingSphere!.radius));
+      assert.ok([...geom.getAttribute("uv").array].every(Number.isFinite));
+      geom.dispose();
+    }
+    assert.ok(triangles<350000,"each dense 1 km tile stays within a local geometry budget");
+    assert.equal(built.trees.flat().length,city.trees.features.length);
+  }
+});
+
+test("city: Yamuna snapshot is present; water triangulation retains islands and faces upward",async()=>{
+  const water=await read("data/processed/city_water.geojson");
+  assert.ok(water.features.some((f:{properties:{name:string}})=>/yamuna/i.test(f.properties.name)));
+  assert.ok(water.features.every((f:{properties:typeof source})=>f.properties.source.length&&Array.isArray(f.properties.conflicts)));
+  const context:EnvironmentContext={land:{type:"FeatureCollection",features:[]},roads:{type:"FeatureCollection",features:[]},water:{type:"FeatureCollection",features:[{type:"Feature",properties:{...source,id:"water",kind:"river",name:"Fixture"},geometry:{type:"Polygon",coordinates:[[[0,0],[10,0],[10,10],[0,10],[0,0]],[[4,4],[4,6],[6,6],[6,4],[4,4]]]}}]}};
+  const built=buildCity(empty(),identity,[],context),g=built.chunks.find(c=>c.water)!.water!;
+  const mesh=new THREE.Mesh(g,new THREE.MeshBasicMaterial({side:THREE.DoubleSide}));mesh.updateMatrixWorld();
+  const ray=(x:number,z:number)=>new THREE.Raycaster(new THREE.Vector3(x,10,z),new THREE.Vector3(0,-1,0)).intersectObject(mesh);
+  assert.ok(ray(2,2).length>0,"mapped water is rendered");assert.equal(ray(5,5).length,0,"island is not flooded by the mesh");
+  assert.ok(g.getAttribute("normal").getY(0)>.9,"water lit from above");
+  g.dispose();(mesh.material as THREE.Material).dispose();
+});
+
+test("streets: left-hand traffic follows real bends, reverse lanes stay separate, bridge ramps are continuous",()=>{
+  const p:RoadProps={...source,id:"road",name:"",class:"primary",width:12,oneway:false,bridge:false};
+  const path=streetPath([[0,0],[100,0],[100,100]],p,identity.project);
+  assert.deepEqual(streetPose(path,50,1,3).position,[50,.22,-3]);
+  assert.deepEqual(streetPose(path,50,-1,3).position,[50,.22,3]);
+  assert.deepEqual(streetPose(path,150,1,3).position,[103,.22,50]);
+  const bridge=streetPath([[0,0],[500,0]],{...p,bridge:true},identity.project);
+  assert.equal(bridge.points[0][1],.22);assert.equal(bridge.points.at(-1)![1],.22);
+  assert.ok(streetPose(bridge,250,1,0).position[1]>6,"even a two-node mapped bridge has an elevated deck");
+  for(let i=1;i<bridge.points.length;i++)assert.ok(Math.abs(bridge.points[i][1]-bridge.points[i-1][1])/(bridge.distances[i]-bridge.distances[i-1])<=.05001);
 });

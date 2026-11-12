@@ -9,7 +9,13 @@ type LngLat = [number, number];
 export type View = "2d" | "3d";
 export type Speed = 1 | 2 | 4 | 8;
 export type LabelMode = "trains" | "stations" | "all" | "off";
-export type CameraCommand = "zoomIn" | "zoomOut" | "network" | "hub";
+export type CameraCommand =
+  | "zoomIn"
+  | "zoomOut"
+  | "network"
+  | "hub"
+  | "low"
+  | "oblique";
 /** The view in 2D terms (centre + Leaflet zoom + viewport height): what both views write and read so a switch keeps the place. */
 export type SharedView = { center: LngLat; zoom: number; heightPx: number };
 /**
@@ -27,14 +33,17 @@ interface MapState {
   showStations: boolean;
   showConstruction: boolean;
   showValidation: boolean;
-  undergroundMode: UndergroundMode;
-  undergroundFollow: { trainId: string; underground: boolean } | null;
-  setUndergroundMode: (mode: UndergroundMode) => void;
-  reportUnderground: (trainId: string, underground: boolean) => void;
-  trainControls: TrainControls;
-  setTrainsHeld: (ids: readonly string[], held: boolean) => void;
+  showGround: boolean; // 3D: hide the ground to see tunnels and underground trains
+  showWater: boolean;
   // Bumped `key` lets the map re-fly to the same place twice.
-  focus: { coordinates: LngLat; key: number } | null;
+  focus: {
+    coordinates: LngLat;
+    key: number;
+    distanceM?: number;
+    heightM?: number;
+  } | null;
+  selectedLandmarkId: string | null;
+  selectLandmark: (id: string | null) => void;
   selectedStationId: string | null;
   labels: LabelMode;
   camera: { command: CameraCommand; key: number } | null;
@@ -53,8 +62,16 @@ interface MapState {
   setAllLines: (hidden: string[]) => void;
   toggleTrackType: (t: InfraType) => void;
   toggleStationType: (t: StationType) => void;
-  setLayer: (layer: "showStations" | "showConstruction" | "showValidation", on: boolean) => void;
-  focusOn: (coordinates: LngLat) => void;
+  setLayer: (
+    layer:
+      | "showStations"
+      | "showConstruction"
+      | "showValidation"
+      | "showGround"
+      | "showWater",
+    on: boolean,
+  ) => void;
+  focusOn: (coordinates: LngLat, distanceM?: number, heightM?: number) => void;
   fitTo: (bounds: [LngLat, LngLat]) => void;
   followTrain: (trainId: string | null) => void;
   setRouteEnd: (end: "from" | "to", stationId: string | null) => void;
@@ -66,14 +83,23 @@ interface MapState {
   togglePlay: () => void;
 }
 
-const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+const toggle = <T>(list: T[], v: T) =>
+  list.includes(v) ? list.filter((x) => x !== v) : [...list, v];
 
 /** Simulated seconds (Unix epoch) for the given clock state. */
-export const simSeconds = (s: Pick<MapState, "playing" | "speed" | "clock">, now = performance.now()) =>
-  s.clock.simAtBase + (s.playing ? ((now - s.clock.realAtBase) / 1000) * s.speed : 0);
+export const simSeconds = (
+  s: Pick<MapState, "playing" | "speed" | "clock">,
+  now = performance.now(),
+) =>
+  s.clock.simAtBase +
+  (s.playing ? ((now - s.clock.realAtBase) / 1000) * s.speed : 0);
 
-const routeParam = (new URLSearchParams(location.search).get("route") ?? "").split(",").filter(Boolean);
-const undergroundParam = new URLSearchParams(location.search).get("underground");
+const routeParam = (new URLSearchParams(location.search).get("route") ?? "")
+  .split(",")
+  .filter(Boolean);
+const undergroundParam = new URLSearchParams(location.search).get(
+  "underground",
+);
 
 // Keep follow command keys monotonic even after stopping, so useCommand does not discard a new follow.
 let followKey = 0;
@@ -94,14 +120,11 @@ export const useMapStore = create<MapState>((set, get) => ({
   showStations: true,
   showConstruction: false, // DECISIONS #3: Phase 4 corridors are off by default
   showValidation: false,
-  undergroundMode: undergroundParam === "surface" || undergroundParam === "underground" ? undergroundParam : "auto",
-  undergroundFollow: null,
-  setUndergroundMode: (undergroundMode) => set({ undergroundMode }),
-  reportUnderground: (trainId, underground) => set({ undergroundFollow: { trainId, underground } }),
-  trainControls: {},
-  setTrainsHeld: (ids, held) => set((s) => ({ trainControls: controlTrains(s.trainControls, ids, held, simSeconds(s)) })),
+  showGround: true,
+  showWater: true,
   focus: null,
   selectedStationId: null,
+  selectedLandmarkId: null,
   labels: "trains",
   camera: null,
   fit: null,
@@ -115,22 +138,45 @@ export const useMapStore = create<MapState>((set, get) => ({
   clock: { simAtBase: Date.now() / 1000, realAtBase: performance.now() },
   toggleLine: (id) => set((s) => ({ hiddenLines: toggle(s.hiddenLines, id) })),
   setAllLines: (hidden) => set({ hiddenLines: hidden }),
-  toggleTrackType: (t) => set((s) => ({ hiddenTrackTypes: toggle(s.hiddenTrackTypes, t) })),
-  toggleStationType: (t) => set((s) => ({ hiddenStationTypes: toggle(s.hiddenStationTypes, t) })),
+  toggleTrackType: (t) =>
+    set((s) => ({ hiddenTrackTypes: toggle(s.hiddenTrackTypes, t) })),
+  toggleStationType: (t) =>
+    set((s) => ({ hiddenStationTypes: toggle(s.hiddenStationTypes, t) })),
   setLayer: (layer, on) => set({ [layer]: on }),
   // Moving the view somewhere else ends a train follow.
-  focusOn: (coordinates) => set((s) => ({ focus: { coordinates, key: (s.focus?.key ?? 0) + 1 }, follow: null })),
-  fitTo: (bounds) => set((s) => ({ fit: { bounds, key: (s.fit?.key ?? 0) + 1 }, follow: null })),
-  followTrain: (trainId) => set({ follow: trainId ? { trainId, key: ++followKey } : null }),
-  setRouteEnd: (end, stationId) => set(end === "from" ? { routeFrom: stationId } : { routeTo: stationId }),
+  focusOn: (coordinates, distanceM, heightM) =>
+    set((s) => ({
+      focus: { coordinates, distanceM, heightM, key: (s.focus?.key ?? 0) + 1 },
+      follow: null,
+    })),
+  fitTo: (bounds) =>
+    set((s) => ({ fit: { bounds, key: (s.fit?.key ?? 0) + 1 }, follow: null })),
+  followTrain: (trainId) =>
+    set({ follow: trainId ? { trainId, key: ++followKey } : null }),
+  setRouteEnd: (end, stationId) =>
+    set(end === "from" ? { routeFrom: stationId } : { routeTo: stationId }),
   swapRoute: () => set((s) => ({ routeFrom: s.routeTo, routeTo: s.routeFrom })),
 
-  selectStation: (id) => set({ selectedStationId: id }),
+  selectStation: (id) =>
+    set({ selectedStationId: id, ...(id && { selectedLandmarkId: null }) }),
+  selectLandmark: (id) =>
+    set({ selectedLandmarkId: id, ...(id && { selectedStationId: null }) }),
   setLabels: (labels) => set({ labels }),
   // Zooming keeps a follow going; jumping to the hub or the whole network ends it.
   cameraDo: (command) =>
-    set((s) => ({ camera: { command, key: (s.camera?.key ?? 0) + 1 }, ...((command === "hub" || command === "network") && { follow: null }) })),
+    set((s) => ({
+      camera: { command, key: (s.camera?.key ?? 0) + 1 },
+      ...((command === "hub" || command === "network") && { follow: null }),
+    })),
   // Re-base the clock on every change so simulated time stays continuous.
-  setSpeed: (speed) => set({ speed, clock: { simAtBase: simSeconds(get()), realAtBase: performance.now() } }),
-  togglePlay: () => set((s) => ({ playing: !s.playing, clock: { simAtBase: simSeconds(s), realAtBase: performance.now() } })),
+  setSpeed: (speed) =>
+    set({
+      speed,
+      clock: { simAtBase: simSeconds(get()), realAtBase: performance.now() },
+    }),
+  togglePlay: () =>
+    set((s) => ({
+      playing: !s.playing,
+      clock: { simAtBase: simSeconds(s), realAtBase: performance.now() },
+    })),
 }));

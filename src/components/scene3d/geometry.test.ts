@@ -75,7 +75,7 @@ test("structure budget: merged/instanced, counts reported", () => {
   );
   assert.ok(b.piers.length > 5000 && b.piers.length < 15000, "about one pier per 30 m of viaduct");
   assert.equal(b.pierCaps.length, b.piers.length);
-  const platforms = b.aboveParts.find((p) => p.key === "platform")!.matrices.length;
-  assert.equal(platforms / 2 + b.belowStations.length, scene.stations.filter((s) => s.lineId).length, "two side platforms per above-ground station");
+  const strips = b.aboveParts.find((p) => p.key === "edgeStrip")!.matrices.length;
+  assert.equal(strips / 2 + b.belowStations.length, scene.stations.filter((s) => s.lineId).length, "two continuous platform edge strips per above-ground station");
   assert.ok(total < 1_000_000, "under 1M triangles for the whole network");
 });

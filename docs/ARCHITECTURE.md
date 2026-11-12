@@ -51,14 +51,14 @@ metro-route/
 
 All files are GeoJSON FeatureCollections in WGS84, with coordinates in `[lng, lat]` order and 6 decimal places (about 0.1 m). They are written one feature per line, so diffs stay readable. **The TypeScript types in `src/data/types.ts` are the source of truth for this schema.**
 
-| File | Geometry | Key properties |
-|---|---|---|
-| `metro_lines.geojson` | MultiLineString (one part per branch) | `id`, `name`, `color`, `colorSource`, `colorOfficial`, `status`, `branches[{id, stationIds[]}]` |
-| `metro_routes.geojson` | LineString per branch (full track, including tail tracks) | `id` (e.g. `blue_vaishali`), `lineId`, `stationIds[]` (travel order), `stopKm[]`, `lengthKm` (first to last stop), `geometryLengthKm` |
-| `metro_segments.geojson` | LineString between consecutive stops, split further where the track type changes | `id`, `lineId`, `routeId`, `fromStationId`, `toStationId`, `trackType`, `trackTypeSource`, `lengthKm` |
-| `metro_stations.geojson` | Point (mean of the per-line OSM station objects) | `id`, `name`, `name_hi`, `aliases[]`, `refs[]`, `lines[]`, `isInterchange`, `stationType`, `platforms[{lineId, coordinates, trackType, trackTypeSource, wikipediaName, wikipediaLayout}]`, `status` |
-| `interchange_stations.geojson` | Point | `stationId`, `name`, `lines[]`, `evidence` (`osm-ref` / `proximity` / `manual`) |
-| `metro_under_construction.geojson` | LineString per OSM construction way | `id`, `name`, `lineId` (null; OSM doesn't say which line), `lengthKm` |
+| File                               | Geometry                                                                         | Key properties                                                                                                                                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `metro_lines.geojson`              | MultiLineString (one part per branch)                                            | `id`, `name`, `color`, `colorSource`, `colorOfficial`, `status`, `branches[{id, stationIds[]}]`                                                                                                     |
+| `metro_routes.geojson`             | LineString per branch (full track, including tail tracks)                        | `id` (e.g. `blue_vaishali`), `lineId`, `stationIds[]` (travel order), `stopKm[]`, `lengthKm` (first to last stop), `geometryLengthKm`                                                               |
+| `metro_segments.geojson`           | LineString between consecutive stops, split further where the track type changes | `id`, `lineId`, `routeId`, `fromStationId`, `toStationId`, `trackType`, `trackTypeSource`, `lengthKm`                                                                                               |
+| `metro_stations.geojson`           | Point (mean of the per-line OSM station objects)                                 | `id`, `name`, `name_hi`, `aliases[]`, `refs[]`, `lines[]`, `isInterchange`, `stationType`, `platforms[{lineId, coordinates, trackType, trackTypeSource, wikipediaName, wikipediaLayout}]`, `status` |
+| `interchange_stations.geojson`     | Point                                                                            | `stationId`, `name`, `lines[]`, `evidence` (`osm-ref` / `proximity` / `manual`)                                                                                                                     |
+| `metro_under_construction.geojson` | LineString per OSM construction way                                              | `id`, `name`, `lineId` (null; OSM doesn't say which line), `lengthKm`                                                                                                                               |
 
 Every feature except interchanges also has: `source[]` (e.g. `osm:node/123`, `wikipedia:<article>@<revision>`), `verified`, `estimated`, `conflicts[]`.
 
@@ -93,11 +93,11 @@ Run with `npm run data:fetch` (network) and then `npm run data:build` (offline, 
 
 `scripts/validate.ts` re-checks `data/processed/` **independently of the build** (it shares no code with it) and writes `data/metadata/validation_report.json`. It exits 1 on any error. `npm run data:build` always runs it after the build. `scripts/validate.test.ts` feeds it corrupted copies of the data to prove each check fires.
 
-| Severity | Checks |
-|---|---|
-| **Error** (blocks the next phase) | GEOJSON_INVALID, SCHEMA, OUT_OF_BOUNDS (NCR box 28.2–28.9 N, 76.7–77.6 E), DUPLICATE_ID, MISSING_GEOMETRY, BROKEN_REFERENCE, SEGMENT_GAP (> 1 m), LENGTH_INCONSISTENT, STATION_ORDER, INTERCHANGE_MISMATCH, NETWORK_DISCONNECTED |
-| **Warning** (document or fix) | DEGENERATE_GEOMETRY, STOP_KM_DRIFT (> 100 m), STATION_FAR_FROM_LINE (> 150 m; 300 m for interchanges), PLATFORM_FAR_FROM_TRACK (> 30 m), DUPLICATE_NAME, NEARBY_STATIONS (< 300 m), REFERENCE_COUNT and REFERENCE_LENGTH (> ±5%) against the Wikipedia infobox |
-| **Info** | SOURCE_CONFLICT, UNVERIFIED_STATION, CORRIDOR_OVERLAP |
+| Severity                          | Checks                                                                                                                                                                                                                                                         |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Error** (blocks the next phase) | GEOJSON_INVALID, SCHEMA, OUT_OF_BOUNDS (NCR–Meerut box 28.2–29.2 N, 76.7–77.9 E), DUPLICATE_ID, MISSING_GEOMETRY, BROKEN_REFERENCE, SEGMENT_GAP (> 1 m), LENGTH_INCONSISTENT, STATION_ORDER, INTERCHANGE_MISMATCH, TRANSFER_INVALID, NETWORK_DISCONNECTED      |
+| **Warning** (document or fix)     | DEGENERATE_GEOMETRY, STOP_KM_DRIFT (> 100 m), STATION_FAR_FROM_LINE (> 150 m; 300 m for interchanges), PLATFORM_FAR_FROM_TRACK (> 30 m), DUPLICATE_NAME, NEARBY_STATIONS (< 300 m), REFERENCE_COUNT and REFERENCE_LENGTH (> ±5%) against the Wikipedia infobox |
+| **Info**                          | SOURCE_CONFLICT, UNVERIFIED_STATION, CORRIDOR_OVERLAP                                                                                                                                                                                                          |
 
 Report shape: `{ passed, summary{errors, warnings, info}, checks[{code, severity, description, issues, status}], stats, references[], issues[{severity, code, message, featureIds, location}] }`. The Leaflet validation overlay draws `issues[].location` on the map.
 
@@ -106,6 +106,7 @@ Station order is checked by projecting each platform onto its route, scanning fo
 ## 2D map (Phase 4)
 
 `MapPage` loads the network once (`loadNetwork`) and renders `MetroMap` with two floating cards (`ControlPanel` on the left, `ValidationPanel` bottom right). The map has stacked panes:
+
 - `construction` (390)
 - `track` (400): segments, sorted underground → elevated
 - `stations` (450): interchanges on top
@@ -132,12 +133,14 @@ Heights (`src/constants/scene.ts`, `src/utils/trackProfile.ts`) are **nominal**:
 - **Per station:** one point per platform, at the track height at that stop, plus an interchange marker.
 
 The scene has:
+
 - **Ground:** a translucent plane (underground track shows through it) plus a 1 km grid.
 - **Track:** screen-space fat lines (drei `Line`). Underground runs are dashed, as in 2D.
 - **Stations:** screen-size point markers.
 - **Camera:** `MapControls`.
 
 Filters come from the same `useMapStore` as 2D. URL parameters:
+
 - `?view=3d` opens the 3D view.
 - `?cam=top` looks straight down, for comparison with the 2D map.
 - `?at=lat,lng,distance` aims the camera at a place.
@@ -146,43 +149,51 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 
 ## 3D rendering
 
-| Element | Approach | Status |
-|---|---|---|
-| Track | **Far:** screen-space lines in the line colour (Phase 5). **Near:** two tracks 4 m apart, each a concrete plinth with two rails (`offsetPath` + `extrudeRect`), on gravel ballast where at grade. The switch happens at 3 m per pixel, with hysteresis (`LodWatcher`) | ✅ Phase 6, realistic in Phase 8 (DECISIONS #57) |
-| Viaduct and piers | Deck slab (10 m) with line-coloured edge faces on a 5.6 m box girder, wherever the track is above +2 m, ramps included; parapets close up. Instanced round piers every 30 m with a pier cap turned across the track | ✅ Phase 6, realistic in Phase 8 |
-| Tunnel | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it | ✅ Phase 6 |
-| Stations | Per line at a stop, 180 m long, oriented along the track (`stationParts`, instanced): two side platforms with yellow edge strips, a glazed gabled roof on columns with a line-coloured fascia, a concourse box below high track. Underground: translucent slate box (X-ray). All parts clickable | ✅ Phase 6, realistic in Phase 8 |
-| Trains | Kenney subway cars merged per car type, instanced per line (27 instanced meshes); stripe recoloured per line; positions from `trainSim` along the route path each frame, left-hand running; far away one dot per train | ✅ Phase 7 |
-| City | Real OSM buildings, roads and green areas (`scripts/build-city.ts`), merged into 3 km chunks (`buildCity.ts`); Kenney trees instanced inside green areas | ✅ Phase 7 |
-| Look | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale | ✅ Phase 7 |
-| Assets | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car |
+| Element           | Approach                                                                                                                                                                                                                                                                                         | Status                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| Track             | **Far:** screen-space lines in the line colour (Phase 5). **Near:** two tracks 4 m apart, each a concrete plinth with two rails (`offsetPath` + `extrudeRect`), on gravel ballast where at grade. The switch happens at 3 m per pixel, with hysteresis (`LodWatcher`)                            | ✅ Phase 6, realistic in Phase 8 (DECISIONS #57) |
+| Viaduct and piers | Deck slab (10 m) with line-coloured edge faces on a 5.6 m box girder, wherever the track is above +2 m, ramps included; parapets close up. Instanced round piers every 30 m with a pier cap turned across the track                                                                              | ✅ Phase 6, realistic in Phase 8                 |
+| Tunnel            | Translucent rectangular shell (13 m) wherever the track is below −2 m; a "Ground" toggle hides the ground plane to show it                                                                                                                                                                       | ✅ Phase 6                                       |
+| Stations          | Per line at a stop, 180 m long, oriented along the track (`stationParts`, instanced): two side platforms with yellow edge strips, a glazed gabled roof on columns with a line-coloured fascia, a concourse box below high track. Underground: translucent slate box (X-ray). All parts clickable | ✅ Phase 6, realistic in Phase 8                 |
+| Trains            | Kenney subway cars for DMRC; separate CC0 3D Assets regional stock and six/four/three-car RRTS/Aqua/Meerut formations (`trainFleet.ts`), 33 instanced meshes. Source material colours are baked for regional cars. Positions from `trainSim`, left-hand running; far away one dot per train      | ✅ Phases 7–8                                    |
+| City              | Real OSM buildings, roads and green areas (`scripts/build-city.ts`), merged into 3 km chunks (`buildCity.ts`); Kenney trees instanced inside green areas                                                                                                                                         | ✅ Phase 7                                       |
+| Look              | Opaque warm ground, hemisphere light plus a shadow-casting sun that follows the view target, flat (no tone mapping), true vertical scale                                                                                                                                                         | ✅ Phase 7                                       |
+| Assets            | Poly Haven CC0 textures at 1k; custom low-poly train under 5k triangles per car                                                                                                                                                                                                                  |
 
 ## Routes and the 2D/3D handoff (Phase 8)
 
-| Part | Approach |
-|---|---|
+| Part          | Approach                                                                                                                                                                                                                                                                                                                                |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Route planner | `src/utils/routePlanner.ts`: nodes are (station, route) pairs; ride edges join consecutive stops of a route in both directions; change edges join a station's routes. Dijkstra on estimated time (DECISIONS #53). A journey is a list of legs, each with its stations, the real segment ids (2D) and km spans along the route path (3D) |
-| Highlight | 2D `RouteLayer` (own pane between track and stations) draws the legs' segments cased in white and dims the rest; 3D `RouteOverlay` slices `RoutePath3D` by the km spans and draws a cased line without depth test |
-| View handoff | `viewHandoff` (in `useMapStore.ts`, not reactive state) holds centre + zoom + viewport height. The 2D map writes it on every move; the 3D `CameraRig` writes it 2–3 times a second via `metresPerPixelAtDistance` → `zoomForMetresPerPixel`. A view reads it once on mount (`metresPerPixel` → `distanceForMetresPerPixel` for 3D) |
-| Train follow | `follow` in the store; `CameraRig` recomputes the train's position with `service.stateAt` + `pointAt` each frame and translates camera and target together |
+| Highlight     | 2D `RouteLayer` (own pane between track and stations) draws the legs' segments cased in white and dims the rest; 3D `RouteOverlay` slices `RoutePath3D` by the km spans and draws a cased line without depth test                                                                                                                       |
+| View handoff  | `viewHandoff` (in `useMapStore.ts`, not reactive state) holds centre + zoom + viewport height. The 2D map writes it on every move; the 3D `CameraRig` writes it 2–3 times a second via `metresPerPixelAtDistance` → `zoomForMetresPerPixel`. A view reads it once on mount (`metresPerPixel` → `distanceForMetresPerPixel` for 3D)      |
+| Train follow  | `follow` in the store; `CameraRig` recomputes the train's position with `service.stateAt` + `pointAt` each frame and translates camera and target together                                                                                                                                                                              |
 
-## Train management and underground visibility (Phase 9)
+## Regional expansion (2026-11-12)
 
-`useMapStore.trainControls` stores `{delayS, heldAtS}` per train. `trainControl.ts` freezes its effective simulation time and accumulates delay on resume. `service.stateAt(train, time, controls)` is used by every position/status consumer; `nextArrivals(station, time, controls)` excludes held trains and honors delay. Global clock pause/speed are independent. State is session-only. `runMotion` eases station departures and arrivals while retaining existing hop durations; motion is nominal, not calibrated DMRC dynamics.
+The Phase 8 expansion adds Aqua (21 stations), Namo Bharat RRTS (15 stations across main/depot services) and Meerut Metro (12 stations). Four Meerut stations are shared; distinct cross-operator stations use pedestrian edges, never proximity merges.
 
-`TrainControlManager` replaces the passive train list and operates on the entire fleet independent of map filters. “Follow” reveals the line and opens 3D. `UndergroundWatcher` samples the full consist along the existing projected path and reports only depth transitions. `groundVisible` resolves Auto/Surface/Underground for the ground, city, trains, structures, labels and route overlay. Auto clears when following ends; manual modes remain selected. Car pitch samples the path grade; instancing and distance-based detail remain in place.
+`fetch-regional.ts` downloads eight route directions and their stop areas from the OSM API into immutable timestamped `data/raw/regional/` snapshots. `build-dataset.ts` combines that snapshot with the existing DMRC snapshot and `data/manual/regional-lines.json`. Operator-local station IDs are namespaced; NCRTC services share one namespace. Regional status/count sources are recorded in the config and sources metadata.
+
+`data/manual/transfers.json` resolves five sourced endpoint pairs and generates `station_transfers.geojson` (`LineString`, TransferProps). Geometry is a schematic station-centre connector, never claimed to be a physical walkway alignment. Walking duration is nominal. The independent validator checks positive duration, endpoints, provenance, geometry, duplicate links and connectivity including walking edges.
+
+The loader exposes `network.transfers`. The planner returns oriented `journey.walks` with the preceding ride index; costs include walking plus a nominal half-headway wait, omitted for a walking-only finish. The itinerary and station panel expose separate-station transfers; dashed overlays appear in both views. Walk-only journeys are supported. RRTS and Meerut retain different stopping patterns on their shared corridor. The speed revision uses sourced operating caps for RRTS (160 km/h), Airport Express and Meerut (120 km/h), with nominal rest-to-rest acceleration/braking; regular metro/Aqua uses a nominal 60 km/h cap. Distinct generic train models remain illustrative; no operator timetable is implemented. Existing city coverage remains around the original DMRC stations only.
+
+See `phase8-regional-expansion.md` for the frozen validation and source record.
+
+The subsequent rolling-stock revision uses separate generic CC0 models for each regional fleet, retaining the DMRC Kenney stock. See `phase8-fleet-assets.md` and `ASSETS.md` for licences, formation references, measured geometry and visual limitations. Service movement uses published express caps and nominal acceleration/braking; see `phase8-train-speeds.md`.
 
 ## Roadmap
 
-| Phase | Deliverable | Exit criteria | Status |
-|---|---|---|---|
-| 1 | Research and plan | User approval | ✅ Done |
-| 2 | Dataset pipeline + processed GeoJSON | All files generated from a dated snapshot | ✅ Done |
-| 3 | Validation script + report | 0 errors; warnings documented | ✅ Done (0 errors, 2 warnings) |
-| 4 | Leaflet 2D map | Every line reviewed against satellite imagery | ✅ Built; 4 conflict stations checked; full human review pending |
-| 5 | 3D foundation (projection, ground, tracks) | 3D and 2D line up | ✅ Done |
-| 6 | 3D infrastructure (viaduct, tunnel, stations) | Continuous track; acceptable FPS | ✅ Done (continuity tested; FPS not measured on a real GPU) |
-| 7 | 3D look, city, trains and UI (user-expanded) | ≥ 50 trains; looks like ref_image.png | ✅ Done: 218 simulated trains; real-GPU fps not measured |
-| 8 | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | All four work in both views where they apply | ✅ Done (40 tests after track revision); real-GPU fps still not measured |
-| 9 | Train control manager, underground visibility, nominal motion (owner-selected scope) | Individual/fleet Start/Stop, consistent predictions, Auto/manual X-ray; tests and screenshots | Implemented; see `phase9-train-control.md` |
-| 10 | Journey planner enhancements (proposed) | Scope to be agreed with owner | Future; do not start without approval |
+| Phase | Deliverable                                                                               | Exit criteria                                                                                 | Status                                                                   |
+| ----- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 1     | Research and plan                                                                         | User approval                                                                                 | ✅ Done                                                                  |
+| 2     | Dataset pipeline + processed GeoJSON                                                      | All files generated from a dated snapshot                                                     | ✅ Done                                                                  |
+| 3     | Validation script + report                                                                | 0 errors; warnings documented                                                                 | ✅ Done (0 errors, 2 warnings)                                           |
+| 4     | Leaflet 2D map                                                                            | Every line reviewed against satellite imagery                                                 | ✅ Built; 4 conflict stations checked; full human review pending         |
+| 5     | 3D foundation (projection, ground, tracks)                                                | 3D and 2D line up                                                                             | ✅ Done                                                                  |
+| 6     | 3D infrastructure (viaduct, tunnel, stations)                                             | Continuous track; acceptable FPS                                                              | ✅ Done (continuity tested; FPS not measured on a real GPU)              |
+| 7     | 3D look, city, trains and UI (user-expanded)                                              | ≥ 50 trains; looks like ref_image.png                                                         | ✅ Done: 218 simulated trains; real-GPU fps not measured                 |
+| 8     | Remaining UI: work-in-progress entries, train follow, 2D/3D view sync, route highlighting | All four work in both views where they apply                                                  | ✅ Done (40 tests after track revision); real-GPU fps still not measured |
+| 9     | Train control manager, underground visibility, nominal motion (owner-selected scope)      | Individual/fleet Start/Stop, consistent predictions, Auto/manual X-ray; tests and screenshots | Implemented; see `phase9-train-control.md`                               |
+| 10    | Journey planner enhancements (proposed)                                                   | Scope to be agreed with owner                                                                 | Future; do not start without approval                                    |

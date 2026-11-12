@@ -1,0 +1,281 @@
+{
+  "pack": "https://3dassets.dev/packs/modern-rail-and-metro-network",
+  "fetchedAt": "2026-11-12T06:23:29.076Z",
+  "assets": [
+    {
+      "file": "rrts-middle.glb",
+      "id": "13670",
+      "title": "High speed trailer car (Modern Rail and Metro Network)",
+      "url": "https://3dassets.dev/assets/modern-rail-and-metro-network-high-speed-trailer-car-e82de8c5",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/13670/v1/model.glb",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "contributor": {
+        "username": "3dassets",
+        "name": "3D Assets",
+        "url": "https://3dassets.dev/u/3dassets"
+      },
+      "stats": {
+        "fileSize": 298216,
+        "triangles": 7184,
+        "vertices": 21552,
+        "meshes": 20,
+        "materials": 6,
+        "textures": 0,
+        "animations": [
+          "open",
+          "close",
+          "wheel-roll"
+        ],
+        "boundingBox": {
+          "min": [
+            -1.4659854791414715,
+            1.19209286886246e-9,
+            -12.829999923706055
+          ],
+          "max": [
+            1.4659854791414715,
+            4.309081962172565,
+            12.829999923706055
+          ]
+        },
+        "sizeMeters": [
+          2.932,
+          4.309,
+          25.66
+        ],
+        "hasDraco": false,
+        "hasMeshopt": false,
+        "hasKTX2": false,
+        "extensionsUsed": [
+          "KHR_mesh_quantization"
+        ]
+      },
+      "aiGenerated": true
+    },
+    {
+      "file": "aqua-cab.glb",
+      "id": "13672",
+      "title": "Metro driving car (Modern Rail and Metro Network)",
+      "url": "https://3dassets.dev/assets/modern-rail-and-metro-network-metro-driving-car-d7d433ca",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/13672/v1/model.glb",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "contributor": {
+        "username": "3dassets",
+        "name": "3D Assets",
+        "url": "https://3dassets.dev/u/3dassets"
+      },
+      "stats": {
+        "fileSize": 310316,
+        "triangles": 7608,
+        "vertices": 22824,
+        "meshes": 50,
+        "materials": 8,
+        "textures": 0,
+        "animations": [
+          "open",
+          "close",
+          "wheel-roll"
+        ],
+        "boundingBox": {
+          "min": [
+            -1.5299917402624572,
+            2.38418573772492e-9,
+            -8.829999923706055
+          ],
+          "max": [
+            1.5299917402624572,
+            4.000276014711191,
+            8.90999984741211
+          ]
+        },
+        "sizeMeters": [
+          3.06,
+          4,
+          17.74
+        ],
+        "hasDraco": false,
+        "hasMeshopt": false,
+        "hasKTX2": false,
+        "extensionsUsed": [
+          "KHR_mesh_quantization"
+        ]
+      },
+      "aiGenerated": true
+    },
+    {
+      "file": "meerut-cab.glb",
+      "id": "13673",
+      "title": "Commuter electric multiple unit driving car (Modern Rail and Metro Network)",
+      "url": "https://3dassets.dev/assets/modern-rail-and-metro-network-commuter-emu-driving-car-8934b654",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/13673/v1/model.glb",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "contributor": {
+        "username": "3dassets",
+        "name": "3D Assets",
+        "url": "https://3dassets.dev/u/3dassets"
+      },
+      "stats": {
+        "fileSize": 387536,
+        "triangles": 9800,
+        "vertices": 29400,
+        "meshes": 52,
+        "materials": 8,
+        "textures": 0,
+        "animations": [
+          "open",
+          "close",
+          "wheel-roll"
+        ],
+        "boundingBox": {
+          "min": [
+            -1.5300228689814648,
+            -8.344650304081824e-9,
+            -10.229999542236328
+          ],
+          "max": [
+            1.5300228689814648,
+            5.910008833135505,
+            10.300000190734863
+          ]
+        },
+        "sizeMeters": [
+          3.06,
+          5.91,
+          20.53
+        ],
+        "hasDraco": false,
+        "hasMeshopt": false,
+        "hasKTX2": false,
+        "extensionsUsed": [
+          "KHR_mesh_quantization"
+        ]
+      },
+      "aiGenerated": true
+    },
+    {
+      "file": "metro-middle.glb",
+      "id": "13674",
+      "title": "Metro intermediate car (Modern Rail and Metro Network)",
+      "url": "https://3dassets.dev/assets/modern-rail-and-metro-network-metro-intermediate-car-a708f3de",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/13674/v1/model.glb",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "contributor": {
+        "username": "3dassets",
+        "name": "3D Assets",
+        "url": "https://3dassets.dev/u/3dassets"
+      },
+      "stats": {
+        "fileSize": 288104,
+        "triangles": 7168,
+        "vertices": 21504,
+        "meshes": 48,
+        "materials": 6,
+        "textures": 0,
+        "animations": [
+          "open",
+          "close",
+          "wheel-roll"
+        ],
+        "boundingBox": {
+          "min": [
+            -1.5295596046923907,
+            2.38418573772492e-9,
+            -8.829999923706055
+          ],
+          "max": [
+            1.5295596046923907,
+            4.000036757974401,
+            8.829999923706055
+          ]
+        },
+        "sizeMeters": [
+          3.059,
+          4,
+          17.66
+        ],
+        "hasDraco": false,
+        "hasMeshopt": false,
+        "hasKTX2": false,
+        "extensionsUsed": [
+          "KHR_mesh_quantization"
+        ]
+      },
+      "aiGenerated": true
+    },
+    {
+      "file": "rrts-cab.glb",
+      "id": "13675",
+      "title": "High speed power car (Modern Rail and Metro Network)",
+      "url": "https://3dassets.dev/assets/modern-rail-and-metro-network-high-speed-power-car-a6dc258e",
+      "cdnUrl": "https://cdn.3dassets.dev/assets/13675/v1/model.glb",
+      "license": {
+        "slug": "cc0-1.0",
+        "name": "CC0 1.0 Universal",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+        "attributionRequired": false
+      },
+      "contributor": {
+        "username": "3dassets",
+        "name": "3D Assets",
+        "url": "https://3dassets.dev/u/3dassets"
+      },
+      "stats": {
+        "fileSize": 398228,
+        "triangles": 9872,
+        "vertices": 29616,
+        "meshes": 28,
+        "materials": 7,
+        "textures": 0,
+        "animations": [
+          "open",
+          "close",
+          "wheel-roll"
+        ],
+        "boundingBox": {
+          "min": [
+            -1.744584506885262,
+            -9.536743172944284e-9,
+            -10.25
+          ],
+          "max": [
+            1.744584506885262,
+            5.910008833135505,
+            10.149999618530273
+          ]
+        },
+        "sizeMeters": [
+          3.489,
+          5.91,
+          20.4
+        ],
+        "hasDraco": false,
+        "hasMeshopt": false,
+        "hasKTX2": false,
+        "extensionsUsed": [
+          "KHR_mesh_quantization"
+        ]
+      },
+      "aiGenerated": true
+    }
+  ]
+}

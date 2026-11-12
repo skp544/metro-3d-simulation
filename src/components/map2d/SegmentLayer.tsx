@@ -26,7 +26,7 @@ export function SegmentLayer({ network }: { network: Network }) {
         key={p.id}
         pane="track"
         positions={latLngs(f.geometry.coordinates)}
-        pathOptions={{ color: lines.get(p.lineId)?.color, weight: style.weight, opacity: style.opacity * (dim ? 0.35 : 1), dashArray: style.dashArray, lineCap: p.trackType === "at_grade" ? "round" : "butt" }}
+        pathOptions={{ color: lines.get(p.lineId)?.color, weight: p.lineId === "meerut_metro" ? style.weight * 0.55 : style.weight, opacity: style.opacity * (dim ? 0.35 : 1), dashArray: style.dashArray, lineCap: p.trackType === "at_grade" ? "round" : "butt" }}
       >
         <Tooltip sticky>
           <div className="text-xs">

@@ -1,0 +1,49 @@
+{
+  "license": "CC0-1.0",
+  "author": "Original procedural models authored for NCR Rail",
+  "source": "scripts/model-landmarks.py",
+  "approximate": true,
+  "axis": "GLB +X frontage, +Y up; base origin; metre units",
+  "models": [
+    {
+      "id": "india-gate",
+      "triangles": 2432,
+      "sizeM": [
+        27.41695766346309,
+        17.752913888008017,
+        42
+      ],
+      "bytes": 141956
+    },
+    {
+      "id": "lotus-temple",
+      "triangles": 20876,
+      "sizeM": [
+        68.93145744154029,
+        67.94067065754973,
+        34
+      ],
+      "bytes": 1451712
+    },
+    {
+      "id": "qutb-minar",
+      "triangles": 15868,
+      "sizeM": [
+        14.32,
+        14.32,
+        72.5
+      ],
+      "bytes": 922580
+    },
+    {
+      "id": "red-fort",
+      "triangles": 7422,
+      "sizeM": [
+        49.46842549350586,
+        21.37138811139633,
+        33
+      ],
+      "bytes": 513296
+    }
+  ]
+}
