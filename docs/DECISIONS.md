@@ -2,6 +2,12 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: India Gate duplicate city extrusion
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 77 | Landmark exclusion | Check containment both ways between a generic city building polygon and a custom landmark footprint, retaining polygon holes and existing identity checks. | India Gate's city building outline has a different OSM ID and completely encloses the landmark footprint. Checking only building corners inside the landmark missed it and hid the arch behind a windowed block. No generated/source data edits are needed. |
+
 ## 2026-11-12: Reconcile train controls with regional fleet and city work
 
 | # | Topic | Decision | Reason |

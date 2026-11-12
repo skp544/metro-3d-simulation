@@ -84,7 +84,10 @@ export function buildCity(city:City,projection:Projection,exclusions:{footprint:
   const project=(p:number[])=>projection.project(p as XZ);
   let buildings=0;
   for(const f of city.buildings.features){
-    if(exclusions.some(e=>f.properties.id===e.osmId||areaPolygons(f.geometry).some(rs=>rs[0].some(p=>insideArea(p,[e.footprint])))))continue;
+    // A separate OSM building outline can enclose the landmark without any building corner
+    // falling inside its footprint (India Gate). Check containment in both directions.
+    if(exclusions.some(e=>f.properties.id===e.osmId||areaPolygons(f.geometry).some(rs=>
+      rs[0].some(p=>insideArea(p,[e.footprint]))||e.footprint.some(p=>insideArea(p,rs)))))continue;
     const p=f.properties,id=Number(p.id.split('/')[1]),h=p.height;
     const base=p.color&&(/^#[\da-f]{6}$/i.test(p.color)||p.color in THREE.Color.NAMES)?p.color:p.facadeStyle==="historic"?"#bda584":walls[Math.floor(hash(id)*walls.length)];
     const wall=color(base),roof=color(roofs[Math.floor(hash(id+4)*roofs.length)]);

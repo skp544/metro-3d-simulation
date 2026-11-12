@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { boundsCentre, createProjection, type Projection } from "../../utils/projection.ts";
 import { selectCityTiles, CITY_TILE_LIMIT } from "../../utils/cityTiles.ts";
 import type { City, CityManifest, EnvironmentContext, RoadProps } from "../../data/cityTypes.ts";
-import { buildCity, streetPath, streetPose } from "./buildCity.ts";
+import { areaPolygons, buildCity, insideArea, streetPath, streetPose } from "./buildCity.ts";
 
 const read=async(p:string)=>JSON.parse(await readFile(p,"utf8"));
 const manifest=await read("data/processed/city_tiles.json") as CityManifest;
@@ -49,6 +49,27 @@ test("city: Yamuna snapshot is present; water triangulation retains islands and 
   assert.ok(ray(2,2).length>0,"mapped water is rendered");assert.equal(ray(5,5).length,0,"island is not flooded by the mesh");
   assert.ok(g.getAttribute("normal").getY(0)>.9,"water lit from above");
   g.dispose();(mesh.material as THREE.Material).dispose();
+});
+
+test("city: India Gate's enclosing OSM building is excluded without removing surrounding buildings", async () => {
+  const gate = landmarks.features.find((f: { properties: { id: string } }) => f.properties.id === "india-gate");
+  const selected = selectCityTiles(manifest, projection, projection.project(gate.geometry.coordinates), 2500);
+  const tiles = await Promise.all(selected.map(t => read(`public${t.url}`) as Promise<City>));
+  const city = empty();
+  city.buildings.features = tiles.flatMap(t => t.buildings.features);
+  const enclosing = city.buildings.features.find(f => areaPolygons(f.geometry).some(rs => insideArea(gate.geometry.coordinates, rs)))!;
+  assert.ok(enclosing, "real city tile contains the duplicate building outline");
+  assert.notEqual(enclosing.properties.id, gate.properties.source[0].split("@")[0]);
+  assert.ok(areaPolygons(enclosing.geometry).every(rs => rs[0].every(p => !insideArea(p, [gate.properties.footprint]))), "old corner-only check misses the enclosing outline");
+  const exclusion = { footprint: gate.properties.footprint, osmId: gate.properties.source[0].split("@")[0] };
+  const duplicateOnly = empty();
+  duplicateOnly.buildings.features = [enclosing];
+  assert.equal(buildCity(duplicateOnly, projection, [exclusion]).stats.buildings, 0);
+  const built = buildCity(city, projection, [exclusion]);
+  assert.ok(built.stats.buildings > 0, "nearby city buildings remain");
+  assert.equal(built.stats.buildings, city.buildings.features.length - 1, "only the duplicate outline is removed");
+  for (const chunk of built.chunks) for (const [key, value] of Object.entries(chunk))
+    if (key !== "key") (value as THREE.BufferGeometry | null)?.dispose();
 });
 
 test("streets: left-hand traffic follows real bends, reverse lanes stay separate, bridge ramps are continuous",()=>{

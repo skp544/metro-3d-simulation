@@ -11,6 +11,8 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
+**India Gate repair:** Custom landmark exclusions in `buildCity.ts` check containment both ways. A separate enclosing city outline previously hid the India Gate arch; a real city-tile regression guards this case. See decision #77. Current checks: TypeScript, lint, build and 75 tests passing.
+
 **Merge repair, 2026-11-12:** Train controls and Auto/Surface/Underground are reconciled with regional fleets, sourced speed profiles and the expanded city. Use `groundVisible` for city/ground/transfer visibility; there is no independent `showGround` state. Auto samples actual fleet lengths. TypeScript, lint, production build and 74 tests pass. See CODE_SUMMARY's merge-repair note and decision #76.
 
 Read **`docs/HANDOFF.md` first**. Latest: expanded real city surroundings, roads and Yamuna (DECISIONS #72–#75; `docs/phase8-city-environment.md`), following the landmark/station extension. City tiles stream near the view; low-angle camera and WASD support exploration. The user reviews/commits. Blender's original objects/file are preserved; project models remain in `NCR_Landmarks`. Phase 9 and people simulation remain separate.

@@ -8,6 +8,10 @@ What exists in the code right now. Update this with every change.
 
 **Latest visual review fix:** Real surrounding buildings expand to 124,105; 109,046 road ways include local streets/paths and continuous arterials. Shared water data contains Yamuna and mapped islands. Actual land use, green areas, facade textures, nearby decorative traffic/lamps, low-angle camera and WASD exploration replace the empty-looking scene. Buildings/trees stream from nearby tiles; the full city is not loaded at startup.
 
+## India Gate visibility fix (2026-11-12)
+
+City building exclusions now check footprint containment in both directions. A separate OSM building outline (`osm:way/1078065894`, mapped height 40 m) encloses the India Gate landmark footprint (`osm:way/361709652`); the former corner-only check missed it, drawing a generic windowed extrusion around the custom arch. The runtime skips that duplicate while retaining surrounding buildings. Source data and the landmark model are unchanged. Regression coverage uses the real streamed city tiles. TypeScript, lint, build and **75 tests** pass; screenshot reproduction: `node scripts/screenshot.mjs "http://127.0.0.1:4173/?view=3d&place=india-gate" /tmp/india-gate.png 1440 900 18000`.
+
 ## Merge repair (2026-11-12)
 
 Restored train-control/underground integration after combining local Phase 9 with the regional fleet and city extensions. The store again owns session train holds and Auto/Surface/Underground mode. All position and arrival consumers use the held clock; stopped trains report zero speed. The existing sourced speed caps and acceleration/braking profiles remain in use. Auto X-ray is mounted, samples the actual fleet length, and hides city geometry along with the ground. Regional cars retain their models and now follow track pitch; filtered overview dots retain their line colours. Removed the superseded train table and restored follow-card Start/Stop and active-fleet KPI counts.
