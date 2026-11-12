@@ -11,6 +11,7 @@ import { facadeTexture, waterTexture } from "./environmentTextures";
 import { selectCityTiles } from "../../utils/cityTiles";
 import { useMapStore } from "../../store/useMapStore";
 import { UrbanLife } from "./UrbanLife";
+import { WaterLabels } from "./WaterLabels";
 import type { LandmarksFC } from "../../data/types";
 
 // Variant order matches scripts/build-city.ts `variant` (0..3): two autumn, two green.
@@ -28,8 +29,10 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
   const [city,setCity]=useState<CityData|null>(null);
   const cache=useRef(new Map<string,CityData>());
   const last=useRef({time:0,key:""});
+  const viewTarget=useRef(new THREE.Vector3());
   const showGround=useMapStore(s=>s.showGround),showWater=useMapStore(s=>s.showWater);
   const [facade,water]=useMemo(()=>[facadeTexture(),waterTexture()],[]);
+  const waterMap=useRef(water);
   useEffect(() => {
     let active=true;onStatus("Loading surroundings…");
     loadEnvironment().then(e=>{if(active)setEnvironment(e);},(e:Error)=>{if(active)onStatus(`Surroundings unavailable: ${e.message}`);});
@@ -37,11 +40,11 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
   }, [onStatus]);
   useEffect(()=>()=>{facade.dispose();water.dispose();},[facade,water]);
   useFrame(({camera,controls})=>{
-    water.offset.x=(performance.now()*.000009)%1;water.offset.y=(performance.now()*.000003)%1;
+    waterMap.current.offset.x=(performance.now()*.000009)%1;waterMap.current.offset.y=(performance.now()*.000003)%1;
     if(!environment||performance.now()-last.current.time<600)return;
-    last.current.time=performance.now();const t=(controls as unknown as {target?:THREE.Vector3})?.target;if(!t)return;
+    last.current.time=performance.now();const t=(controls as unknown as {target?:THREE.Vector3})?.target;if(!t)return;viewTarget.current.copy(t);
     const next=selectCityTiles(environment.manifest,projection,[t.x,t.z],camera.position.distanceTo(t));
-    const key=next.map(t=>t.id).join();if(key!==last.current.key){last.current.key=key;setWanted(next);}
+    const key=next.map(t=>t.id).join()+`:${Math.floor(t.x/300)},${Math.floor(t.z/300)}`;if(key!==last.current.key){last.current.key=key;setWanted(next);}
     else if(!next.length)onStatus("");
   });
   useEffect(()=>{
@@ -64,11 +67,14 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
         for(const f of data.roads.features)if(!seen.has(f.properties.id+":road")){seen.add(f.properties.id+":road");merged.roads.features.push(f);}
         merged.trees.features.push(...data.trees.features);
       }
+      const t=viewTarget.current;
+      merged.trees.features.sort((a,b)=>{const aa=projection.project(a.geometry.coordinates as [number,number]),bb=projection.project(b.geometry.coordinates as [number,number]);return Math.hypot(aa[0]-t.x,aa[1]-t.z)-Math.hypot(bb[0]-t.x,bb[1]-t.z);});
+      merged.trees.features=merged.trees.features.slice(0,6000);
       setCity(merged);onStatus("");
       const keep=new Set(wanted.map(t=>t.url));for(const key of cache.current.keys())if(cache.current.size>64&&!keep.has(key))cache.current.delete(key);
     }).catch((e:Error)=>{if(active&&e.name!=="AbortError")onStatus("Some surroundings could not load. Move the view to retry.");});
     return ()=>{active=false;abort.abort();};
-  },[wanted,environment,onStatus]);
+  },[wanted,environment,onStatus,projection]);
   const exclusions=useMemo(()=>landmarks.features.map(f=>({footprint:f.properties.footprint,osmId:f.properties.source[0].split("@")[0]})),[landmarks]);
   const empty=useMemo<CityData>(()=>({buildings:{type:"FeatureCollection",features:[]},roads:{type:"FeatureCollection",features:[]},green:{type:"FeatureCollection",features:[]},trees:{type:"FeatureCollection",features:[]}}),[]);
   const built=useMemo(()=>buildCity(city??empty,projection,exclusions),[city,empty,projection,exclusions]);
@@ -105,6 +111,7 @@ export function City({ projection, landmarks, onStatus }: { projection: Projecti
         <Trees key={url} url={url} matrices={built.trees[i]} />
       ))}
       {showGround&&<UrbanLife paths={built.paths} />}
+      {showGround&&showWater&&environment&&<WaterLabels data={environment.context.water} projection={projection}/>}
     </group>
   );
 }

@@ -37,7 +37,7 @@ function lamp(){return merge([
 export function UrbanLife({paths}:{paths:StreetPath[]}){
   const refs=useRef<(THREE.InstancedMesh|null)[]>([]),lamps=useRef<THREE.InstancedMesh>(null);
   const candidates=useRef<{paths:StreetPath[];source:StreetPath[];x:number;z:number;time:number}|null>(null);
-  const geometries=useMemo(()=>[vehicle(0),vehicle(1),vehicle(2)],[]),pole=useMemo(lamp,[]);
+  const geometries=useMemo(()=>[vehicle(0),vehicle(1),vehicle(2)],[]),pole=useMemo(()=>lamp(),[]);
   useEffect(()=>()=>{geometries.forEach(g=>g.dispose());pole.dispose();},[geometries,pole]);
   useFrame(({camera,controls})=>{
     const target=(controls as unknown as {target?:THREE.Vector3})?.target;if(!target)return;

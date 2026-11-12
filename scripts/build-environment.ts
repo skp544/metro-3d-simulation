@@ -100,14 +100,14 @@ for(const g of green){
   if(!["wood","forest","park","garden","orchard","recreation_ground"].includes(g.properties.kind))continue;
   const ring=polygons(g.geometry).flatMap(p=>p[0]);
   const xs=ring.map(p=>p[0]),ys=ring.map(p=>p[1]),minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const wooded=["wood","forest"].includes(g.properties.kind),want=Math.min(wooded?1600:500,Math.floor(area(g.geometry)/(wooded?140:260)));
+  const wooded=["wood","forest"].includes(g.properties.kind),want=Math.min(wooded?1000:160,Math.floor(area(g.geometry)/(wooded?240:450)));
   const seed=Number(g.properties.id.split('/')[1]),rand=rng(seed);
   for(let tries=0,placed=0;placed<want&&tries<want*30;tries++){
     const p:[number,number]=[minX+rand()*(maxX-minX),minY+rand()*(maxY-minY)];if(!inside(p,g.geometry))continue;
     const [x,z]=projection.project(p),key=`${Math.floor(x/7)},${Math.floor(z/7)}`;if(occupied.has(key))continue;
     if((index.get(`${Math.floor(x/200)},${Math.floor(z/200)}`)??[]).some(b=>x>=b.bounds[0]&&z>=b.bounds[1]&&x<=b.bounds[2]&&z<=b.bounds[3]&&b.contains([x,z])))continue;
     occupied.add(key);placed++;
-    const properties:TreeProps={...g.properties,source:g.properties.source,estimated:true,variant:rand()<.05?Math.floor(rand()*2):2+Math.floor(rand()*2),area:g.properties.id};
+    const properties:TreeProps={source:[g.properties.id],verified:false,conflicts:[],estimated:true,variant:rand()<.05?Math.floor(rand()*2):2+Math.floor(rand()*2),area:g.properties.id};
     trees.push({type:"Feature",geometry:{type:"Point",coordinates:p.map(n=>Math.round(n*1e6)/1e6)},properties});
   }
 }

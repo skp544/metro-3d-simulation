@@ -17,6 +17,6 @@ export function facadeTexture(){
 export function waterTexture(){
   const canvas=document.createElement("canvas");canvas.width=256;canvas.height=256;const c=canvas.getContext("2d")!;
   c.fillStyle="#e4eeee";c.fillRect(0,0,256,256);
-  for(let y=0;y<256;y+=12){c.strokeStyle=y%24===0?"#b4d1d6":"#f4faf9";c.lineWidth=1;c.beginPath();for(let x=0;x<=256;x+=4){const yy=y+Math.sin(x*.05+y)*1.7;x?c.lineTo(x,yy):c.moveTo(x,yy);}c.stroke();}
+  for(let y=0;y<256;y+=12){c.strokeStyle=y%24===0?"#b4d1d6":"#f4faf9";c.lineWidth=1;c.beginPath();for(let x=0;x<=256;x+=4){const yy=y+Math.sin(x*.05+y)*1.7;if(x)c.lineTo(x,yy);else c.moveTo(x,yy);}c.stroke();}
   const texture=new THREE.CanvasTexture(canvas);texture.wrapS=texture.wrapT=THREE.RepeatWrapping;texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=4;return texture;
 }

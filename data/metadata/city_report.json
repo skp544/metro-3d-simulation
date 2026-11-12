@@ -1,9 +1,13 @@
 {
-  "generatedAt": "2026-11-12T08:55:58.567Z",
+  "generatedAt": "2026-11-12T09:02:44.244Z",
   "sources": [
     {
       "file": "data/raw/osm-city/2026-11-04.json",
       "snapshot": "2026-11-04T16:46:22Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/arterial-roads.json",
+      "snapshot": "2026-11-12T08:58:18Z"
     },
     {
       "file": "data/raw/environment/2026-11-12/land-water.json",
@@ -48,21 +52,29 @@
     {
       "file": "data/raw/environment/2026-11-12/neighbourhood-05.json",
       "snapshot": "2026-11-12T08:54:10Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-06.json",
+      "snapshot": "2026-11-12T08:55:14Z"
+    },
+    {
+      "file": "data/raw/environment/2026-11-12/neighbourhood-07.json",
+      "snapshot": "2026-11-12T08:55:14Z"
     }
   ],
   "counts": {
-    "buildings": 102085,
-    "roads": 71338,
+    "buildings": 124105,
+    "roads": 109046,
     "greenAreas": 10618,
-    "trees": 320393,
+    "trees": 175646,
     "landAreas": 19711,
     "waterAreas": 3095,
-    "tiles": 1746
+    "tiles": 5345
   },
   "buildingHeightSources": {
-    "osm:height": 897,
-    "osm:levels": 3423,
-    "nominal": 97765
+    "osm:height": 908,
+    "osm:levels": 3753,
+    "nominal": 119444
   },
   "issues": [],
   "notes": [

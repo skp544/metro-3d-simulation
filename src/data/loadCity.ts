@@ -13,7 +13,9 @@ const get = async <T,>(url: string): Promise<T> => {
 
 let waterPromise:Promise<AreasFC>|undefined;
 export const loadWater=()=>waterPromise??=(get<AreasFC>(waterUrl).catch(e=>{waterPromise=undefined;throw e;}));
-export async function loadEnvironment(){
+async function environment(){
   const [manifest,context,water]=await Promise.all([get<CityManifest>(tilesUrl),get<EnvironmentContext>(contextUrl),loadWater()]);
   return {manifest,context:{...context,water}};
 }
+let environmentPromise:ReturnType<typeof environment>|undefined;
+export const loadEnvironment=()=>environmentPromise??=environment().catch(e=>{environmentPromise=undefined;throw e;});

@@ -1,11 +1,12 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE } from "../../constants/scene";
 
 export function SceneAtmosphere(){
   const fog=useMemo(()=>new THREE.Fog(PALETTE.background,2500,8000),[]);
-  useFrame(({camera,controls})=>{const t=(controls as unknown as {target?:THREE.Vector3})?.target;if(t){const d=camera.position.distanceTo(t);fog.near=Math.max(2500,d*1.8);fog.far=Math.max(8000,d*4.5);}});
+  const fogRef=useRef(fog);
+  useFrame(({camera,controls})=>{const t=(controls as unknown as {target?:THREE.Vector3})?.target;if(t){const d=camera.position.distanceTo(t);fogRef.current.near=Math.max(2500,d*1.8);fogRef.current.far=Math.max(8000,d*4.5);}});
   return <primitive attach="fog" object={fog}/>;
 }
 export function EnvironmentGround({width,depth,x,z}:{width:number;depth:number;x:number;z:number}){
