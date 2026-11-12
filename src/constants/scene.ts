@@ -18,10 +18,10 @@ export const VERTICAL_EXAGGERATION = 1;
 
 // Low-poly palette, matched to ref_image.png: warm light ground, cream buildings, soft shadows.
 export const PALETTE = {
-  background: "#e7e2da",
-  ground: "#dcd6cc",
-  road: "#c9c3b8",
-  green: "#c3d19f",
+  background: "#dce8ed",
+  ground: "#c1c5ad",
+  road: "#56616a",
+  green: "#92ae78",
   wall: "#f5f2ec",
   roof: "#e6e1d7",
   deck: "#d4d0c9", // concrete
@@ -38,8 +38,8 @@ export const PALETTE = {
   stationAbove: "#ffffff",
   stationBelow: "#475569",
   sun: "#fff3e0",
-  sky: "#ffffff",
-  bounce: "#c8c0b2",
+  sky: "#e1edf3",
+  bounce: "#b8bea6",
 };
 export const TRACK_WIDTH_PX = 3;
 export const STATION_SIZE_PX = 7;

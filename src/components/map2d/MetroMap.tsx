@@ -13,6 +13,7 @@ import { StationLayer } from "./StationLayer";
 import { ValidationLayer } from "./ValidationLayer";
 import { TransferLayer } from "./TransferLayer";
 import { LandmarkLayer } from "./LandmarkLayer";
+import { WaterLayer } from "./WaterLayer";
 
 function DataAttribution() {
   const map = useMap();
@@ -82,6 +83,7 @@ export function MetroMap({ network }: { network: Network }) {
         ))}
       </LayersControl>
       <ZoomControl position="topright" />
+      <Pane name="water" style={{zIndex:350}}><WaterLayer/></Pane>
       {/* Panes fix the stacking: construction < track < stations < validation markers. */}
       <Pane name="construction" style={{ zIndex: 390 }}>
         <ConstructionLayer network={network} />

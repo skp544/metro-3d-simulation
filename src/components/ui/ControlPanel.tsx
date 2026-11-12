@@ -166,6 +166,7 @@ export function ControlPanel({ network }: { network: Network }) {
           </Section>
 
           <Section title="Layers">
+            <Row checked={s.showWater} onChange={v=>s.setLayer("showWater",v)}>River &amp; water</Row>
             <Row
               checked={s.showStations}
               onChange={(v) => s.setLayer("showStations", v)}

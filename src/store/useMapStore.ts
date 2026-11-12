@@ -6,7 +6,7 @@ type LngLat = [number, number];
 export type View = "2d" | "3d";
 export type Speed = 1 | 2 | 4 | 8;
 export type LabelMode = "trains" | "stations" | "all" | "off";
-export type CameraCommand = "zoomIn" | "zoomOut" | "network" | "hub";
+export type CameraCommand = "zoomIn" | "zoomOut" | "network" | "hub" | "low" | "oblique";
 /** The view in 2D terms (centre + Leaflet zoom + viewport height): what both views write and read so a switch keeps the place. */
 export type SharedView = { center: LngLat; zoom: number; heightPx: number };
 /**
@@ -25,6 +25,7 @@ interface MapState {
   showConstruction: boolean;
   showValidation: boolean;
   showGround: boolean; // 3D: hide the ground to see tunnels and underground trains
+  showWater: boolean;
   // Bumped `key` lets the map re-fly to the same place twice.
   focus: { coordinates: LngLat; key: number; distanceM?: number; heightM?: number } | null;
   selectedLandmarkId: string | null;
@@ -47,7 +48,7 @@ interface MapState {
   setAllLines: (hidden: string[]) => void;
   toggleTrackType: (t: InfraType) => void;
   toggleStationType: (t: StationType) => void;
-  setLayer: (layer: "showStations" | "showConstruction" | "showValidation" | "showGround", on: boolean) => void;
+  setLayer: (layer: "showStations" | "showConstruction" | "showValidation" | "showGround" | "showWater", on: boolean) => void;
   focusOn: (coordinates: LngLat, distanceM?: number, heightM?: number) => void;
   fitTo: (bounds: [LngLat, LngLat]) => void;
   followTrain: (trainId: string | null) => void;
@@ -85,6 +86,7 @@ export const useMapStore = create<MapState>((set, get) => ({
   showConstruction: false, // DECISIONS #3: Phase 4 corridors are off by default
   showValidation: false,
   showGround: true,
+  showWater: true,
   focus: null,
   selectedStationId: null,
   selectedLandmarkId: null,

@@ -14,6 +14,12 @@ export function SceneControls() {
   return (
     <div className="pointer-events-auto flex flex-col items-end gap-3">
       <div className="flex flex-col divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white/95 shadow-lg">
+        <button type="button" className={button} onClick={()=>cameraDo("low")} aria-label="Low angle view" title="Low angle view">
+          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><path d="M2 10s3-5 8-5 8 5 8 5-3 5-8 5-8-5-8-5Z"/><circle cx="10" cy="10" r="2.5"/></svg>
+        </button>
+        <button type="button" className={button} onClick={()=>cameraDo("oblique")} aria-label="Oblique view" title="Oblique view">
+          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden><path d="m2 12 8-5 8 5-8 5-8-5Z M10 7V2 M7 5l3-3 3 3"/></svg>
+        </button>
         <button type="button" className={button} onClick={() => cameraDo("zoomIn")} aria-label="Zoom in">
           +
         </button>

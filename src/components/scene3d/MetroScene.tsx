@@ -19,6 +19,7 @@ import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
 import { TransferLinks } from "./TransferLinks";
+import { SceneAtmosphere, EnvironmentGround } from "./SceneAtmosphere";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.
 function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
@@ -46,6 +47,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
   const showGround = useMapStore((s) => s.showGround);
   const journey = useJourney(network);
   const [near, setNear] = useState(false);
+  const [environmentStatus,setEnvironmentStatus]=useState("");
   // Close up, the opaque ground hides tunnels; keep underground routes readable as dashed lines on the
   // surface, like a map overlay (the brief: "make underground routes visually understandable").
   const surfaceRuns = useMemo(
@@ -106,19 +108,17 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         aria-label="3D view of the Delhi Metro network"
       >
         <color attach="background" args={[PALETTE.background]} />
-        <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, 1.15]} />
+        <hemisphereLight args={[PALETTE.sky, PALETTE.bounce, .9]} />
+        <SceneAtmosphere />
         <Sun />
-        <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.46} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
+        <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.49} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
         <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
         <LodWatcher onChange={setNear} />
         {showGround && (
-          <mesh rotation-x={-Math.PI / 2} position={[(minX + maxX) / 2, 0, (minZ + maxZ) / 2]} receiveShadow>
-            <planeGeometry args={[maxX - minX + 20000, maxZ - minZ + 20000]} />
-            <meshLambertMaterial color={PALETTE.ground} />
-          </mesh>
+          <EnvironmentGround width={maxX-minX+20000} depth={maxZ-minZ+20000} x={(minX+maxX)/2} z={(minZ+maxZ)/2} />
         )}
         <Suspense fallback={null}>
-          <City projection={scene.projection} landmarks={network.landmarks} />
+          <City projection={scene.projection} landmarks={network.landmarks} onStatus={setEnvironmentStatus} />
           <Landmarks data={network.landmarks} projection={scene.projection} />
         </Suspense>
         <Structures scene={scene} colors={colors} near={near} />
@@ -132,8 +132,9 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         {near && showGround && <TrackLines runs={surfaceRuns} colors={colors} dashSize={14} gapSize={10} />}
         {!near && <StationPoints stations={scene.stations} colors={colors} />}
       </Canvas>
+      {environmentStatus&&<div role="status" className="pointer-events-none absolute right-14 bottom-12 z-[500] rounded-lg bg-white/90 px-3 py-1 text-xs text-slate-600">{environmentStatus}</div>}
       <p className="pointer-events-none absolute right-3 bottom-2 z-[500] max-w-[95vw] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
-        Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D Assets (CC0) · landmarks approximate · trains simulated · infrastructure nominal
+        Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D Assets (CC0) · trains simulated · road traffic illustrative · architecture nominal
       </p>
     </div>
   );
