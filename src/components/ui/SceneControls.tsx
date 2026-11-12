@@ -54,6 +54,7 @@ export function SceneControls() {
             </button>
           ))}
         </div>
+        <p className="mt-2 text-[10px] text-slate-500">WASD to move · Shift for speed</p>
       </div>
     </div>
   );

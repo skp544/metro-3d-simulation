@@ -20,6 +20,7 @@ import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
 import { TransferLinks } from "./TransferLinks";
 import { SceneAtmosphere, EnvironmentGround } from "./SceneAtmosphere";
+import { ExploreMovement } from "./ExploreMovement";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.
 function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
@@ -113,6 +114,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         <Sun />
         <MapControls makeDefault target={startTarget} enableDamping maxPolarAngle={Math.PI * 0.49} minDistance={MIN_DISTANCE_M} maxDistance={size * 3} />
         <CameraRig projection={scene.projection} hub={views.hub} network={views.network} service={service} paths={scene.paths} />
+        <ExploreMovement />
         <LodWatcher onChange={setNear} />
         {showGround && (
           <EnvironmentGround width={maxX-minX+20000} depth={maxZ-minZ+20000} x={(minX+maxX)/2} z={(minZ+maxZ)/2} />
