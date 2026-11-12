@@ -5,6 +5,7 @@ import { PALETTE } from "../../constants/scene";
 import { loadCity, type City as CityData } from "../../data/loadCity";
 import type { Projection } from "../../utils/projection";
 import { buildCity } from "./buildCity";
+import type { LandmarksFC } from "../../data/types";
 
 // Variant order matches scripts/build-city.ts `variant` (0..3): two autumn, two green.
 const TREE_MODELS = [
@@ -15,12 +16,12 @@ const TREE_MODELS = [
 ];
 
 /** Real OSM buildings, roads and green areas around the stations, plus Kenney trees inside the green areas. */
-export function City({ projection }: { projection: Projection }) {
+export function City({ projection, landmarks }: { projection: Projection; landmarks: LandmarksFC }) {
   const [city, setCity] = useState<CityData | null>(null);
   useEffect(() => {
     loadCity().then(setCity, (e: Error) => console.error("City data failed to load:", e.message));
   }, []);
-  const built = useMemo(() => (city ? buildCity(city, projection.project) : null), [city, projection]);
+  const built = useMemo(() => (city ? buildCity(city, projection.project, landmarks.features.map(f => ({ footprint: f.properties.footprint, osmId: f.properties.source[0].split("@")[0] }))) : null), [city, projection, landmarks]);
   if (!built) return null;
   return (
     <>

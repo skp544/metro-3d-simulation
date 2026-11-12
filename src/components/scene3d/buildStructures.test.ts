@@ -72,7 +72,7 @@ test("stationParts: side platforms clear the trains, roof above them, concourse 
   const trainEdge = TRAIN.trackOffset + TRAIN.carWidth / 2;
   assert.ok(S.platform.inner > trainEdge, `platform edge ${S.platform.inner} m beyond the train's ${trainEdge} m`);
   assert.ok(S.roof.eave > S.railTop + TRAIN.carHeight, "train fits under the eaves");
-  assert.deepEqual(centres("platform").map((c) => Math.sign(c.z)), [-1, 1], "one platform each side");
+  assert.deepEqual([...new Set(centres("platform").map((c) => Math.sign(c.z)))], [-1, 1], "platform sections on both sides, including stairwell openings");
   assert.ok(centres("roof").every((c) => c.y > 12 + S.platform.top));
   assert.equal(get("column").matrices.length, 2 * Math.floor(S.stationLength / S.roof.columnSpacing));
   assert.equal(get("fascia").colors!.length, 2);

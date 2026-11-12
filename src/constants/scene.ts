@@ -76,7 +76,9 @@ export const STRUCTURE = {
   platform: { inner: 3.8, outer: 8.2, top: 1.9 }, // across from the track centre line; top = rail + 1.1 m
   edgeStrip: { across: 4.1, halfWidth: 0.3 }, // yellow tactile strip near the platform edge
   roof: { halfWidth: 10, eave: 7.4, ridge: 8.9, thickness: 0.35, columnAcross: 7.8, columnSpacing: 15, columnSize: 0.5, opacity: 0.45 }, // glazed, like the reference's see-through roof
-  concourse: { halfWidth: 10, bottom: 4, top: 7.5, lengthShare: 0.6 }, // absolute heights above ground
+  concourse: { halfWidth: 13.5, bottom: 5.65, top: 6, lengthShare: 0.6 }, // open floor slab, absolute heights above ground
+  // Generic circulation for isolated elevated platforms. All dimensions NOMINAL, not surveyed access.
+  circulation: { outer: 11.8, roofHalfWidth: 13.5, columnAcross: 11.4, wellAcross: 9.4, wellWidth: 3, wellLength: 18, wellAlong: 45, stairRun: 17, maxRiser: .18, liftAlong: 65, liftAcross: 14.4, liftWidth: 2.8, groundStairAcross: 16, groundStairRun: 13.5, railHeight: 1.1, clearLaneAcross: 6.1, clearLaneWidth: 3 },
   stationHalfWidth: 13, // underground station boxes (X-ray)
   stationBelowTrack: 4,
   stationAboveTrack: 6,

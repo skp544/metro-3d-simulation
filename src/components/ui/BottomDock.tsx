@@ -6,8 +6,9 @@ import { useSimNow } from "../../store/useSimNow";
 import type { Service } from "../../utils/trainSim";
 import { ValidationList } from "./ValidationPanel";
 import { TrainSpeed } from "./TrainSpeed";
+import { LandmarkList } from "./LandmarkPanel";
 
-type Tab = "trains" | "stations" | "validation";
+type Tab = "trains" | "stations" | "places" | "validation";
 
 /** Bottom tabbed list like the reference's fleet table: trains, stations, validation issues. */
 export function BottomDock({ network, service }: { network: Network; service: Service }) {
@@ -16,6 +17,7 @@ export function BottomDock({ network, service }: { network: Network; service: Se
   const tabs: { id: Tab; label: string; count: number }[] = [
     { id: "trains", label: "Trains", count: service.trains.length },
     { id: "stations", label: "Stations", count: network.stations.features.length },
+    { id: "places", label: "Places", count: network.landmarks.features.length },
     { id: "validation", label: "Validation", count: network.validation.summary.errors + network.validation.summary.warnings },
   ];
   return (
@@ -31,7 +33,7 @@ export function BottomDock({ network, service }: { network: Network; service: Se
               setTab(t.id);
               setOpen(true);
             }}
-            className={`border-b-2 px-3 py-2 text-xs ${tab === t.id && open ? "border-slate-900 font-semibold text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+            className={`border-b-2 px-2 py-2 text-[11px] sm:px-3 sm:text-xs ${tab === t.id && open ? "border-slate-900 font-semibold text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"}`}
           >
             {t.label} <span className="text-slate-400">{t.count}</span>
           </button>
@@ -44,6 +46,7 @@ export function BottomDock({ network, service }: { network: Network; service: Se
         <div className="max-h-[22vh] overflow-y-auto" role="tabpanel">
           {tab === "trains" && <TrainList network={network} service={service} />}
           {tab === "stations" && <StationList network={network} />}
+          {tab === "places" && <LandmarkList network={network} />}
           {tab === "validation" && <ValidationList network={network} />}
         </div>
       )}

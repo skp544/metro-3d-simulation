@@ -1,6 +1,24 @@
 // Schema of data/processed/*.geojson. Shared by scripts/ (build, validate) and the app.
 import type { Feature, FeatureCollection, LineString, MultiLineString, Point } from "geojson";
 
+export interface LandmarkProps extends Provenance {
+  id: string;
+  name: string;
+  footprint: [number, number][];
+  model: string;
+  widthM: number;
+  depthM: number;
+  heightM: number;
+  heightEstimated: boolean;
+  yaw: number;
+  orientationSource: string;
+  scope: string;
+  nearestStation: { stationId: string; name: string; distanceM: number };
+  reference: string;
+  snapshot: string;
+}
+export type LandmarksFC = FeatureCollection<Point, LandmarkProps>;
+
 export type InfraType = "elevated" | "underground" | "at_grade" | "unknown";
 // "mixed": an interchange whose platforms differ, e.g. Kashmere Gate (Red elevated, Yellow/Violet underground).
 export type StationType = InfraType | "mixed";

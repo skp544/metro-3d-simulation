@@ -1,0 +1,13 @@
+CC0 1.0 Universal
+
+The original procedural landmark models in this directory are dedicated to the public domain under CC0 1.0.
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Author: Original procedural models authored for NCR Rail (2026-11-12).
+Reproducible source: scripts/model-landmarks.py; Blender library: assets/landmarks/landmarks.blend.
+These are approximate architectural interpretations, not surveyed reconstructions.
+Reference photographs are not included as textures or distributed assets.
+
+Geographic footprints and positions are separately derived from OpenStreetMap contributors, ODbL:
+https://www.openstreetmap.org/copyright
+See data/raw/landmarks, data/manual/landmarks.json and docs/phase8-landmarks-stations.md.

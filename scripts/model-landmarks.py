@@ -1,0 +1,256 @@
+"""Original low-poly architectural interpretations. Run in Blender (live MCP or --background).
+Only the NCR_Landmarks collection is replaced; unrelated objects and the active file are preserved.
+Exports metre-scale, Z-up Blender sources / Y-up GLBs with base origin and local X frontage.
+"""
+import bpy, math, json, os
+from mathutils import Vector
+from math import sin, cos, pi
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, 'public', 'models', 'landmarks')
+os.makedirs(OUT, exist_ok=True)
+data = json.load(open(os.path.join(ROOT, 'data', 'processed', 'landmarks.geojson'), encoding='utf8'))
+old_selection = list(bpy.context.selected_objects)
+old_active = bpy.context.view_layer.objects.active
+old = bpy.data.collections.get('NCR_Landmarks')
+if old:
+    for obj in list(old.all_objects):
+        bpy.data.objects.remove(obj, do_unlink=True)
+    bpy.data.collections.remove(old)
+work = bpy.data.collections.new('NCR_Landmarks')
+bpy.context.scene.collection.children.link(work)
+current = None
+
+def mat(name, color, metal=0):
+    m = bpy.data.materials.get('NCR_'+name) or bpy.data.materials.new('NCR_'+name)
+    m.use_nodes = True
+    bsdf = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Base Color'].default_value = (*color, 1)
+    bsdf.inputs['Roughness'].default_value = .83
+    bsdf.inputs['Metallic'].default_value = metal
+    m.diffuse_color = (*color, 1)
+    return m
+
+stone = mat('Sandstone', (.65,.43,.25))
+light = mat('LightStone', (.83,.67,.47))
+red = mat('RedSandstone', (.55,.20,.13))
+darkred = mat('CarvedBands', (.31,.10,.065))
+marble = mat('Marble', (.94,.94,.89))
+shadow = mat('Recess', (.17,.20,.20))
+glass = mat('Skylight', (.29,.47,.53), .25)
+
+def link(obj, material):
+    for c in list(obj.users_collection): c.objects.unlink(obj)
+    current.objects.link(obj)
+    obj.data.materials.append(material)
+    return obj
+
+def mesh(name, verts, faces, material):
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.update()
+    ob = bpy.data.objects.new(name, me)
+    current.objects.link(ob)
+    me.materials.append(material)
+    return ob
+
+def box(name, xyz, size, material):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=xyz)
+    ob = link(bpy.context.object, material)
+    ob.name = name
+    ob.scale = size
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    return ob
+
+def cylinder(name, x,y,z, r, depth, material, vertices=48, r2=None):
+    bpy.ops.mesh.primitive_cone_add(vertices=vertices, radius1=r, radius2=r if r2 is None else r2, depth=depth, location=(x,y,z+depth/2))
+    ob=link(bpy.context.object, material); ob.name=name
+    return ob
+
+def ring(name, z, radius, height, material, x=0,y=0):
+    return cylinder(name,x,y,z,radius,height,material,64)
+
+def arch(name, width, spring, radius, top, depth, material, y=0):
+    # Solid wall above a real semicircular opening (not a painted black patch).
+    n=32; v=[]; faces=[]
+    for i in range(n+1):
+        a=pi-pi*i/n; x=radius*cos(a); z=spring+radius*sin(a)
+        v.extend([(x,y-depth/2,z),(x,y-depth/2,top),(x,y+depth/2,z),(x,y+depth/2,top)])
+    for i in range(n):
+        a=i*4; b=a+4
+        faces.extend([(a,b,b+1,a+1),(a+2,a+3,b+3,b+2),(a,a+2,b+2,b),(a+1,b+1,b+3,a+3)])
+    faces.extend([(0,1,3,2),(n*4,n*4+2,n*4+3,n*4+1)])
+    mesh(name,v,faces,material)
+    for side in [-1,1]:
+        box(name+' pier',(side*(width/2+radius)/2,y,top/2),((width/2-radius),depth,top),material)
+
+def arch_trim(radius, spring, y, depth, material, thickness=.6):
+    for i in range(24):
+        a=i*pi/24; b=(i+1)*pi/24
+        verts=[(r*cos(t),yy,spring+r*sin(t)) for yy in [y-depth/2,y+depth/2] for r,t in [(radius,a),(radius,b),(radius+thickness,b),(radius+thickness,a)]]
+        mesh('Radial arch stones',verts,[(0,1,2,3),(4,7,6,5),(0,4,5,1),(3,2,6,7)],material)
+
+def india_gate():
+    box('Stepped plinth',(0,0,.3),(28,18,.6),stone)
+    box('Upper plinth',(0,0,.75),(27,17,.3),light)
+    arch('Main vaulted arch',26,18,5.7,32,14,stone)
+    for y in [-7.2,7.2]:
+        arch_trim(5.7,18,y,.5,light,.75)
+        for side in [-1,1]:
+            for x in [7.1,11.8]:
+                box('Engaged pilaster',(side*x,y,15),(1.0,.7,27.8),light)
+                box('Pilaster base',(side*x,y,2),(1.5,1.0,2),stone)
+                box('Pilaster capital',(side*x,y,29),(1.6,1.0,1.2),light)
+            for z in [6,10,14,18,22,26]:
+                box('Stone courses',(side*9.4,y+.04,z),(3.0,.12,.10),stone)
+    for z,w,d,h in [(31.9,27,15,.7),(32.6,28,16,.6),(33.2,27.4,15.5,.6),(34,24,14,1),(37.1,24,14,5.2),(40,26,15,.65),(40.6,24.8,14.5,.5)]:
+        box('Entablature and attic',(0,0,z),(w,d,h),light if z<34 or z>39 else stone)
+    # Recessed inscription panels; letter forms are original geometry, not a photograph texture.
+    for y,rot in [(-7.04,pi/2),(7.04,-pi/2)]:
+        curve=bpy.data.curves.new('INDIA inscription','FONT'); curve.body='INDIA'; curve.align_x='CENTER'; curve.size=1.35; curve.extrude=.018
+        ob=bpy.data.objects.new('INDIA inscription',curve); current.objects.link(ob); ob.location=(0,y,36.9); ob.rotation_euler=(rot,0,0); curve.materials.append(darkred)
+        bpy.context.view_layer.objects.active=ob; ob.select_set(True); bpy.ops.object.convert(target='MESH'); ob.select_set(False)
+    ring('Crown bowl base',41,1.5,.35,stone)
+    cylinder('Crown bowl',0,0,41.35,1.5,.65,light,r2=2.1)
+
+def qutb():
+    ring('Base plinth',0,7.16,.7,red)
+    heights=[.7,29,45,57,65,72.5]; radii=[7.16,5.25,3.95,3.05,2.15,1.375]
+    for level in range(5):
+        z0,z1=heights[level:level+2]; r0,r1=radii[level:level+2]
+        v=[]; n=192
+        for z,r in [(z0,r0),(z1,r1)]:
+            for i in range(n):
+                a=2*pi*i/n; flute=(.19 if level<3 else .06)*cos(24*a)
+                v.append(((r+flute)*cos(a),(r+flute)*sin(a),z))
+        faces=[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
+        faces.extend([tuple(range(n-1,-1,-1)),tuple(range(n,2*n))])
+        mesh('Fluted storey '+str(level+1),v,faces,marble if level==3 else red)
+        for z in [z0+1.5,z0+2.1,(z0+z1)/2]:
+            r=r0+(r1-r0)*(z-z0)/(z1-z0)
+            ring('Carved calligraphy band (simplified)',z,r+.20,.36,darkred if level<3 else light)
+        if level<4:
+            for i in range(24):
+                a=2*pi*i/24
+                ob=box('Balcony stone bracket',((r1+.3)*cos(a),(r1+.3)*sin(a),z1-1.0),(.5,1.2,1.0),light)
+                ob.rotation_euler.z=a-pi/2
+            ring('Balcony corbel',z1-.6,r1+.65,.35,light)
+            ring('Balcony projecting lip',z1-.25,r1+1,.35,light)
+            # Open parapet: balusters rather than a solid tube.
+            for i in range(48):
+                a=2*pi*i/48
+                cylinder('Balcony baluster',(r1+.8)*cos(a),(r1+.8)*sin(a),z1+.1,.09,.8,light,6)
+            ring('Balcony rail',z1+.9,r1+.95,.16,light)
+
+def petal(angle, r0, r1, z1, bulge, width, material):
+    # Pointed double-curved shell, split into small quads for a readable faceted marble surface.
+    v=[]; nu=16; nv=10
+    for i in range(nu+1):
+        t=i/nu; r=r0*(1-t)+r1*t+bulge*sin(pi*t)
+        w=width*(sin(pi*t)**.72)
+        for j in range(nv+1):
+            s=2*j/nv-1; aa=angle+s*w/max(r,1)
+            z=1.2+(z1-1.2)*t+3*sin(pi*t)*(1-s*s)
+            v.append((r*cos(aa),r*sin(aa),z))
+    faces=[]
+    for i in range(nu):
+        for j in range(nv):
+            a=i*(nv+1)+j; faces.append((a,a+1,a+nv+2,a+nv+1))
+    ob=mesh('Marble petal shell',v,faces,material)
+    solid=ob.modifiers.new('Shell thickness','SOLIDIFY'); solid.thickness=.28
+    bpy.context.view_layer.objects.active=ob; ob.select_set(True); bpy.ops.object.modifier_apply(modifier=solid.name); ob.select_set(False)
+
+def lotus():
+    ring('Nine-sided terrace',0,34,.8,light)
+    cylinder('Hall shadow',0,0,.8,15,9,shadow,72)
+    for i in range(9):
+        a=2*pi*i/9
+        petal(a,19,4,34,8,5.8,marble)
+        petal(a+pi/9,26,20,26,5,9.8,marble)
+        petal(a,25,34,11,1,9.0,marble)
+    ring('Central skylight',31.5,4,1.0,glass)
+
+def dome(x,y,z,r):
+    # Low Mughal dome, lathed over an octagonal pavilion.
+    v=[]; rows=8; n=32
+    for j in range(rows+1):
+        t=j/rows*pi/2; rr=r*cos(t)
+        for i in range(n):
+            a=2*pi*i/n; v.append((x+rr*cos(a),y+rr*sin(a),z+r*.7*sin(t)))
+    mesh('Chhatri dome',v,[(j*n+i,j*n+(i+1)%n,(j+1)*n+(i+1)%n,(j+1)*n+i) for j in range(rows) for i in range(n)],marble)
+    cylinder('Dome finial',x,y,z+r*.7,.16,1.3,light,12,r2=0)
+
+def red_fort():
+    box('Gate plinth',(0,0,.3),(49,21,.6),red)
+    arch('Gate central vaulted passage',31,10,4.5,23,17,red)
+    for y in [-8.6,8.6]:
+        arch_trim(4.5,10,y,.5,light,.5)
+        box('Gate upper cornice',(0,y,23),(34,1.4,.7),light)
+        for x in [-10,0,10]:
+            box('Upper inset panel',(x,y,20),(4,.2,2),darkred)
+    for x in [-17,17]:
+        cylinder('Octagonal gate bastion',x,0,.6,7.3,23,red,8)
+        cylinder('Bastion cornice',x,0,23.5,7.8,.65,light,8)
+        for i in range(8):
+            a=2*pi*i/8
+            cylinder('Chhatri slender column',x+4*cos(a),4*sin(a),24.2,.28,4.3,light,8)
+        cylinder('Chhatri eaves',x,0,28.5,5.8,.5,marble,8)
+        dome(x,0,29,4)
+        for y in [-5.3,5.3]:
+            for z in [7,13,19]: box('Bastion recessed slit',(x,y,z),(.5,.3,1.8),darkred)
+    for x in range(-14,15,2):
+        for y in [-8,8]:
+            box('Crenellation',(x,y,24.2),(1.2,1.4,1.8),red)
+            cylinder('Merlon pointed cap',x,y,25.1,.7,.8,red,4,r2=0)
+    for x in [-10,-5,0,5,10]:
+        cylinder('Upper arcade pillar',x,0,24,.18,3,light,8)
+    box('Upper arcade canopy',(0,0,27),(22,4,.5),marble)
+    for x in [-9,-6,-3,0,3,6,9]:
+        cylinder('Roof small cupola base',x,0,27.3,.7,1,marble,12)
+        dome(x,0,28.3,.8)
+    cylinder('Flag mast',0,-4,26,.1,6.4,light,12)
+    for i,m in enumerate([mat('FlagSaffron',(1,.40,.08)),marble,mat('FlagGreen',(.06,.36,.15))]):
+        box('Flag stripe',(1,-4,31.9-i*.4),(2,.05,.4),m)
+
+builders={'india-gate':india_gate,'lotus-temple':lotus,'qutb-minar':qutb,'red-fort':red_fort}
+report=[]
+for f in data['features']:
+    p=f['properties']; current=bpy.data.collections.new('NCR_'+p['id']); work.children.link(current)
+    bpy.ops.object.select_all(action='DESELECT')
+    builders[p['id']]()
+    objs=list(current.objects)
+    corners=[o.matrix_world @ Vector(v) for o in objs for v in o.bound_box]
+    # Refresh matrices after construction before measuring / exporting.
+    bpy.context.view_layer.update()
+    corners=[o.matrix_world @ Vector(v) for o in objs for v in o.bound_box]
+    mn=Vector(tuple(min(v[i] for v in corners) for i in range(3)))
+    mx=Vector(tuple(max(v[i] for v in corners) for i in range(3)))
+    target=(p['widthM'],p['depthM'],p['heightM']) if p['id']!='qutb-minar' else (14.32,14.32,72.5)
+    scale=Vector(tuple(target[i]/(mx[i]-mn[i]) for i in range(3)))
+    for ob in objs:
+        for v in ob.data.vertices:
+            world=ob.matrix_world @ v.co
+            v.co=Vector(((world.x-(mx.x+mn.x)/2)*scale.x,(world.y-(mx.y+mn.y)/2)*scale.y,(world.z-mn.z)*scale.z))
+        ob.matrix_world.identity()
+        ob.select_set(True)
+    bpy.context.view_layer.objects.active=objs[0]
+    bpy.ops.object.join()
+    ob=bpy.context.object; ob.name='NCR_'+p['id']
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    bpy.ops.export_scene.gltf(filepath=os.path.join(OUT,p['id']+'.glb'),export_format='GLB',use_selection=True,export_yup=True,export_extras=True)
+    triangles=sum(len(poly.vertices)-2 for poly in ob.data.polygons)
+    report.append({'id':p['id'],'triangles':triangles,'sizeM':target,'bytes':os.path.getsize(os.path.join(OUT,p['id']+'.glb'))})
+    ob.select_set(False)
+    # Place source objects apart for workshop inspection, after the origin-centred exports.
+    ob.location.x=len(report)*110
+
+# Library write preserves the user's active .blend path and does not save their unrelated objects.
+source_dir=os.path.join(ROOT,'assets','landmarks')
+os.makedirs(source_dir,exist_ok=True)
+bpy.data.libraries.write(os.path.join(source_dir,'landmarks.blend'),{work},fake_user=True)
+with open(os.path.join(OUT,'manifest.json'),'w',encoding='utf8') as file:
+    json.dump({'license':'CC0-1.0','author':'Original procedural models authored for NCR Rail','source':'scripts/model-landmarks.py','approximate':True,'axis':'GLB +X frontage, +Y up; base origin; metre units','models':report},file,indent=2)
+for ob in old_selection:
+    if ob.name in bpy.context.view_layer.objects: ob.select_set(True)
+if old_active and old_active.name in bpy.context.view_layer.objects: bpy.context.view_layer.objects.active=old_active
+print(json.dumps(report))

@@ -48,7 +48,7 @@ function toGeometry(acc: Acc) {
   return g;
 }
 
-export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ) {
+export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ, exclusions: { footprint: LngLat[]; osmId: string }[] = []) {
   const project = (p: Pos) => projectLngLat(p as LngLat);
   const chunks = new Map<string, { buildings: Acc; roads: Acc; green: Acc }>();
   const chunk = ([x, z]: XZ) => {
@@ -60,6 +60,7 @@ export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ) {
   let buildingTris = 0;
 
   city.buildings.features.forEach((f, n) => {
+    if (exclusions.some(e => (f.properties as { id?: string }).id === e.osmId || f.geometry.coordinates[0].slice(0, -1).some(p => insideRing(p, e.footprint)))) return;
     const pts = f.geometry.coordinates[0].slice(0, -1).map(project);
     if (pts.length < 3) return;
     const h = f.properties.height;
@@ -100,6 +101,7 @@ export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ) {
 
   const trees: THREE.Matrix4[][] = [[], [], [], []];
   city.trees.features.forEach((f, n) => {
+    if (exclusions.some(e => insideRing(f.geometry.coordinates, e.footprint))) return;
     const [x, z] = project(f.geometry.coordinates);
     const s = TREE_HEIGHT_SCALE * (0.8 + hash(n + 0.5) * 0.4);
     trees[f.properties.variant % 4].push(
@@ -112,4 +114,14 @@ export function buildCity(city: CityInput, projectLngLat: (p: LngLat) => XZ) {
     trees,
     stats: { chunks: chunks.size, buildingTris, trees: city.trees.features.length },
   };
+}
+
+/** Ray crossing on geographic rings; no invented radius around a landmark. */
+function insideRing(p: number[], ring: LngLat[]) {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const a = ring[i], b = ring[j];
+    if ((a[1] > p[1]) !== (b[1] > p[1]) && p[0] < (b[0] - a[0]) * (p[1] - a[1]) / (b[1] - a[1]) + a[0]) inside = !inside;
+  }
+  return inside;
 }

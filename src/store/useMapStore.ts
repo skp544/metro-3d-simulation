@@ -26,7 +26,9 @@ interface MapState {
   showValidation: boolean;
   showGround: boolean; // 3D: hide the ground to see tunnels and underground trains
   // Bumped `key` lets the map re-fly to the same place twice.
-  focus: { coordinates: LngLat; key: number } | null;
+  focus: { coordinates: LngLat; key: number; distanceM?: number; heightM?: number } | null;
+  selectedLandmarkId: string | null;
+  selectLandmark: (id: string | null) => void;
   selectedStationId: string | null;
   labels: LabelMode;
   camera: { command: CameraCommand; key: number } | null;
@@ -46,7 +48,7 @@ interface MapState {
   toggleTrackType: (t: InfraType) => void;
   toggleStationType: (t: StationType) => void;
   setLayer: (layer: "showStations" | "showConstruction" | "showValidation" | "showGround", on: boolean) => void;
-  focusOn: (coordinates: LngLat) => void;
+  focusOn: (coordinates: LngLat, distanceM?: number, heightM?: number) => void;
   fitTo: (bounds: [LngLat, LngLat]) => void;
   followTrain: (trainId: string | null) => void;
   setRouteEnd: (end: "from" | "to", stationId: string | null) => void;
@@ -85,6 +87,7 @@ export const useMapStore = create<MapState>((set, get) => ({
   showGround: true,
   focus: null,
   selectedStationId: null,
+  selectedLandmarkId: null,
   labels: "trains",
   camera: null,
   fit: null,
@@ -102,13 +105,14 @@ export const useMapStore = create<MapState>((set, get) => ({
   toggleStationType: (t) => set((s) => ({ hiddenStationTypes: toggle(s.hiddenStationTypes, t) })),
   setLayer: (layer, on) => set({ [layer]: on }),
   // Moving the view somewhere else ends a train follow.
-  focusOn: (coordinates) => set((s) => ({ focus: { coordinates, key: (s.focus?.key ?? 0) + 1 }, follow: null })),
+  focusOn: (coordinates, distanceM, heightM) => set((s) => ({ focus: { coordinates, distanceM, heightM, key: (s.focus?.key ?? 0) + 1 }, follow: null })),
   fitTo: (bounds) => set((s) => ({ fit: { bounds, key: (s.fit?.key ?? 0) + 1 }, follow: null })),
   followTrain: (trainId) => set((s) => ({ follow: trainId ? { trainId, key: (s.follow?.key ?? 0) + 1 } : null })),
   setRouteEnd: (end, stationId) => set(end === "from" ? { routeFrom: stationId } : { routeTo: stationId }),
   swapRoute: () => set((s) => ({ routeFrom: s.routeTo, routeTo: s.routeFrom })),
 
-  selectStation: (id) => set({ selectedStationId: id }),
+  selectStation: (id) => set({ selectedStationId: id, ...(id && { selectedLandmarkId: null }) }),
+  selectLandmark: (id) => set({ selectedLandmarkId: id, ...(id && { selectedStationId: null }) }),
   setLabels: (labels) => set({ labels }),
   // Zooming keeps a follow going; jumping to the hub or the whole network ends it.
   cameraDo: (command) =>

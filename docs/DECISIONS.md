@@ -2,6 +2,22 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Landmarks and generic station circulation implemented
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 69 | Landmark data and scope | Four immutable OSM way/full snapshots dated 2026-11-12 generate one shared landmark GeoJSON. India Gate and Lahori Gate use the footprint's long axis; radial model orientation is nominal. Red Fort is represented by **Lahori Gate only**, explicitly labelled. Nearest stations are computed from geometry and distances labelled straight line | Real positions and clear geographic scope; no invented walking routes or full fort reconstruction |
+| 70 | Original Blender assets | Author four procedural architectural interpretations in a separate `NCR_Landmarks` collection. Preserve the original scene objects and file path. Retain Python source and a `.blend` library; export base-origin, metre-scale CC0 GLBs (46,598 triangles total). Reference images are not distributed textures; nominal details and heights are labelled | Usable original assets without paid generators or inaccessible downloads; reproducible and small enough for the existing scene |
+| 71 | Station circulation | 201 isolated elevated platform frames with sufficient headroom get wider side platforms, two stair openings per side, an uninterrupted 3 m lane, open concourse floor at nominal 6 m, street stairs and lift connections. Steps, guards, rafters and furniture render within 700 m of the target, at most six stations, camera distance below 1.4 km. Local floor/flight/lift metadata prepares future people work | Functional nominal architecture with real slab openings and clear tracks. Complex/shared, mixed, low ramp and underground layouts require site plans; no people, surveyed entrances or interchange navigation are claimed |
+
+## 2026-11-12: Next task — landmarks and station circulation
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 66 | First landmarks (user) | Add India Gate, Lotus Temple, Qutb Minar and Red Fort. Use suitable licensed models or create recognizable models in Blender using architectural reference images. Real coordinates/footprints and provenance remain required; approximations must be labelled | User explicitly confirmed these four places and authorized Blender modeling where suitable models are unavailable |
+| 67 | Station design (user) | Improve station architecture and leave coherent circulation space for future 3D people. Preserve train clearances and geographic alignment; generic dimensions/layouts remain nominal. Adding people or crowd simulation is not part of this initial request | User requested better station design in preparation for adding people later |
+| 68 | Handoff and Blender status | Prepare `docs/HANDOFF.md` for another chat. Modeling/app implementation is pending. Blender MCP is registered in Codex and a live `get_addon_status` call succeeded: Blender 5.3.0, add-on 1.8, protocol 15. Preserve the user's existing scene when work resumes | User requested a transferable handoff; the earlier missing-connection blocker is now resolved |
+
 ## 2026-11-12: Verified speed limits and current speed display
 
 | # | Topic | Decision | Reason |

@@ -12,6 +12,7 @@ import { SegmentLayer } from "./SegmentLayer";
 import { StationLayer } from "./StationLayer";
 import { ValidationLayer } from "./ValidationLayer";
 import { TransferLayer } from "./TransferLayer";
+import { LandmarkLayer } from "./LandmarkLayer";
 
 function DataAttribution() {
   const map = useMap();
@@ -99,6 +100,7 @@ export function MetroMap({ network }: { network: Network }) {
         <ValidationLayer network={network} />
       </Pane>
       <DataAttribution />
+      <Pane name="landmarks" style={{ zIndex: 455 }}><LandmarkLayer network={network} /></Pane>
       <CommandHandler />
       <ViewReporter />
     </MapContainer>

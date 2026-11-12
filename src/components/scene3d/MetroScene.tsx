@@ -9,6 +9,7 @@ import { useMapStore, viewHandoff } from "../../store/useMapStore";
 import { distanceForMetresPerPixel, metresPerPixel } from "../../utils/projection";
 import type { Service } from "../../utils/trainSim";
 import { City } from "./City";
+import { Landmarks } from "./Landmarks";
 import { buildScene3D } from "./geometry";
 import { RouteOverlay } from "./RouteOverlay";
 import { CameraRig, StationLabels, Sun, type View3D } from "./SceneRig";
@@ -117,7 +118,8 @@ export function MetroScene({ network, service }: { network: Network; service: Se
           </mesh>
         )}
         <Suspense fallback={null}>
-          <City projection={scene.projection} />
+          <City projection={scene.projection} landmarks={network.landmarks} />
+          <Landmarks data={network.landmarks} projection={scene.projection} />
         </Suspense>
         <Structures scene={scene} colors={colors} near={near} />
         <Suspense fallback={null}>
@@ -130,8 +132,8 @@ export function MetroScene({ network, service }: { network: Network; service: Se
         {near && showGround && <TrackLines runs={surfaceRuns} colors={colors} dashSize={14} gapSize={10} />}
         {!near && <StationPoints stations={scene.stations} colors={colors} />}
       </Canvas>
-      <p className="pointer-events-none absolute right-3 bottom-2 z-[500] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
-        Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D Assets (CC0) · trains simulated · heights and sizes nominal
+      <p className="pointer-events-none absolute right-3 bottom-2 z-[500] max-w-[95vw] rounded bg-white/80 px-2 py-0.5 text-[11px] text-slate-600">
+        Map data © OpenStreetMap contributors (ODbL) · models Kenney + 3D Assets (CC0) · landmarks approximate · trains simulated · infrastructure nominal
       </p>
     </div>
   );

@@ -54,7 +54,7 @@ export function CameraRig({ projection, hub, network, service, paths }: { projec
 
   useCommand("focus", focus?.key, !!controls, () => {
     const [x, z] = projection.project(focus!.coordinates);
-    flyTo(around(new THREE.Vector3(x, 0, z), FOCUS_DISTANCE_M));
+    flyTo(around(new THREE.Vector3(x, focus!.heightM ?? 0, z), focus!.distanceM ?? FOCUS_DISTANCE_M));
   });
 
   useCommand("fit", fit?.key, !!controls, () => {

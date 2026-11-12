@@ -4,6 +4,7 @@ import type { Network } from "../../data/loadNetwork";
 import { useMapStore, type Speed } from "../../store/useMapStore";
 import { formatIst, useSimNow } from "../../store/useSimNow";
 import { ViewToggle } from "./ViewToggle";
+import { showLandmark } from "../../store/showLandmark";
 
 const SPEEDS: Speed[] = [1, 2, 4, 8];
 
@@ -38,11 +39,13 @@ function StationSearch({ network }: { network: Network }) {
   const results = useMemo(() => {
     const k = norm(q);
     if (!k) return [];
-    return network.stations.features
+    const stations = network.stations.features
       .filter((f) => [f.properties.name, ...f.properties.aliases, ...f.properties.refs, ...f.properties.lines.map(id => lines.get(id)?.name ?? "")].some((n) => norm(n).includes(k)))
       .sort((a, b) => Number(!norm(a.properties.name).startsWith(k)) - Number(!norm(b.properties.name).startsWith(k)))
-      .slice(0, 8);
-  }, [q, network.stations, lines]);
+      .slice(0, 8).map(f => ({ id: f.properties.id, name: f.properties.name, lines: f.properties.lines, ref: f.properties.refs[0], pick: () => { selectStation(f.properties.id); focusOn(f.geometry.coordinates as [number, number]); } }));
+    const places = network.landmarks.features.filter(f => norm(f.properties.name).includes(k)).map(f => ({ id: f.properties.id, name: f.properties.name, lines: [] as string[], ref: "Landmark", pick: () => showLandmark(f) }));
+    return [...places, ...stations].slice(0, 8);
+  }, [q, network.stations, network.landmarks, lines, selectStation, focusOn]);
   // Searching for a system that is not on the map yet says so instead of finding nothing.
   const wip = useMemo(() => {
     const k = norm(q);
@@ -62,8 +65,7 @@ function StationSearch({ network }: { network: Network }) {
   }, []);
 
   const pick = (f: (typeof results)[number]) => {
-    selectStation(f.properties.id);
-    focusOn(f.geometry.coordinates as [number, number]);
+    f.pick();
     setQ("");
     setOpen(false);
     input.current?.blur();
@@ -80,8 +82,8 @@ function StationSearch({ network }: { network: Network }) {
         role="combobox"
         aria-expanded={open && results.length + wip.length > 0}
         aria-controls="station-search-results"
-        aria-label="Search stations"
-        placeholder="Search stations, e.g. Rajiv Chowk or KG"
+        aria-label="Search stations and places"
+        placeholder="Search stations or landmarks"
         value={q}
         onChange={(e) => {
           setQ(e.target.value);
@@ -104,7 +106,7 @@ function StationSearch({ network }: { network: Network }) {
       {open && results.length + wip.length > 0 && (
         <ul id="station-search-results" role="listbox" className="absolute top-full right-0 left-0 mt-1 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
           {results.map((f, i) => (
-            <li key={f.properties.id} role="option" aria-selected={i === active}>
+            <li key={f.id} role="option" aria-selected={i === active}>
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -112,12 +114,12 @@ function StationSearch({ network }: { network: Network }) {
                 className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs ${i === active ? "bg-slate-100" : "hover:bg-slate-50"}`}
               >
                 <span className="flex gap-0.5">
-                  {f.properties.lines.map((l) => (
+                  {f.lines.map((l) => (
                     <span key={l} className="h-2 w-2 rounded-full" style={{ background: lines.get(l)?.color }} />
                   ))}
                 </span>
-                <span className="font-medium text-slate-800">{f.properties.name}</span>
-                {f.properties.refs[0] && <span className="ml-auto text-[10px] text-slate-400">{f.properties.refs[0]}</span>}
+                <span className="font-medium text-slate-800">{f.name}</span>
+                {f.ref && <span className="ml-auto text-[10px] text-slate-400">{f.ref}</span>}
               </button>
             </li>
           ))}

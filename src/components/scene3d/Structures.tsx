@@ -1,9 +1,9 @@
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { PALETTE, STRUCTURE } from "../../constants/scene";
 import { useMapStore } from "../../store/useMapStore";
-import { buildStructures, sleeperMatrices } from "./buildStructures";
+import { buildStructures, sleeperMatrices, stationDetailParts } from "./buildStructures";
 import type { Scene3DData } from "./geometry";
 
 /**
@@ -56,9 +56,26 @@ export function Structures({ scene, colors, near }: { scene: Scene3DData; colors
       {built.aboveParts.map((p) => (
         <Instances key={p.key} matrices={p.matrices} colors={p.colors} color={p.color} shape={p.shape} opacity={p.opacity} onClick={pick(p.ids)} />
       ))}
+      {near && <StationDetails stations={built.circulationStations} />}
       {!showGround && <Instances matrices={built.belowStations} color={PALETTE.stationBelow} opacity={0.55} onClick={pick(built.belowStationIds)} />}
     </>
   );
+}
+
+function StationDetails({ stations }: { stations: Scene3DData["stations"] }) {
+  const [nearby, setNearby] = useState<Scene3DData["stations"]>([]);
+  const last = useRef({ time: 0, key: "" });
+  useFrame(({ camera, controls }) => {
+    if (performance.now() - last.current.time < 300) return;
+    last.current.time = performance.now();
+    const target = (controls as unknown as { target?: THREE.Vector3 })?.target;
+    const next = target && camera.position.distanceTo(target) < 1400 ? stations.filter(s => Math.hypot(s.position[0] - target.x, s.position[2] - target.z) < 700).sort((a,b) => Math.hypot(a.position[0]-target.x,a.position[2]-target.z) - Math.hypot(b.position[0]-target.x,b.position[2]-target.z)).slice(0, 6) : [];
+    const key = next.map(s => `${s.stationId}:${s.lineId}`).join();
+    if (key !== last.current.key) { last.current.key = key; setNearby(next); }
+  });
+  // Filters can change without a camera move. Never retain details for a hidden platform.
+  const parts = useMemo(() => stationDetailParts(nearby.filter(s => stations.includes(s))), [nearby, stations]);
+  return parts.map(p => <Instances key={p.key} matrices={p.matrices} color={p.color} opacity={p.opacity} />);
 }
 
 const SLEEPER_CAPACITY = 40_000;

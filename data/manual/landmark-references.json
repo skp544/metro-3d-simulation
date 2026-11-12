@@ -1,0 +1,19 @@
+{
+  "checked": "2026-11-12",
+  "references": [
+    { "url": "https://www.delhitourism.gov.in/tourist_place/india_gate.html", "facts": "42 m arch; sandstone proportions and cornices in site photographs", "distributedImages": false },
+    { "url": "https://www.delhitourism.gov.in/tourist_place/bahai_temple.html", "facts": "White marble lotus architecture", "distributedImages": false },
+    { "url": "https://www.ice.org.uk/what-is-civil-engineering/infrastructure-projects/lotus-temple", "facts": "27 petals; three types of leaves; separated inner leaves and central skylight", "distributedImages": false },
+    { "url": "https://bahaihouseofworship.in/wp-content/uploads/2024/04/architectural_blossoming_of_the_lotus.pdf", "facts": "Inner leaves rise 34.3 m above inner podium; current model height is rounded nominal 34 m from its own base", "distributedImages": false },
+    { "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/LotusDelhi.jpg/960px-LotusDelhi.jpg", "facts": "Visual comparison of outer petal tips and open gaps; reference downloaded only to temporary folder", "distributedImages": false },
+    { "url": "https://www.delhitourism.gov.in/tourist_place/qutab_minar.html", "facts": "72.5 m high; 14.32 m base diameter and 2.75 m top diameter; projecting balconies", "distributedImages": false },
+    { "url": "https://dmolddelhi.delhi.gov.in/tourist-place/red-fort/", "facts": "Red sandstone facade; gate towers, battlements, chhatris", "distributedImages": false },
+    { "url": "https://commons.wikimedia.org/wiki/File:Lahori_Gate_-_Red_Fort_-_Delhi_2014-05-13_3151-3160_Compress.JPG", "facts": "Gate facade reference; actual scope limited to OSM way 80429907", "distributedImages": false }
+  ],
+  "assetSearch": [
+    { "url": "https://sketchfab.com/3d-models/lotus-temple-bf5edd0ef1a74bc3be8c2a52ac2f0362", "result": "Search advertised CC Attribution, but model page/download unavailable (403); not imported" },
+    { "url": "https://www.fab.com/listings/06306e01-c286-4b39-ad4f-bb80d0deefd8", "result": "India Gate listing; no verified usable downloadable asset captured; not imported" },
+    { "url": "https://www.nexprint.com/en/models/G3213670", "result": "Red Fort miniature listing, not used; no verified architectural extent/licence/download captured" }
+  ],
+  "limitations": ["Station circulation and all street access are generic nominal layouts, not verified entrances.", "India Gate and Lahori Gate front/back orientation is symmetric about the OSM footprint long axis.", "Lotus petal rotation and shell curvature are nominal; pools and grounds omitted without captured site geometry.", "Reference images are not texture licences. Only original generated geometry and materials are distributed."]
+}

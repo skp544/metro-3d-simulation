@@ -2,7 +2,9 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-12 | **Phase:** 8 with regional networks, distinct fleet assets and sourced speed display. See `phase8-regional-expansion.md`, `phase8-fleet-assets.md` and `phase8-train-speeds.md`. Full imagery review and real-GPU frame rate remain pending.
+**Last updated:** 2026-11-12 | **Phase:** 8 including regional networks, fleet/speed work, four landmarks and generic station circulation. See `phase8-landmarks-stations.md` for the latest extension. Full imagery review and real-GPU frame rate remain pending.
+
+**Latest implementation:** India Gate, Lotus Temple, Qutb Minar and Red Fort's Lahori Gate, sourced from dated OSM footprints with original procedural Blender GLBs. Search, Places list, markers and details work in both views. 201 eligible elevated platform frames have wider walkable platforms and nominal stair/lift circulation; nearby detail is capped at six stations. Blender's original scene objects and active file path are preserved. Awaiting user review/commit; Phase 9 and people simulation remain separate.
 
 ## Data pipeline
 
@@ -11,6 +13,7 @@ What exists in the code right now. Update this with every change.
 | `scripts/fetch-osm.ts` | Downloads the Overpass snapshot → `data/raw/osm/<date>.json` (retries on 429/5xx) |
 | `scripts/fetch-wikipedia.ts` | Downloads station tables and infobox figures (stations, length) for the 9 line articles → `data/raw/wikipedia/<date>.json` |
 | `scripts/fetch-regional.ts` | Main OSM API: eight route directions and stop areas → immutable `data/raw/regional/<timestamp>.json`; preserves the DMRC snapshot |
+| `scripts/fetch-landmarks.mjs`, `scripts/build-landmarks.ts` | Four immutable OSM way/full snapshots + manual source/scope config → shared `landmarks.geojson`; nearest station and straight-line distance derived from data. Included in `data:build` |
 | `data/manual/regional-lines.json`, `data/manual/transfers.json` | Three regional line configs, operator namespaces, references, five explicit bidirectional pedestrian connections |
 | `scripts/build-dataset.ts` | Latest raw snapshots + `data/manual/` → `data/processed/*.geojson`, `data/metadata/{sources,data_quality_report}.json`. Exits 1 on errors |
 | `scripts/validate.ts` | 23 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors |
@@ -33,6 +36,7 @@ Commands: `npm run data:fetch`, `npm run data:fetch-regional`, `npm run data:bui
 | Interchanges | 30 shared stations (27 by shared ref, 3 by proximity), plus 5 separate-station walking links |
 | Segments | 378, joined end to end with no gaps |
 | Under-construction ways | 12 |
+| Landmarks | 4 (Red Fort = Lahori Gate only) |
 | Station types | 215 elevated, 61 underground, 3 at-grade, 8 mixed, 1 unknown |
 
 Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 34, Pink 46, Magenta 33, Grey 4, Airport Express 7.
@@ -74,11 +78,13 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
 | `public/models/regional/` | Five CC0 3D Assets GLBs, source/licence manifest, approximately 1.68 MB; RRTS, Aqua and Meerut silhouettes |
-| Tests | 54: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4), fleet formations/geometry (2), speed/motion (5) |
+| `src/components/scene3d/Landmarks.tsx`, `src/components/map2d/LandmarkLayer.tsx`, `src/components/ui/LandmarkPanel.tsx`, `src/store/showLandmark.ts` | Original models, shared geographic markers/footprints, Places list, searchable focus, source/approximation details and nearest station links; `?place=<id>` review entry |
+| `assets/landmarks/`, `public/models/landmarks/`, `scripts/model-landmarks.py` | Blender source library, original CC0 GLBs/license/manifest and reproducible modeling script; 46,598 triangles and 3,029,544 bytes of GLBs |
+| Tests | 59: previous 54 plus landmark provenance/GLB checks (2) and circulation clearance/opening/level/shared-layout checks (3) |
 
-Build: 2D bundle 445 KB JS (136 KB gzip); 3D chunk 1.074 MB (290 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
+Build: 2D bundle 450 KB JS (137 KB gzip); 3D chunk 1.082 MB (293 KB gzip), loaded only when the 3D view opens. Network, landmarks and city data are fetched at runtime; landmark GLBs load in 3D only.
 
-3D scene: city ≈ 473k triangles in 109 chunks; structures ≈ 744k (12,976 piers, 8,013 station parts; rails, track bed and parapets ≈ 209k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view). Trains use 33 instanced meshes and draw models within 5 km of the view, dots further away. DMRC cars are approximately 1.5k triangles each; regional cars approximately 7.8k–9.9k. Formations total 51,520 triangles (RRTS), 32,208 (Aqua), 27,432 (Meerut).
+3D scene: city ≈ 473k triangles in 109 chunks (custom landmark footprints exclude duplicate buildings/trees); structures ≈ 764k (12,976 piers, 9,621 station parts; rails, track bed and parapets ≈ 209k of it, drawn close up only; up to 40k instanced sleepers within 900 m). New circulation detail adds about 400 box instances per nearby station, at most six. Landmarks add 46.6k triangles. Trains use 33 instanced meshes and draw models within 5 km of the view, dots further away. DMRC cars are approximately 1.5k triangles each; regional cars approximately 7.8k–9.9k. Formations total 51,520 triangles (RRTS), 32,208 (Aqua), 27,432 (Meerut).
 
 Regional trains now have distinct generic models and six/four/three-car RRTS/Aqua/Meerut formations; DMRC retains its existing six-car representation. Published caps are 160 km/h for RRTS and 120 for Airport Express/Meerut; regular metro/Aqua uses a nominal 60 km/h cap. Shared acceleration/braking profiles drive movement and route estimates; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
 

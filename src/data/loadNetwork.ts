@@ -9,6 +9,8 @@ import transfersUrl from "../../data/processed/station_transfers.geojson?url";
 import constructionUrl from "../../data/processed/metro_under_construction.geojson?url";
 import sourcesUrl from "../../data/metadata/sources.json?url";
 import validationUrl from "../../data/metadata/validation_report.json?url";
+import landmarksUrl from "../../data/processed/landmarks.geojson?url";
+import type { LandmarksFC } from "./types";
 import type {
   ConstructionFC,
   InterchangesFC,
@@ -21,6 +23,7 @@ import type {
 } from "./types";
 
 export interface Network {
+  landmarks: LandmarksFC;
   lines: LinesFC;
   routes: RoutesFC;
   segments: SegmentsFC;
@@ -50,6 +53,7 @@ export async function loadNetwork(): Promise<Network> {
     construction,
     validation,
     sources,
+    landmarks,
   ] = await Promise.all([
     get<LinesFC>(linesUrl),
     get<RoutesFC>(routesUrl),
@@ -60,12 +64,14 @@ export async function loadNetwork(): Promise<Network> {
     get<ConstructionFC>(constructionUrl),
     get<ValidationReport>(validationUrl),
     get<{ sources: { id: string; snapshot?: string }[] }>(sourcesUrl),
+    get<LandmarksFC>(landmarksUrl),
   ]);
   const osmSnapshot =
     sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
   const regionalSnapshot =
     sources.sources.find((s) => s.id === "osm-regional")?.snapshot ?? "unknown";
   return {
+    landmarks,
     lines,
     routes,
     segments,

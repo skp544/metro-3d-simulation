@@ -2,6 +2,19 @@
 
 Every third-party asset in `public/models/`, with its source and licence. Add a row before adding a file.
 
+## Original landmark models (2026-11-12)
+
+Four original procedural Blender interpretations are released under CC0 1.0, with no photographic textures. Architectural reference URLs, checked date and rejected/inaccessible asset candidates are in `data/manual/landmark-references.json`. Geographic positions/footprints remain OSM-derived ODbL data, separate from the model licence. The active Blender file path and original cube/camera/light were preserved; only the project collection `NCR_Landmarks` was created/rebuilt.
+
+| Local GLB | Triangles | Bytes | Scale / scope |
+|---|---|---|---|
+| `landmarks/india-gate.glb` | 2,432 | 141,956 | 42 m height from Delhi Tourism; footprint envelope from OSM; decorative proportions approximate |
+| `landmarks/lotus-temple.glb` | 20,876 | 1,451,712 | Nominal 34 m; 27 shells in three sets of nine, skyline/opening approximations; no invented surrounding pools |
+| `landmarks/qutb-minar.glb` | 15,868 | 922,580 | Source-backed 72.5 m height and 14.32 m base diameter; five storeys, simplified flutes and balconies |
+| `landmarks/red-fort.glb` | 7,422 | 513,296 | **Lahori Gate only**, mapped envelope; nominal 33 m height; approximate red sandstone towers/chhatris |
+
+Reproduce with `scripts/model-landmarks.py` in Blender. Source library: `assets/landmarks/landmarks.blend` (workshop objects spaced apart); exports have base origins, metre units, +X frontage/+Y up in glTF. Manifest and full licence URL: `public/models/landmarks/{manifest.json,LICENSE.txt}`. Source links and verification are detailed in `docs/phase8-landmarks-stations.md`.
+
 ## Regional train assets (2026-11-12)
 
 The user requested train silhouettes distinct from the Delhi Metro model. These are generic stand-ins, not exact NCRTC/CRRC replicas. Five original, AI-generated assets by **3D Assets** from the [Modern Rail and Metro Network pack](https://3dassets.dev/packs/modern-rail-and-metro-network) are released by the publisher under [CC0 1.0](https://creativecommons.org/publicdomain/zero/1.0/). Sources, original bounds, mesh counts and licence metadata are retained in `public/models/regional/manifest.json`.
