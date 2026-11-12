@@ -8,6 +8,7 @@ import { simSeconds, useMapStore } from "../../store/useMapStore";
 import type { Service, TrainState } from "../../utils/trainSim";
 import { pointAt, type Scene3DData } from "./geometry";
 import { carCapacity, carOffset, FLEETS, FLEET_MODEL_URLS, fleetForLine, regionalCarGeometry } from "./trainFleet";
+import { TrainSpeed } from "../ui/TrainSpeed";
 
 const CAR_MODELS = FLEETS.dmrc.models;
 const RENDER_RADIUS_M = 5000; // full models only near the view target; further away is sub-pixel anyway
@@ -328,6 +329,7 @@ function TrainLabels({
             style={{ background: colors.get(state.train.lineId) }}
           />
           <span className="font-semibold">{state.train.id}</span>
+          <TrainSpeed state={state} />
           <span
             className={
               state.atStationId ? "text-emerald-600" : "text-amber-600"

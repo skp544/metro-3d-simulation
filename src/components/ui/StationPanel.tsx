@@ -4,6 +4,7 @@ import type { Network } from "../../data/loadNetwork";
 import { useMapStore } from "../../store/useMapStore";
 import { useSimNow } from "../../store/useSimNow";
 import type { Service } from "../../utils/trainSim";
+import { TrainSpeedLimit } from "./TrainSpeed";
 
 /** Right-hand detail panel for the selected station, like the reference's hub panel. */
 export function StationPanel({ network, service }: { network: Network; service: Service }) {
@@ -82,6 +83,11 @@ export function StationPanel({ network, service }: { network: Network; service: 
 
       <section className="border-t border-slate-100 px-4 py-3">
         <h3 className="mb-1.5 text-xs font-semibold text-slate-800">Platforms</h3>
+        <ul className="mb-2 space-y-1">
+          {station.lines.map(lineId => <li key={lineId} className="text-[11px] text-slate-600">
+            {lines.get(lineId)?.name}: <TrainSpeedLimit lineId={lineId} showDesign />
+          </li>)}
+        </ul>
         <table className="w-full text-left text-xs">
           <tbody>
             {station.platforms.map((p) => (

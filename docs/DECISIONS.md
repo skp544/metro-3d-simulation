@@ -2,6 +2,13 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Verified speed limits and current speed display
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 64 | Train speeds (user) | Verify and show Namo Bharat's 160 km/h operating maximum separately from its 180 km/h design speed; Airport Express operating maximum 120 km/h (DMRC Annual Report 2023–24); Meerut Metro operating maximum 120 km/h, design 135 km/h (Alstom). Keep checked date and direct source links in `trainSpeeds.ts`. Ordinary metros/Aqua use a nominal 60 km/h model cap, with published maximum left unknown | User explicitly requested internet verification and faster express trains; design speed, actual instantaneous speed and estimated model settings must not be conflated |
+| 65 | Motion, UI and route estimates | Rest-to-rest acceleration/cruise/braking replaces constant 45 km/h motion. Acceleration 0.8 m/s² and braking 0.9 m/s² are nominal, with lower peak on short hops. Show current simulated km/h in the train table, 3D labels and follow card; source-backed limits also appear in station details. Planner and simulated arrivals use the same motion. Playback multiplier changes time, not the km/h value | Visible speeds must agree with actual model movement and route times, and must read zero at station dwells. No live speed feed, local speed restrictions or official timetable is claimed |
+
 ## 2026-11-12: Distinct regional train models
 
 | # | Topic | Decision | Reason |

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { buildRoutePlanner, TRANSFER_S } from "./routePlanner.ts";
+import { trainSpeedProfile } from "../constants/trainSpeeds.ts";
 
 const read = async (f: string) => JSON.parse(await readFile(`data/processed/${f}`, "utf8"));
 const [routes, segments, stations, transfers] = await Promise.all([read("metro_routes.geojson"), read("metro_segments.geojson"), read("metro_stations.geojson"), read("station_transfers.geojson")]);
@@ -58,7 +59,8 @@ test("an interchange trip changes line at a shared station and costs the transfe
   assert.ok(lines.includes(j.legs[0].lineId) && lines.includes(j.legs[1].lineId), "both lines serve the change station");
   assert.ok(j.timeS > j.transfers * TRANSFER_S);
   const kmh = (j.km / j.timeS) * 3600;
-  assert.ok(kmh > 20 && kmh < 40, `${kmh.toFixed(1)} km/h door to door`);
+  const fastest = Math.max(...j.legs.map(l => trainSpeedProfile(l.lineId).simulationMaxKmh));
+  assert.ok(kmh > 20 && kmh < fastest, `${kmh.toFixed(1)} km/h door to door stays below the fastest ride's cap`);
 });
 
 test("routes are symmetric and degenerate requests return null", () => {

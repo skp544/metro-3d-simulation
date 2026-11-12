@@ -5,6 +5,7 @@ import { useMapStore } from "../../store/useMapStore";
 import { useSimNow } from "../../store/useSimNow";
 import type { Service } from "../../utils/trainSim";
 import { ValidationList } from "./ValidationPanel";
+import { TrainSpeed } from "./TrainSpeed";
 
 type Tab = "trains" | "stations" | "validation";
 
@@ -61,6 +62,9 @@ function TrainList({ network, service }: { network: Network; service: Service })
 
   return (
     <table className="w-full text-left text-xs">
+      <thead className="sticky top-0 bg-white text-[10px] text-slate-400">
+        <tr><th className="py-1 pl-4 font-normal">Train</th><th className="font-normal">Line / destination</th><th className="font-normal">Status</th><th className="font-normal">Speed · sim.</th><th className="pr-4 font-normal">Trip</th></tr>
+      </thead>
       <tbody>
         {states.map((s) => (
           <tr
@@ -88,7 +92,8 @@ function TrainList({ network, service }: { network: Network; service: Service })
                 {s.atStationId ? `At ${names.get(s.atStationId)}` : `Next ${names.get(s.nextStationId)}`}
               </span>
             </td>
-            <td className="w-28 py-1.5 pr-4">
+            <td className="px-2 py-1.5 whitespace-nowrap"><TrainSpeed state={s} /></td>
+            <td className="w-20 min-w-16 py-1.5 pr-4">
               <div className="h-1.5 rounded-full bg-slate-100" title={`${Math.round(s.progress * 100)}% of the trip`}>
                 <div className="h-1.5 rounded-full" style={{ width: `${s.progress * 100}%`, background: lines.get(s.train.lineId)?.color }} />
               </div>

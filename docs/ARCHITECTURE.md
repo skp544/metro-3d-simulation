@@ -174,11 +174,11 @@ The Phase 8 expansion adds Aqua (21 stations), Namo Bharat RRTS (15 stations acr
 
 `data/manual/transfers.json` resolves five sourced endpoint pairs and generates `station_transfers.geojson` (`LineString`, TransferProps). Geometry is a schematic station-centre connector, never claimed to be a physical walkway alignment. Walking duration is nominal. The independent validator checks positive duration, endpoints, provenance, geometry, duplicate links and connectivity including walking edges.
 
-The loader exposes `network.transfers`. The planner returns oriented `journey.walks` with the preceding ride index; costs include walking plus a nominal half-headway wait, omitted for a walking-only finish. The itinerary and station panel expose separate-station transfers; dashed overlays appear in both views. Walk-only journeys are supported. RRTS and Meerut retain different stopping patterns on their shared corridor. All simulated train speeds and models remain generic (45 km/h cruise, no operator timetable). Existing city coverage remains around the original DMRC stations only.
+The loader exposes `network.transfers`. The planner returns oriented `journey.walks` with the preceding ride index; costs include walking plus a nominal half-headway wait, omitted for a walking-only finish. The itinerary and station panel expose separate-station transfers; dashed overlays appear in both views. Walk-only journeys are supported. RRTS and Meerut retain different stopping patterns on their shared corridor. The speed revision uses sourced operating caps for RRTS (160 km/h), Airport Express and Meerut (120 km/h), with nominal rest-to-rest acceleration/braking; regular metro/Aqua uses a nominal 60 km/h cap. Distinct generic train models remain illustrative; no operator timetable is implemented. Existing city coverage remains around the original DMRC stations only.
 
 See `phase8-regional-expansion.md` for the frozen validation and source record.
 
-The subsequent rolling-stock revision uses separate generic CC0 models for each regional fleet, retaining the DMRC Kenney stock. See `phase8-fleet-assets.md` and `ASSETS.md` for licences, formation references, measured geometry and visual limitations. Service speeds remain nominal.
+The subsequent rolling-stock revision uses separate generic CC0 models for each regional fleet, retaining the DMRC Kenney stock. See `phase8-fleet-assets.md` and `ASSETS.md` for licences, formation references, measured geometry and visual limitations. Service movement uses published express caps and nominal acceleration/braking; see `phase8-train-speeds.md`.
 
 ## Roadmap
 

@@ -6,6 +6,8 @@
 // Explicit .ts imports: this module is also loaded directly by Node's test runner.
 import { TRAIN } from "../constants/scene.ts";
 import type { RoutesFC, SegmentsFC, TransferProps, TransfersFC } from "../data/types.ts";
+import { trainSpeedProfile } from "../constants/trainSpeeds.ts";
+import { buildRun } from "./trainMotion.ts";
 
 /** Nominal cost of changing trains: platform walk plus half a headway of waiting (DECISIONS #53). */
 export const TRANSFER_S = 120 + TRAIN.headwayS / 2;
@@ -44,7 +46,6 @@ interface Edge {
 }
 
 export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = TRAIN, transfers?: TransfersFC) {
-  const speed = (cfg.cruiseKmh * 1000) / 3600; // m/s
   // Segments between two stops; a hop can have several (split where the track type changes).
   const segmentIds = new Map<string, string[]>();
   for (const { properties: s } of segments.features) {
@@ -72,12 +73,13 @@ export function buildRoutePlanner(routes: RoutesFC, segments: SegmentsFC, cfg = 
 
   for (const f of routes.features) {
     const r = f.properties;
+    const maxSpeedKmh = trainSpeedProfile(r.lineId, cfg.cruiseKmh).simulationMaxKmh;
     const km = r.stopKm.map((k) => k - r.stopKm[0]);
     for (let i = 0; i + 1 < r.stationIds.length; i++) {
       const [a, b] = [node(r.stationIds[i], r.id), node(r.stationIds[i + 1], r.id)];
       const segs = segmentIds.get(`${r.id}|${r.stationIds[i]}|${r.stationIds[i + 1]}`) ?? [];
       // Run time plus the dwell at the stop being left.
-      const cost = (Math.abs(km[i + 1] - km[i]) * 1000) / speed + cfg.dwellS;
+      const cost = buildRun(Math.abs(km[i + 1] - km[i]) * 1000, maxSpeedKmh, cfg.accelerationMps2, cfg.brakingMps2).durationS + cfg.dwellS;
       addEdge(a, { to: b, routeId: r.id, fromKm: km[i], toKm: km[i + 1], segmentIds: segs, cost });
       addEdge(b, { to: a, routeId: r.id, fromKm: km[i + 1], toKm: km[i], segmentIds: segs, cost });
     }

@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-12 · **Phase:** 8 including the regional expansion (Aqua, RRTS, Meerut Metro and explicit walking transfers), including distinct rolling-stock assets (see `phase8-fleet-assets.md`), ready for review. Full imagery review and real-GPU frame rate remain pending. See `phase8-regional-expansion.md`.
+**Last updated:** 2026-11-12 | **Phase:** 8 with regional networks, distinct fleet assets and sourced speed display. See `phase8-regional-expansion.md`, `phase8-fleet-assets.md` and `phase8-train-speeds.md`. Full imagery review and real-GPU frame rate remain pending.
 
 ## Data pipeline
 
@@ -64,8 +64,9 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
 | `src/store/useCommand.ts` | Runs a focus/fit/follow/camera command once, in whichever view is showing |
 | `src/store/useJourney.ts` | The planned journey for the chosen route ends (one planner per network) |
-| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (302 trains; nominal speeds, separate visual fleet profiles), `stateAt`, `nextArrivals` |
+| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (253 trains; per-line speed caps, nominal acceleration/braking, separate visual fleet profiles), `stateAt`, `nextArrivals` |
 | `src/utils/routePlanner.ts` | `buildRoutePlanner(routes, segments, cfg, transfers).plan(from, to)`: fastest estimated journey on a (station, route) graph; legs with stations, segment ids and km spans; nominal 5-min same-station change (`TRANSFER_S`), plus oriented walking steps with nominal walk/wait costs |
+| `src/constants/trainSpeeds.ts`, `src/utils/trainMotion.ts`, `src/components/ui/TrainSpeed.tsx` | Sourced operating/design limits; rest-to-rest motion shared by simulation and routing; current simulated km/h plus published limits/source links |
 | `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; 2D zoom ↔ metres per pixel ↔ 3D camera distance; nominal height profile with ramps |
 | `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles, `WORK_IN_PROGRESS_SYSTEMS` (names only); 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
 | `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `TransferLayer` (schematic dashed pedestrian links), `ValidationLayer`, `ConstructionLayer` |
@@ -73,13 +74,13 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
 | `public/models/regional/` | Five CC0 3D Assets GLBs, source/licence manifest, approximately 1.68 MB; RRTS, Aqua and Meerut silhouettes |
-| Tests | 49: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4), fleet formations/geometry (2) |
+| Tests | 54: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4), fleet formations/geometry (2), speed/motion (5) |
 
-Build: 2D bundle 441 KB JS (134 KB gzip); 3D chunk 1.074 MB (290 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
+Build: 2D bundle 445 KB JS (136 KB gzip); 3D chunk 1.074 MB (290 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
 3D scene: city ≈ 473k triangles in 109 chunks; structures ≈ 744k (12,976 piers, 8,013 station parts; rails, track bed and parapets ≈ 209k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view). Trains use 33 instanced meshes and draw models within 5 km of the view, dots further away. DMRC cars are approximately 1.5k triangles each; regional cars approximately 7.8k–9.9k. Formations total 51,520 triangles (RRTS), 32,208 (Aqua), 27,432 (Meerut).
 
-Regional trains now have distinct generic models and six/four/three-car RRTS/Aqua/Meerut formations; DMRC retains its existing six-car representation. The original 45 km/h simulated cruise remains; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
+Regional trains now have distinct generic models and six/four/three-car RRTS/Aqua/Meerut formations; DMRC retains its existing six-car representation. Published caps are 160 km/h for RRTS and 120 for Airport Express/Meerut; regular metro/Aqua uses a nominal 60 km/h cap. Shared acceleration/braking profiles drive movement and route estimates; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
 
 ## Dependencies
 

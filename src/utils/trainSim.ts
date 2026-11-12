@@ -1,9 +1,11 @@
 // Simulated metro service: where every train is at a given time. Deterministic (a pure function of
-// time), so pausing or speeding up the clock never drifts. NOT a real timetable: no open DMRC
-// schedule or live positions exist; the service pattern comes from the nominal TRAIN constants.
+// time), so pausing or speeding up the clock never drifts. No operator timetable or live-position feed
+// is used: nominal motion/dwells/headway are combined with the sourced express speed caps.
 // Explicit .ts imports: this module is also loaded directly by Node's test runner.
 import { TRAIN } from "../constants/scene.ts";
 import type { RoutesFC } from "../data/types.ts";
+import { trainSpeedProfile } from "../constants/trainSpeeds.ts";
+import { buildRun, motionAt, type RunProfile } from "./trainMotion.ts";
 
 /** One leg of a route's round trip: a dwell (fromKm === toKm) or a run between two stops. */
 interface Leg {
@@ -13,6 +15,7 @@ interface Leg {
   toKm: number;
   dir: 1 | -1;
   stop: number; // dwell: index of the stop; run: index of the stop being approached
+  motion: RunProfile | null;
 }
 
 export interface SimRoute {
@@ -22,6 +25,7 @@ export interface SimRoute {
   stopKm: number[]; // from the first stop
   cycleS: number; // full round trip including terminal dwells
   legs: Leg[];
+  maxSpeedKmh: number; // simulation cap; published status is recorded in trainSpeeds.ts
 }
 
 export interface SimTrain {
@@ -39,6 +43,7 @@ export interface TrainState {
   nextStationId: string; // next stop in the direction of travel (or current, while dwelling)
   terminusId: string; // where this trip ends
   progress: number; // 0..1 of the current one-way trip
+  speedKmh: number; // instantaneous speed in simulated time; zero during station dwells
 }
 
 const LINE_CODE: Record<string, string> = {
@@ -47,26 +52,26 @@ const LINE_CODE: Record<string, string> = {
 };
 
 export function buildService(routes: RoutesFC, cfg = TRAIN) {
-  const speed = (cfg.cruiseKmh * 1000) / 3600; // m/s
   const simRoutes: SimRoute[] = routes.features.map((f) => {
     const p = f.properties;
+    const maxSpeedKmh = trainSpeedProfile(p.lineId, cfg.cruiseKmh).simulationMaxKmh;
     const stopKm = p.stopKm.map((k) => k - p.stopKm[0]);
     const legs: Leg[] = [];
     let t = 0;
     const trip = (order: number[], dir: 1 | -1) =>
       order.forEach((s, j) => {
         const dwell = j === 0 ? cfg.terminalDwellS : cfg.dwellS;
-        legs.push({ t0: t, t1: (t += dwell), fromKm: stopKm[s], toKm: stopKm[s], dir, stop: s });
+        legs.push({ t0: t, t1: (t += dwell), fromKm: stopKm[s], toKm: stopKm[s], dir, stop: s, motion: null });
         const next = order[j + 1];
         if (next !== undefined) {
-          const runS = (Math.abs(stopKm[next] - stopKm[s]) * 1000) / speed;
-          legs.push({ t0: t, t1: (t += runS), fromKm: stopKm[s], toKm: stopKm[next], dir, stop: next });
+          const motion = buildRun(Math.abs(stopKm[next] - stopKm[s]) * 1000, maxSpeedKmh, cfg.accelerationMps2, cfg.brakingMps2);
+          legs.push({ t0: t, t1: (t += motion.durationS), fromKm: stopKm[s], toKm: stopKm[next], dir, stop: next, motion });
         }
       });
     const forward = stopKm.map((_, i) => i);
     trip(forward, 1);
     trip([...forward].reverse(), -1);
-    return { routeId: p.id, lineId: p.lineId, stationIds: p.stationIds, stopKm, cycleS: t, legs };
+    return { routeId: p.id, lineId: p.lineId, stationIds: p.stationIds, stopKm, cycleS: t, legs, maxSpeedKmh };
   });
 
   // Trains evenly spaced around each round trip, one every `headwayS` per direction.
@@ -93,8 +98,8 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
       else hi = mid;
     }
     const leg = r.legs[lo];
-    const f = leg.t1 > leg.t0 ? (phase - leg.t0) / (leg.t1 - leg.t0) : 0;
-    const km = leg.fromKm + (leg.toKm - leg.fromKm) * f;
+    const motion = leg.motion ? motionAt(leg.motion, phase - leg.t0) : { distanceM: 0, speedKmh: 0 };
+    const km = leg.fromKm + Math.sign(leg.toKm - leg.fromKm) * motion.distanceM / 1000;
     const last = r.stationIds.length - 1;
     const total = r.stopKm[last] || 1;
     return {
@@ -105,6 +110,7 @@ export function buildService(routes: RoutesFC, cfg = TRAIN) {
       nextStationId: r.stationIds[leg.stop],
       terminusId: r.stationIds[leg.dir === 1 ? last : 0],
       progress: leg.dir === 1 ? km / total : 1 - km / total,
+      speedKmh: motion.speedKmh,
     };
   }
 

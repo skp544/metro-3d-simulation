@@ -91,7 +91,9 @@ export const TRAIN = {
   carLength: 21.6, // m (DMRC broad-gauge car, nominal)
   carWidth: 3.2,
   carHeight: 3.9,
-  cruiseKmh: 45, // with dwell ≈ 34 km/h average, close to DMRC's reported average speed
+  cruiseKmh: 60, // nominal cap for regular metros; published express limits live in trainSpeeds.ts
+  accelerationMps2: 0.8, // nominal simplified motion, not operator performance measurements
+  brakingMps2: 0.9,
   dwellS: 30,
   terminalDwellS: 180,
   headwayS: 360, // one train every 6 min per direction
