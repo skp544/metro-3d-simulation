@@ -4,6 +4,18 @@ Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows /
 
 The landmark/station extension and the user's visual-review requests (buildings, roads and Yamuna) are implemented. The user handles commits. Read `CLAUDE.md`, `docs/CODE_SUMMARY.md`, DECISIONS #72–#75 and `docs/phase8-city-environment.md` first, then the frozen landmark report. The pre-implementation handoff is preserved in `docs/handoffs/2026-11-12-before-landmarks.md`.
 
+## Large generated files (read if you just pulled)
+
+- Pushed to GitHub on 2026-11-12. `data/processed/city_buildings.geojson` (~58 MB) and `city_roads.geojson` (~51 MB) exceed GitHub's 50 MB recommendation (warning only). GitHub rejects any single file over 100 MB; `city_trees.geojson` once hit 104 MB, so keep it and similar files under that limit.
+- These are **generated**: never hand-edit. Rebuild with `npm run data:city` (inputs: `data/raw/osm-city/` and `data/raw/environment/2026-11-12/`). See `docs/phase8-city-environment.md` for method and sizes; the app serves them compressed.
+- If a file nears 100 MB, switch it to Git LFS (https://git-lfs.com) or gitignore it and regenerate, and record the change in `docs/DECISIONS.md`.
+
+## Large generated files (read if you just pulled)
+
+- `data/processed/city_buildings.geojson` (~58 MB) and `city_roads.geojson` (~51 MB) exceed GitHub's 50 MB recommendation (push warning only). GitHub rejects any single file over 100 MB: `city_trees.geojson` hit 104 MB once, so keep generated files below that.
+- They are **generated**: never hand-edit. Rebuild with `npm run data:city` (inputs: `data/raw/osm-city/` and `data/raw/environment/2026-11-12/`). Method and sizes are in `docs/phase8-city-environment.md`; the app serves them compressed.
+- If a file nears 100 MB, move it to Git LFS (https://git-lfs.com) or gitignore and regenerate it, and log the change in `docs/DECISIONS.md`.
+
 ## Completed
 
 - Expanded real OSM environment: 124,105 buildings, 109,046 road ways, 19,711 land areas and 3,095 water areas. Station neighbourhoods expand to 650 m, local roads to 800 m, landmark districts to 2.3 km. All 14 new source snapshots are immutable under `data/raw/environment/2026-11-12/`; original city snapshot remains a baseline.
