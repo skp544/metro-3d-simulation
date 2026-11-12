@@ -27,7 +27,7 @@ export function MapPage() {
   }, []);
 
   if (error) return <Message>Could not load the metro data: {error}</Message>;
-  if (!network || !service) return <Message>Loading the Delhi Metro network…</Message>;
+  if (!network || !service) return <Message>Loading the NCR rail network…</Message>;
   return (
     <div className="flex h-dvh flex-col">
       <TopBar network={network} />

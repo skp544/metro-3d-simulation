@@ -5,8 +5,8 @@ import { test } from "node:test";
 import { buildRoutePlanner, TRANSFER_S } from "./routePlanner.ts";
 
 const read = async (f: string) => JSON.parse(await readFile(`data/processed/${f}`, "utf8"));
-const [routes, segments, stations] = await Promise.all([read("metro_routes.geojson"), read("metro_segments.geojson"), read("metro_stations.geojson")]);
-const planner = buildRoutePlanner(routes, segments);
+const [routes, segments, stations, transfers] = await Promise.all([read("metro_routes.geojson"), read("metro_segments.geojson"), read("metro_stations.geojson"), read("station_transfers.geojson")]);
+const planner = buildRoutePlanner(routes, segments, undefined, transfers);
 const props = stations.features.map((f: { properties: { id: string; name: string; lines: string[] } }) => f.properties) as { id: string; name: string; lines: string[] }[];
 const id = (name: string) => {
   const s = props.find((p) => p.name === name);
@@ -21,10 +21,13 @@ test("every station is reachable from Rajiv Chowk; legs chain end to start", () 
     if (s.id === from) continue;
     const j = planner.plan(from, s.id);
     assert.ok(j, `no route to ${s.name}`);
-    assert.equal(j.legs[0].stationIds[0], from);
-    assert.equal(j.legs.at(-1)!.stationIds.at(-1), s.id);
+    assert.ok(j.legs[0]?.stationIds[0] === from || j.walks[0]?.fromStationId === from);
+    assert.ok(j.legs.at(-1)?.stationIds.at(-1) === s.id || j.walks.at(-1)?.toStationId === s.id);
     j.legs.forEach((l, i) => {
-      if (i > 0) assert.equal(l.stationIds[0], j.legs[i - 1].stationIds.at(-1), `${s.name}: change at the same station`);
+      if (i > 0) {
+        const previous = j.legs[i - 1].stationIds.at(-1);
+        assert.ok(l.stationIds[0] === previous || j.walks.some(w => w.fromStationId === previous && w.toStationId === l.stationIds[0]), `${s.name}: change uses a shared station or explicit pedestrian link`);
+      }
       assert.ok(l.segmentIds.length >= l.stationIds.length - 1, `${s.name}: at least one segment per hop`);
     });
     assert.equal(j.transfers, j.legs.length - 1);

@@ -2,7 +2,7 @@
 
 What exists in the code right now. Update this with every change.
 
-**Last updated:** 2026-11-09 · **Phase:** 8 done (work-in-progress entries, train follow, 2D/3D view handoff, route highlighting; realistic track and stations after review), waiting for approval. Phase 4's human imagery review is still pending
+**Last updated:** 2026-11-12 ? **Phase:** 8 including the regional expansion (Aqua, RRTS, Meerut Metro and explicit walking transfers), ready for review. Full imagery review and real-GPU frame rate remain pending. See `phase8-regional-expansion.md`.
 
 ## Data pipeline
 
@@ -10,28 +10,30 @@ What exists in the code right now. Update this with every change.
 |---|---|
 | `scripts/fetch-osm.ts` | Downloads the Overpass snapshot → `data/raw/osm/<date>.json` (retries on 429/5xx) |
 | `scripts/fetch-wikipedia.ts` | Downloads station tables and infobox figures (stations, length) for the 9 line articles → `data/raw/wikipedia/<date>.json` |
+| `scripts/fetch-regional.ts` | Main OSM API: eight route directions and stop areas ? immutable `data/raw/regional/<timestamp>.json`; preserves the DMRC snapshot |
+| `data/manual/regional-lines.json`, `data/manual/transfers.json` | Three regional line configs, operator namespaces, references, five explicit bidirectional pedestrian connections |
 | `scripts/build-dataset.ts` | Latest raw snapshots + `data/manual/` → `data/processed/*.geojson`, `data/metadata/{sources,data_quality_report}.json`. Exits 1 on errors |
-| `scripts/validate.ts` | 22 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors |
-| `scripts/validate.test.ts` | 10 tests: the real data passes, and 8 kinds of corruption are caught, plus loop projection |
+| `scripts/validate.ts` | 23 independent checks on `data/processed/` → `data/metadata/validation_report.json`. Exits 1 on errors |
+| `scripts/validate.test.ts` | 13 tests: baseline corruption checks plus pedestrian endpoints/timing and missing-link connectivity |
 | `data/manual/lines.json` | 9 lines: Wikidata colours, OSM route_master, canonical/reverse relation per branch, Wikipedia article |
 | `data/manual/interchanges.json` | Proximity threshold (250 m); `merge`/`separate` lists (empty) |
 | `data/manual/station_overrides.json` | Per-station name/platform type corrections (empty) |
 | `src/data/types.ts` | GeoJSON schema types shared by the scripts and the app |
 
-Commands: `npm run data:fetch`, `npm run data:build` (build + validate), `npm run data:validate`, `npm test`.
+Commands: `npm run data:fetch`, `npm run data:fetch-regional`, `npm run data:build` (build + validate), `npm run data:validate`, `npm test`.
 
-**Validation (latest):** PASSED: 0 errors, 2 warnings (Magenta −5.5% and Grey −6.4% length vs Wikipedia), 22 info. Network is 1 connected component; all 9 station counts match Wikipedia.
+**Validation (latest):** PASSED: 0 errors, 7 warnings (two accepted length differences plus five nearby-station pairs), 68 info. One connected network including walking edges. Regional counts: Aqua 21, RRTS 15 (main + Duhai Depot), Meerut Metro 12. Original nine counts still match Wikipedia.
 
-## Dataset (OSM snapshot 2026-10-31T12:28Z)
+## Dataset (DMRC OSM 2026-10-31T12:28Z; regional OSM fetched 2026-11-12T06:02Z)
 
 | Output | Count |
 |---|---|
-| Lines / routes (branches) | 9 / 12 |
-| Stations | 244 (233 match Wikipedia on type) |
-| Interchanges | 26 (23 by shared ref, 3 by proximity) |
-| Segments | 312, joined end to end with no gaps |
+| Lines / routes (branches) | 12 / 16 |
+| Stations | 288 (233 match Wikipedia on type) |
+| Interchanges | 30 shared stations (27 by shared ref, 3 by proximity), plus 5 separate-station walking links |
+| Segments | 378, joined end to end with no gaps |
 | Under-construction ways | 12 |
-| Station types | 176 elevated, 57 underground, 2 at-grade, 8 mixed, 1 unknown |
+| Station types | 215 elevated, 61 underground, 3 at-grade, 8 mixed, 1 unknown |
 
 Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 34, Pink 46, Magenta 33, Grey 4, Airport Express 7.
 
@@ -41,9 +43,9 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 - 4 type conflicts:
   - Shahdara and Seelampur (Red): OSM says elevated, Wikipedia says at-grade. OSM was kept.
   - Adarsh Nagar (Yellow) and Tis Hazari (Red): OSM track is untagged, so Wikipedia's "elevated" was used.
-- 9 stations not found in Wikipedia: Badarpur, GTB Nagar, IIT Delhi, Jama Masjid, North Pitampura - Prashant Vihar, Rajendra Nagar, Punjabi Bagh, Rohini East, Rohini West.
+- 57 platform comparisons have no Wikipedia match: the regional networks have no captured per-station second-source layout table; original DMRC unmatched stations: Badarpur, GTB Nagar, IIT Delhi, Jama Masjid, North Pitampura - Prashant Vihar, Rajendra Nagar, Punjabi Bagh, Rohini East, Rohini West.
 - 1 unknown type: Rohini East (OSM `tunnel=building_passage`).
-- 25 stations have no DMRC code in OSM, so they use `stn_osm_*` IDs.
+- 46 stations have no operator code in OSM and use namespaced OSM IDs. All regional station codes are operator-local; NCRTC shares a namespace between RRTS and Meerut Metro.
 
 ## City context (3D only)
 
@@ -62,19 +64,21 @@ Stations per line match Wikipedia: Red 29, Yellow 37, Blue 57, Green 24, Violet 
 | `src/store/useSimNow.ts` | `useSimNow` (simulated time for panels), `formatIst` |
 | `src/store/useCommand.ts` | Runs a focus/fit/follow/camera command once, in whichever view is showing |
 | `src/store/useJourney.ts` | The planned journey for the chosen route ends (one planner per network) |
-| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (218 trains), `stateAt`, `nextArrivals` |
-| `src/utils/routePlanner.ts` | `buildRoutePlanner(routes, segments).plan(from, to)`: fastest estimated journey on a (station, route) graph; legs with stations, segment ids and km spans; nominal 5-min change (`TRANSFER_S`) |
+| `src/utils/trainSim.ts` | `buildService(routes)`: deterministic simulated service (302 trains; generic nominal speeds/models), `stateAt`, `nextArrivals` |
+| `src/utils/routePlanner.ts` | `buildRoutePlanner(routes, segments, cfg, transfers).plan(from, to)`: fastest estimated journey on a (station, route) graph; legs with stations, segment ids and km spans; nominal 5-min same-station change (`TRANSFER_S`), plus oriented walking steps with nominal walk/wait costs |
 | `src/utils/projection.ts`, `src/utils/trackProfile.ts` | Web Mercator → metres; 2D zoom ↔ metres per pixel ↔ 3D camera distance; nominal height profile with ramps |
 | `src/constants/map.ts`, `src/constants/scene.ts` | 2D styles, `WORK_IN_PROGRESS_SYSTEMS` (names only); 3D palette (matched to ref_image.png), true vertical scale, `STRUCTURE`, `TRAIN`, `SHADOW` |
-| `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `ValidationLayer`, `ConstructionLayer` |
-| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
+| `src/components/map2d/` | `MetroMap` (view handoff, focus/fit commands, URL hash), `SegmentLayer`, `StationLayer` (click → station panel; both dim off-route), `RouteLayer`, `TransferLayer` (schematic dashed pedestrian links), `ValidationLayer`, `ConstructionLayer` |
+| `src/components/scene3d/` | `MetroScene` (shadows, flat look, hub start view, LOD, underground surface lines), `SceneRig` (`CameraRig` fly-to/fit/zoom/views, train follow, view handoff; `Sun`, `StationLabels`), `RouteOverlay`, `TransferLinks` (schematic pedestrian overlay), `City` + `buildCity.ts`, `Structures` + `buildStructures.ts` (concrete viaduct, piers with caps, parapets, track bed, sleepers near the view, rails, ballast; stations with side platforms, glazed roof on columns, concourse; clickable), `Trains` (Kenney cars, stripe per line, clickable labels to follow, far dots), `geometry.ts`, `TrackLines`, `StationPoints` |
 | `src/components/ui/` | `TopBar` (search incl. work-in-progress systems, `ViewToggle`, speed, LIVE clock), `KpiCards`, `RoutePanel`, `ControlPanel` (incl. "Other systems"), `StationPanel` (route from/to buttons), `BottomDock` (Trains: follow in 3D / Stations / `ValidationList`), `SceneControls`, `FollowCard` |
 | `public/models/kenney/` | CC0 Kenney subway cars and trees (docs/ASSETS.md) |
-| Tests | 40: validator (10), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5) |
+| Tests | 47: validator (13), projection + profile + view scale (7), structures (9), network geometry (4), city (1), train simulation (4), route planner (5), regional coverage/routing (4) |
 
-Build: 2D bundle 432 KB JS (131 KB gzip); 3D chunk 1.07 MB (287 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
+Build: 2D bundle 441 KB JS (134 KB gzip); 3D chunk 1.07 MB (289 KB gzip), loaded only when the 3D view opens. Network and city data are fetched at runtime.
 
-3D scene: city ≈ 473k triangles in 107 chunks; structures ≈ 522k (8,429 piers, 6,595 station parts; rails, track bed and parapets ≈ 150k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view); trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
+3D scene: city ≈ 473k triangles in 109 chunks; structures ≈ 522k (8,429 piers, 6,595 station parts; rails, track bed and parapets ≈ 150k of it, drawn close up only; up to 40k instanced sleepers within 900 m of the view); trains drawn as models within 5 km of the view (≈ 1.5k triangles per car), as dots further away.
+
+The new corridors reuse generic 3D models and the original 45 km/h simulated cruise; times are estimates, not operator schedules. City coverage remains around original DMRC stations. Four shared NCRTC stations connect express and local stopping patterns. The five external transfers keep station identities separate.
 
 ## Dependencies
 

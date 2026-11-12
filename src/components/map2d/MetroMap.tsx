@@ -11,6 +11,7 @@ import { RouteLayer } from "./RouteLayer";
 import { SegmentLayer } from "./SegmentLayer";
 import { StationLayer } from "./StationLayer";
 import { ValidationLayer } from "./ValidationLayer";
+import { TransferLayer } from "./TransferLayer";
 
 function DataAttribution() {
   const map = useMap();
@@ -89,6 +90,7 @@ export function MetroMap({ network }: { network: Network }) {
       </Pane>
       <Pane name="route" style={{ zIndex: 420 }}>
         <RouteLayer network={network} />
+        <TransferLayer network={network} />
       </Pane>
       <Pane name="stations" style={{ zIndex: 450 }}>
         <StationLayer network={network} />

@@ -4,9 +4,9 @@ Source: the project brief (`text.txt`), narrowed by the decisions in `DECISIONS.
 
 ## Scope
 
-- **In:** DMRC operational lines: Red, Yellow, Blue (main branch + Vaishali branch), Green (main + Kirti Nagar branch), Violet, Pink, Magenta, Grey, Airport Express.
+- **In:** Noida Metro Aqua Line, Delhi?Meerut Namo Bharat RRTS, Meerut Metro, and DMRC operational lines: Red, Yellow, Blue (main branch + Vaishali branch), Green (main + Kirti Nagar branch), Violet, Pink, Magenta, Grey, Airport Express.
 - **Under construction:** Phase 4 corridors, in a separate layer that is off by default. Geometry is drawn only where a verified source exists.
-- **Work in progress (UI listing only, no data):** Rapid Metro Gurugram, Noida Aqua Line, Namo Bharat/RapidX.
+- **Work in progress (UI listing only, no data):** Rapid Metro Gurugram.
 
 ## Data
 
@@ -63,5 +63,7 @@ Source: the project brief (`text.txt`), narrowed by the decisions in `DECISIONS.
 **Visual style** (`ref_image.png`): light theme; low-poly isometric 3D scene with soft shading; white rounded floating cards (KPI tiles, a collapsible list on the left, a detail panel on the right, a tabbed table at the bottom); a top bar with search, speed controls (×1/×2/×4/×8) and a live status pill; floating labels on moving vehicles; vertical map controls (zoom, rotate, reset).
 
 ## Future
+
+Regional pedestrian transfers use explicit sourced connections, separate station identities and nominal walking times.
 
 Journey planner: pick source and destination, compute the route, then show the interchanges, number of stops and distance.

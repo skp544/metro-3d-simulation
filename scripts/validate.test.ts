@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { locate, validate } from "./validate.ts";
 
-const FILES = ["metro_lines", "metro_routes", "metro_segments", "metro_stations", "interchange_stations", "metro_under_construction"];
+const FILES = ["metro_lines", "metro_routes", "metro_segments", "metro_stations", "interchange_stations", "station_transfers", "metro_under_construction"];
 type FC = { features: { properties: Record<string, any>; geometry: { coordinates: any } }[] };
 
 // Copies data/processed into a temp dir after applying `mutate`, then validates the copy.
@@ -28,6 +28,21 @@ const route = (d: Record<string, FC>, id: string) => d.metro_routes.features.fin
 test("real dataset passes", async () => {
   const r = await validate();
   assert.equal(r.summary.errors, 0, JSON.stringify(r.issues.filter((i) => i.severity === "error"), null, 1));
+});
+
+test("pedestrian link to an unknown station is rejected", async () => {
+  const r = await validateMutated(d => { d.station_transfers.features[0].properties.toStationId = "stn_missing"; });
+  assert.ok(codes(r).has("TRANSFER_INVALID"));
+});
+
+test("non-positive walking time is rejected", async () => {
+  const r = await validateMutated(d => { d.station_transfers.features[0].properties.walkSeconds = 0; });
+  assert.ok(codes(r).has("TRANSFER_INVALID"));
+});
+
+test("missing Aqua pedestrian link breaks network connectivity", async () => {
+  const r = await validateMutated(d => { d.station_transfers.features = d.station_transfers.features.filter(f => f.properties.id !== "walk_noida_52_51"); });
+  assert.ok(codes(r).has("NETWORK_DISCONNECTED"));
 });
 
 test("duplicate station id", async () => {

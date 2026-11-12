@@ -17,6 +17,7 @@ import { StationPoints } from "./StationPoints";
 import { Structures } from "./Structures.tsx";
 import { TrackLines } from "./TrackLines";
 import { Trains } from "./Trains";
+import { TransferLinks } from "./TransferLinks";
 
 // Reports whether the view is close enough for real track geometry: an 8 m ribbon must be a few pixels wide.
 function LodWatcher({ onChange }: { onChange: (near: boolean) => void }) {
@@ -123,6 +124,7 @@ export function MetroScene({ network, service }: { network: Network; service: Se
           <Trains scene={scene} service={service} colors={colors} stationNames={names} near={near} />
         </Suspense>
         <StationLabels stations={scene.stations} names={names} near={near} />
+        <TransferLinks network={network} scene={scene} />
         {journey && <RouteOverlay journey={journey} paths={scene.paths} stations={scene.stations} colors={colors} names={names} />}
         {!near && <TrackLines runs={scene.runs} colors={colors} />}
         {near && showGround && <TrackLines runs={surfaceRuns} colors={colors} dashSize={14} gapSize={10} />}

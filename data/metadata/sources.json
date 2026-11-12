@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T12:54:29.679Z",
+  "generatedAt": "2026-11-12T06:08:43.200Z",
   "sources": [
     {
       "id": "osm",
@@ -10,6 +10,25 @@
       "snapshot": "2026-10-31T12:28:36Z",
       "file": "data/raw/osm/2026-10-31.json",
       "usedFor": "track geometry, track type (bridge/tunnel/layer tags), stops, stations, station codes, interchanges"
+    },
+    {
+      "id": "osm-regional",
+      "name": "OpenStreetMap regional networks via OSM API",
+      "url": "https://api.openstreetmap.org/api/0.6",
+      "licence": "ODbL-1.0",
+      "attribution": "© OpenStreetMap contributors",
+      "snapshot": "2026-11-12T06:02:28.701Z",
+      "file": "data/raw/regional/2026-11-12T06-02-28-701Z.json",
+      "usedFor": "Aqua Line, Namo Bharat and Meerut Metro tracks, stops, stations and colours"
+    },
+    {
+      "id": "regional-operators",
+      "urls": [
+        "https://www.nmrcnoida.com/",
+        "https://ncrtc.in/honble-pm-inaugurated-balance-sections-of-namo-bharat-corridor-meerut-metro/",
+        "https://www.alstom.com/sites/alstom.com/files/2026/02/23/20260223_PR_RRTS_Meerut_Metro_EN.pdf"
+      ],
+      "usedFor": "operational status and station counts; see data/manual/transfers.json for connection evidence"
     },
     {
       "id": "wikipedia",
@@ -40,10 +59,12 @@
       "id": "manual",
       "files": [
         "data/manual/lines.json",
+        "data/manual/regional-lines.json",
+        "data/manual/transfers.json",
         "data/manual/interchanges.json",
         "data/manual/station_overrides.json"
       ],
-      "usedFor": "line config, interchange and station corrections"
+      "usedFor": "line config, explicit walking links, interchange and station corrections"
     }
   ]
 }

@@ -166,6 +166,18 @@ Filters come from the same `useMapStore` as 2D. URL parameters:
 | View handoff | `viewHandoff` (in `useMapStore.ts`, not reactive state) holds centre + zoom + viewport height. The 2D map writes it on every move; the 3D `CameraRig` writes it 2–3 times a second via `metresPerPixelAtDistance` → `zoomForMetresPerPixel`. A view reads it once on mount (`metresPerPixel` → `distanceForMetresPerPixel` for 3D) |
 | Train follow | `follow` in the store; `CameraRig` recomputes the train's position with `service.stateAt` + `pointAt` each frame and translates camera and target together |
 
+## Regional expansion (2026-11-12)
+
+The Phase 8 expansion adds Aqua (21 stations), Namo Bharat RRTS (15 stations across main/depot services) and Meerut Metro (12 stations). Four Meerut stations are shared; distinct cross-operator stations use pedestrian edges, never proximity merges.
+
+`fetch-regional.ts` downloads eight route directions and their stop areas from the OSM API into immutable timestamped `data/raw/regional/` snapshots. `build-dataset.ts` combines that snapshot with the existing DMRC snapshot and `data/manual/regional-lines.json`. Operator-local station IDs are namespaced; NCRTC services share one namespace. Regional status/count sources are recorded in the config and sources metadata.
+
+`data/manual/transfers.json` resolves five sourced endpoint pairs and generates `station_transfers.geojson` (`LineString`, TransferProps). Geometry is a schematic station-centre connector, never claimed to be a physical walkway alignment. Walking duration is nominal. The independent validator checks positive duration, endpoints, provenance, geometry, duplicate links and connectivity including walking edges.
+
+The loader exposes `network.transfers`. The planner returns oriented `journey.walks` with the preceding ride index; costs include walking plus a nominal half-headway wait, omitted for a walking-only finish. The itinerary and station panel expose separate-station transfers; dashed overlays appear in both views. Walk-only journeys are supported. RRTS and Meerut retain different stopping patterns on their shared corridor. All simulated train speeds and models remain generic (45 km/h cruise, no operator timetable). Existing city coverage remains around the original DMRC stations only.
+
+See `phase8-regional-expansion.md` for the frozen validation and source record.
+
 ## Roadmap
 
 | Phase | Deliverable | Exit criteria | Status |

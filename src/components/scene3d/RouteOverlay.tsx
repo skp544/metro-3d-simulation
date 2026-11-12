@@ -39,12 +39,10 @@ export function RouteOverlay({ journey, paths, stations, colors, names }: { jour
   }, [journey, paths, showGround]);
 
   const ends = useMemo(() => {
-    const at = (stationId: string, lineId: string) => stations.find((s) => s.stationId === stationId && s.lineId === lineId)?.position;
-    const first = journey.legs[0];
-    const last = journey.legs.at(-1)!;
+    const at = (stationId: string) => stations.find((s) => s.stationId === stationId)?.position;
     return [
-      { label: "From", stationId: journey.fromId, position: at(journey.fromId, first.lineId) },
-      { label: "To", stationId: journey.toId, position: at(journey.toId, last.lineId) },
+      { label: "From", stationId: journey.fromId, position: at(journey.fromId) },
+      { label: "To", stationId: journey.toId, position: at(journey.toId) },
     ];
   }, [journey, stations]);
 

@@ -2,6 +2,16 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-12: Phase 8 regional expansion
+
+The user requested the remaining regional systems, specifically Noida Aqua Line, Delhi–Meerut RRTS and Meerut Metro, with proper interchanges. This revises decision #1 for those three systems. Rapid Metro Gurugram remains a work-in-progress entry.
+
+| # | Topic | Decision | Reason |
+|---|---|---|---|
+| 59 | Regional scope (user) | Add operational Aqua, Namo Bharat and Meerut Metro routes using actual OSM geometry and dated snapshots; preserve the existing DMRC snapshot. Include the Duhai Depot passenger branch; exclude Jangpura and Modipuram Depot from active routes | Requested regional coverage; no invented track or planned stations presented as operational |
+| 60 | Proper interchanges | Operator-local station IDs are namespaced. Four NCRTC shared stations remain shared; five cross-system pedestrian links are explicit, sourced, bidirectional edges between separate stations. Show schematic dashed connectors, separate ticketing, and estimated walking time; proximity alone never merges regional stations | Sector 51/52 and DMRC/RRTS stations have separate identities. Express RRTS and local Meerut services need distinct stop patterns |
+| 61 | Timing and 3D limits | Retain the existing generic six-car models and 45 km/h simulated cruise, 6-min nominal headway, 30-s dwell; walking links add nominal walk plus half-headway wait. Walking-only finishes have no train wait. Existing city geometry remains around original DMRC stations. Record seven validation warnings and pending imagery/performance review | Source-backed geography can be shipped without inventing operator timetables, surveyed walkway alignments or station-specific 3D designs |
+
 ## 2026-11-09: Phase 8 (remaining UI)
 
 The user said "start Phase 8" (2026-11-09). The four agreed items were done in order, smallest first.

@@ -1,23 +1,26 @@
 {
-  "generatedAt": "2026-10-31T12:54:29.679Z",
+  "generatedAt": "2026-11-12T06:08:43.200Z",
   "inputs": {
     "osm": "data/raw/osm/2026-10-31.json",
     "osmSnapshot": "2026-10-31T12:28:36Z",
+    "regional": "data/raw/regional/2026-11-12T06-02-28-701Z.json",
+    "regionalFetchedAt": "2026-11-12T06:02:28.701Z",
     "wikipedia": "data/raw/wikipedia/2026-10-31.json"
   },
   "counts": {
-    "lines": 9,
-    "routes": 12,
-    "stations": 244,
-    "interchanges": 26,
-    "segments": 312,
+    "lines": 12,
+    "routes": 16,
+    "stations": 288,
+    "interchanges": 30,
+    "walkingTransfers": 5,
+    "segments": 378,
     "underConstructionWays": 12,
     "stationsVerified": 233,
     "stationsWithConflicts": 4,
     "stationsByType": {
-      "elevated": 176,
-      "underground": 57,
-      "at_grade": 2,
+      "elevated": 215,
+      "underground": 61,
+      "at_grade": 3,
       "mixed": 8,
       "unknown": 1
     }
@@ -31,7 +34,10 @@
     "pink": 46,
     "magenta": 33,
     "grey": 4,
-    "airport_express": 7
+    "airport_express": 7,
+    "aqua": 21,
+    "rrts": 15,
+    "meerut_metro": 12
   },
   "trackKmByType": {
     "red": {
@@ -105,15 +111,39 @@
       "unknown": 0,
       "untagged": 0,
       "inferred": 0
+    },
+    "aqua": {
+      "elevated": 28.031,
+      "underground": 0,
+      "at_grade": 0,
+      "unknown": 0,
+      "untagged": 0,
+      "inferred": 0
+    },
+    "rrts": {
+      "elevated": 93.977,
+      "underground": 16.192,
+      "at_grade": 1.869,
+      "unknown": 0,
+      "untagged": 0.707,
+      "inferred": 0
+    },
+    "meerut_metro": {
+      "elevated": 15.547,
+      "underground": 4.908,
+      "at_grade": 0.763,
+      "unknown": 0,
+      "untagged": 0.419,
+      "inferred": 0
     }
   },
   "issueCounts": {
     "STOP_AREA_FALLBACK": 8,
     "PROXIMITY_MERGE": 3,
     "TYPE_CONFLICT": 4,
-    "WIKI_UNMATCHED": 9,
+    "WIKI_UNMATCHED": 57,
     "NAME_VARIANTS": 1,
-    "STATION_NO_REF": 25,
+    "STATION_NO_REF": 46,
     "TRACK_TYPE_INFERRED": 3
   },
   "issues": [
@@ -249,11 +279,563 @@
       ]
     },
     {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a01 (New Ashok Nagar) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a01"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a02 (Anand Vihar) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a02"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a03 (Sahibabad) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a03"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a04 (Ghaziabad) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a04"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a05 (Guldhar) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a05"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a06 (Duhai) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a06"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a07 (Murad Nagar) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a07"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a08 (Modinagar South) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a08"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a09 (Modinagar North) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a09"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a10 (Meerut South) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a10"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a10 (Meerut South) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a10"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a11 (Partapur) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a11"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a12 (Rithani) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a12"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a13 (Shatabdi Nagar) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a13"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a13 (Shatabdi Nagar) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a13"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a14 (Brahmapuri) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a14"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a15 (Meerut Central) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a15"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a16 (Bhainsali) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a16"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a17 (Begumpul) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a17"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a17 (Begumpul) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a17"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a18 (MES Colony) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a18"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a19 (Daurli) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a19"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a20 (Meerut North) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a20"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a21 (Modipuram) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a21"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_a21 (Modipuram) not found in the meerut_metro Wikipedia table",
+      "ids": [
+        "stn_ncrtc_a21"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_as2 (Duhai Depot Station) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_as2"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_ncrtc_z00 (Sarai Kale Khan) not found in the rrts Wikipedia table",
+      "ids": [
+        "stn_ncrtc_z00"
+      ]
+    },
+    {
       "severity": "info",
       "code": "NAME_VARIANTS",
       "message": "stn_ndi: OSM uses several names (New Delhi / New Delhi Airport Express Terminal)",
       "ids": [
         "stn_ndi"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n10074648933 (Rainbow) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n10074648933"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n10074648933 (Rainbow) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n10074648933"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165777365 (Noida Sector 143) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165777365"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165777365 (Noida Sector 143) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165777365"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165777372 (Noida Sector 148) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165777372"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165777372 (Noida Sector 148) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165777372"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165778689 (Alpha 1) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165778689"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165778689 (Alpha 1) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165778689"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165778690 (Delta 1) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165778690"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165778690 (Delta 1) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165778690"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165778691 (GNIDA Office) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165778691"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165778691 (GNIDA Office) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165778691"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165778709 (Noida Sector 147) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165778709"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165778709 (Noida Sector 147) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165778709"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4165778734 (Noida Sector 144) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4165778734"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4165778734 (Noida Sector 144) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4165778734"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4267913896 (Noida Sector 83) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4267913896"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4267913896 (Noida Sector 83) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4267913896"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4267913913 (Noida Sector 137) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4267913913"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4267913913 (Noida Sector 137) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4267913913"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4678434989 (Noida Sector 146) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4678434989"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4678434989 (Noida Sector 146) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4678434989"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4678434990 (Noida Sector 145) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4678434990"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4678434990 (Noida Sector 145) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4678434990"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4849443432 (NSEZ) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4849443432"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4849443432 (NSEZ) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4849443432"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4849447792 (Depot Station) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4849447792"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4849447792 (Depot Station) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4849447792"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4950920120 (Noida Sector 101) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4950920120"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4950920120 (Noida Sector 101) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4950920120"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4950923222 (Noida Sector 51) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4950923222"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4950923222 (Noida Sector 51) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4950923222"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4950923223 (Noida Sector 76) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4950923223"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4950923223 (Noida Sector 76) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4950923223"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_n4950923224 (Noida Sector 81) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_n4950923224"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_n4950923224 (Noida Sector 81) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_n4950923224"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_w1008841199 (Noida Sector 142) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_w1008841199"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_w1008841199 (Noida Sector 142) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_w1008841199"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_w696190204 (Knowledge Park II) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_w696190204"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_w696190204 (Knowledge Park II) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_w696190204"
+      ]
+    },
+    {
+      "severity": "warning",
+      "code": "WIKI_UNMATCHED",
+      "message": "stn_nmrc_osm_w696191675 (Pari Chowk) not found in the aqua Wikipedia table",
+      "ids": [
+        "stn_nmrc_osm_w696191675"
+      ]
+    },
+    {
+      "severity": "info",
+      "code": "STATION_NO_REF",
+      "message": "stn_nmrc_osm_w696191675 (Pari Chowk) has no DMRC station code in OSM",
+      "ids": [
+        "stn_nmrc_osm_w696191675"
       ]
     },
     {

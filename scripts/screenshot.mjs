@@ -6,20 +6,44 @@
 
 import { spawn } from "node:child_process";
 import { writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const [url, out, w = "1440", h = "900", wait = "6000"] = process.argv.slice(2);
 const port = 9333;
-const chrome = spawn("/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", [
-  "--headless=new", `--remote-debugging-port=${port}`, "--use-angle=swiftshader", "--enable-unsafe-swiftshader",
-  "--hide-scrollbars", `--window-size=${w},${h}`, `--user-data-dir=/tmp/cdp-shot-profile-${Date.now()}`, "about:blank",
-], { stdio: "ignore" });
+const binary =
+  process.env.CHROME_PATH ??
+  (process.platform === "win32"
+    ? "C:/Program Files/Google/Chrome/Application/chrome.exe"
+    : process.platform === "darwin"
+      ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      : "google-chrome");
+const chrome = spawn(
+  binary,
+  [
+    "--headless=new",
+    `--remote-debugging-port=${port}`,
+    "--use-angle=swiftshader",
+    "--enable-unsafe-swiftshader",
+    "--hide-scrollbars",
+    "--no-first-run",
+    `--window-size=${w},${h}`,
+    `--user-data-dir=${join(tmpdir(), `cdp-shot-profile-${Date.now()}`)}`,
+    "about:blank",
+  ],
+  { stdio: "ignore", windowsHide: true },
+);
 
 try {
   let target;
   for (let i = 0; i < 40 && !target; i++) {
     await sleep(250);
-    try { target = (await (await fetch(`http://127.0.0.1:${port}/json`)).json()).find((t) => t.type === "page"); } catch {}
+    try {
+      target = (
+        await (await fetch(`http://127.0.0.1:${port}/json`)).json()
+      ).find((t) => t.type === "page");
+    } catch {}
   }
   const ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((r) => ws.addEventListener("open", r));
@@ -28,21 +52,59 @@ try {
   ws.addEventListener("message", (e) => {
     const m = JSON.parse(e.data);
     if (m.id && pending.has(m.id)) pending.get(m.id)(m.result ?? m.error);
-    if (m.method === "Runtime.consoleAPICalled" && m.params.type !== "warning") console.log("console." + m.params.type, m.params.args.map((a) => a.value ?? a.description).join(" ").slice(0, 400));
-    if (m.method === "Runtime.exceptionThrown") console.log("EXCEPTION", (m.params.exceptionDetails.exception?.description ?? m.params.exceptionDetails.text).slice(0, 600));
+    if (m.method === "Runtime.consoleAPICalled" && m.params.type !== "warning")
+      console.log(
+        "console." + m.params.type,
+        m.params.args
+          .map((a) => a.value ?? a.description)
+          .join(" ")
+          .slice(0, 400),
+      );
+    if (m.method === "Runtime.exceptionThrown")
+      console.log(
+        "EXCEPTION",
+        (
+          m.params.exceptionDetails.exception?.description ??
+          m.params.exceptionDetails.text
+        ).slice(0, 600),
+      );
   });
-  const send = (method, params = {}) => new Promise((r) => { pending.set(++id, r); ws.send(JSON.stringify({ id, method, params })); });
+  const send = (method, params = {}) =>
+    new Promise((r) => {
+      pending.set(++id, r);
+      ws.send(JSON.stringify({ id, method, params }));
+    });
   await send("Runtime.enable");
   await send("Page.enable");
-  await send("Emulation.setDeviceMetricsOverride", { width: +w, height: +h, deviceScaleFactor: 1, mobile: false });
+  await send("Emulation.setDeviceMetricsOverride", {
+    width: +w,
+    height: +h,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
   await send("Page.navigate", { url });
   await sleep(+wait);
   if (process.env.EVAL) {
-    console.log("eval", JSON.stringify(await send("Runtime.evaluate", { expression: process.env.EVAL, awaitPromise: true, returnByValue: true })).slice(0, 400));
+    console.log(
+      "eval",
+      JSON.stringify(
+        await send("Runtime.evaluate", {
+          expression: process.env.EVAL,
+          awaitPromise: true,
+          returnByValue: true,
+        }),
+      ).slice(0, 400),
+    );
     await sleep(3000);
   }
   for (let i = 0; i < +(process.env.WHEEL ?? 0); i++) {
-    await send("Input.dispatchMouseEvent", { type: "mouseWheel", x: +w / 2, y: +h / 2, deltaX: 0, deltaY: -300 });
+    await send("Input.dispatchMouseEvent", {
+      type: "mouseWheel",
+      x: +w / 2,
+      y: +h / 2,
+      deltaX: 0,
+      deltaY: -300,
+    });
     await sleep(150);
   }
   if (process.env.WHEEL) await sleep(2500);

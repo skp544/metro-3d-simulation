@@ -43,6 +43,7 @@ export interface TrainState {
 
 const LINE_CODE: Record<string, string> = {
   red: "RD", yellow: "YL", blue: "BL", green: "GN", violet: "VT", pink: "PK", magenta: "MG", grey: "GY", airport_express: "AX",
+  aqua: "AQ", rrts: "NB", meerut_metro: "MM",
 };
 
 export function buildService(routes: RoutesFC, cfg = TRAIN) {

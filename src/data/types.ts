@@ -73,6 +73,15 @@ export interface InterchangeProps {
   evidence: "osm-ref" | "proximity" | "manual";
 }
 
+/** Bidirectional pedestrian connection between distinct stations. Geometry is a schematic connector. */
+export interface TransferProps extends Provenance {
+  id: string;
+  fromStationId: string;
+  toStationId: string;
+  walkSeconds: number; // nominal walking time, excludes the wait for the next train
+  note: string;
+}
+
 export interface ConstructionProps extends Provenance {
   id: string;
   name: string | null;
@@ -103,5 +112,6 @@ export type RoutesFC = FeatureCollection<LineString, RouteProps>;
 export type SegmentsFC = FeatureCollection<LineString, SegmentProps>;
 export type StationsFC = FeatureCollection<Point, StationProps>;
 export type InterchangesFC = FeatureCollection<Point, InterchangeProps>;
+export type TransfersFC = FeatureCollection<LineString, TransferProps>;
 export type ConstructionFC = FeatureCollection<LineString, ConstructionProps>;
 export type StationFeature = Feature<Point, StationProps>;

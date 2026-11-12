@@ -15,8 +15,8 @@ export function TopBar({ network }: { network: Network }) {
         <span className="grid h-7 w-7 place-items-center rounded-lg bg-slate-900 text-[11px] font-bold text-white" aria-hidden>
           M
         </span>
-        <span className="text-sm font-semibold text-slate-900">Delhi Metro</span>
-        <span className="hidden rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500 sm:inline">DMRC network</span>
+        <span className="text-sm font-semibold text-slate-900">NCR Rail</span>
+        <span className="hidden rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500 sm:inline">Delhi · Noida · Meerut</span>
       </div>
       <StationSearch network={network} />
       <ViewToggle />
@@ -39,10 +39,10 @@ function StationSearch({ network }: { network: Network }) {
     const k = norm(q);
     if (!k) return [];
     return network.stations.features
-      .filter((f) => [f.properties.name, ...f.properties.aliases, ...f.properties.refs].some((n) => norm(n).includes(k)))
+      .filter((f) => [f.properties.name, ...f.properties.aliases, ...f.properties.refs, ...f.properties.lines.map(id => lines.get(id)?.name ?? "")].some((n) => norm(n).includes(k)))
       .sort((a, b) => Number(!norm(a.properties.name).startsWith(k)) - Number(!norm(b.properties.name).startsWith(k)))
       .slice(0, 8);
-  }, [q, network.stations]);
+  }, [q, network.stations, lines]);
   // Searching for a system that is not on the map yet says so instead of finding nothing.
   const wip = useMemo(() => {
     const k = norm(q);

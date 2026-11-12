@@ -13,6 +13,7 @@ import type {
   SegmentProps,
   StationProps,
   StationType,
+  TransferProps,
 } from "../src/data/types.ts";
 
 type Tags = Record<string, string>;
@@ -35,6 +36,10 @@ type LineCfg = {
   colorSource: string;
   official: boolean;
   wikipedia: string;
+  system?: string;
+  statusSource?: string;
+  expectedStations?: number;
+  stationSuffix?: string;
   branches: { id: string; osmRoute: number; osmReverse: number }[];
 };
 type Issue = { severity: "error" | "warning" | "info"; code: string; message: string; ids?: string[] };
@@ -50,7 +55,11 @@ const osmPath = await latest("data/raw/osm");
 const wikiPath = await latest("data/raw/wikipedia");
 const osm = await readJson(osmPath);
 const wiki = await readJson(wikiPath);
-const { lines: lineCfgs } = (await readJson("data/manual/lines.json")) as { lines: LineCfg[] };
+const { lines: dmrcCfgs } = (await readJson("data/manual/lines.json")) as { lines: LineCfg[] };
+const { lines: regionalCfgs } = (await readJson("data/manual/regional-lines.json")) as { lines: LineCfg[] };
+const lineCfgs = [...dmrcCfgs, ...regionalCfgs];
+const regionalPath = await latest("data/raw/regional");
+const regional = await readJson(regionalPath);
 const manualIx = await readJson("data/manual/interchanges.json");
 const { overrides } = await readJson("data/manual/station_overrides.json");
 
@@ -60,7 +69,7 @@ const issue = (severity: Issue["severity"], code: string, message: string, ids?:
 
 // ---------- helpers ----------
 const el = new Map<string, OsmEl>();
-for (const e of osm.elements as OsmEl[]) el.set(`${e.type}/${e.id}`, e);
+for (const e of [...osm.elements, ...regional.elements] as OsmEl[]) el.set(`${e.type}/${e.id}`, e);
 const get = (type: string, id: number) => el.get(`${type}/${id}`);
 
 const r6 = (n: number) => Math.round(n * 1e6) / 1e6;
@@ -219,12 +228,15 @@ function stationObjOf(stop: OsmEl): OsmEl | null {
   return null;
 }
 
-const provisionalId = (stop: OsmEl, st: OsmEl | null) =>
+const baseId = (stop: OsmEl, st: OsmEl | null) =>
   st?.tags?.ref
     ? `stn_${st.tags.ref.toLowerCase()}`
     : st
       ? `stn_osm_${st.type[0]}${st.id}`
       : `stn_name_${norm(stop.tags?.name ?? String(stop.id))}`;
+// Station codes are operator-local. NCRTC's RRTS and Meerut services deliberately share a namespace.
+const provisionalId = (stop: OsmEl, st: OsmEl | null, system?: string) =>
+  baseId(stop, st).replace(/^stn_/, `stn_${system ? `${system}_` : ""}`);
 
 type Entry = { pid: string; lineId: string; branchId: string; stop: OsmEl; station: OsmEl | null; km?: number };
 const entries: Entry[] = [];
@@ -258,13 +270,13 @@ for (const line of lineCfgs) {
         issue("warning", "STOP_OFF_TRACK", `${b.id}: stop "${stop.tags?.name}" is ${Math.round(offM)} m from the track`, [`osm:node/${stop.id}`]);
       if (own.length && km <= prevKm) issue("error", "STOP_ORDER", `${b.id}: stop "${stop.tags?.name}" is not after the previous stop`);
       prevKm = km;
-      own.push({ pid: provisionalId(stop, st), lineId: line.id, branchId: b.id, stop, station: st, km });
+      own.push({ pid: provisionalId(stop, st, line.system), lineId: line.id, branchId: b.id, stop, station: st, km });
     }
     branchStops.set(b.id, own);
     entries.push(...own);
     const rev = stopsOf(reverse).map((stop) => {
       const st = stationOf(stop);
-      return { pid: provisionalId(stop, st), lineId: line.id, branchId: b.id, stop, station: st };
+      return { pid: provisionalId(stop, st, line.system), lineId: line.id, branchId: b.id, stop, station: st };
     });
     entries.push(...rev);
     const fwd = own.map((e) => e.pid).join(">");
@@ -299,6 +311,8 @@ for (let i = 0; i < pids.length; i++) {
     const [a, b] = [pids[i], pids[j]];
     const la = new Set(groups.get(a)!.map((e) => e.lineId));
     if (groups.get(b)!.some((e) => la.has(e.lineId))) continue;
+    // Cross-operator proximity does not prove an interchange; regional links are explicit walking edges.
+    if (groups.get(a)!.some(e => regionalCfgs.some(l => l.id === e.lineId)) || groups.get(b)!.some(e => regionalCfgs.some(l => l.id === e.lineId))) continue;
     const d = meters(groupPos(groups.get(a)!), groupPos(groups.get(b)!));
     if (d > manualIx.proximityMeters || blocked.has(`${a}|${b}`)) continue;
     union(a, b, "proximity");
@@ -332,6 +346,8 @@ for (const [id, es] of [...merged].sort((a, b) => a[0].localeCompare(b[0]))) {
   if (new Set([...stationNames, ...stopNames].map(norm)).size > 1)
     issue("info", "NAME_VARIANTS", `${id}: OSM uses several names (${[name, ...aliases].join(" / ")})`, [id]);
   const lines = lineOrder.filter((l) => es.some((e) => e.lineId === l));
+  const displaySuffix = lines.length === 1 ? lineCfgs.find(l => l.id === lines[0])?.stationSuffix : undefined;
+  if (displaySuffix && !aliases.includes(name)) aliases.push(name);
   const conflicts: string[] = [];
   const source = new Set<string>([...sts.map((s) => `osm:${s.type}/${s.id}`)]);
   let allVerified = sts.length > 0;
@@ -376,7 +392,7 @@ for (const [id, es] of [...merged].sort((a, b) => a[0].localeCompare(b[0]))) {
     geometry: { type: "Point", coordinates: groupPos(es) },
     properties: {
       id,
-      name: ov?.name ?? name,
+      name: ov?.name ?? `${name}${displaySuffix ?? ""}`,
       name_hi: sts.map((s) => s.tags?.["name:hi"]).find(Boolean)?.replace(/\s*\([^()]*लाइन[^()]*\)\s*$/, "") ?? null,
       aliases,
       refs,
@@ -503,7 +519,7 @@ for (const line of lineCfgs) {
       colorOfficial: line.official,
       status: "operational",
       branches: branchesOut,
-      source: [`osm:relation/${line.osmRouteMaster}`, "manual:lines.json"],
+      source: [`osm:relation/${line.osmRouteMaster}`, ...(line.statusSource ? [line.statusSource, "manual:regional-lines.json"] : ["manual:lines.json"])],
       verified: false,
       estimated: false,
       conflicts,
@@ -538,6 +554,19 @@ const constructionFeatures = [...el.values()]
   });
 
 // ---------- write ----------
+const transferCfg = await readJson("data/manual/transfers.json") as { transfers: { id: string; from: { lineId: string; name: string }; to: { lineId: string; name: string }; walkSeconds: number; source: string[]; note: string }[] };
+const transferFeatures = transferCfg.transfers.map(t => {
+  const resolve = (end: typeof t.from) => {
+    const hits = stationFeatures.filter(f => f.properties.lines.includes(end.lineId) && [f.properties.name, ...f.properties.aliases].some(n => norm(n) === norm(end.name)));
+    if (hits.length !== 1) throw new Error(`${t.id}: ${end.lineId}/${end.name} resolves to ${hits.length} stations`);
+    return hits[0];
+  };
+  const from = resolve(t.from), to = resolve(t.to);
+  return { type: "Feature" as const, geometry: { type: "LineString" as const, coordinates: [from.geometry.coordinates, to.geometry.coordinates] }, properties: {
+    id: t.id, fromStationId: from.properties.id, toStationId: to.properties.id, walkSeconds: t.walkSeconds,
+    note: t.note, source: t.source, estimated: true, verified: false, conflicts: [],
+  } satisfies TransferProps };
+});
 const fc = (features: unknown[]) => `{"type":"FeatureCollection","features":[\n${features.map((f) => JSON.stringify(f)).join(",\n")}\n]}\n`;
 await mkdir("data/processed", { recursive: true });
 await mkdir("data/metadata", { recursive: true });
@@ -546,6 +575,7 @@ await writeFile("data/processed/metro_routes.geojson", fc(routeFeatures));
 await writeFile("data/processed/metro_segments.geojson", fc(segmentFeatures));
 await writeFile("data/processed/metro_stations.geojson", fc(stationFeatures));
 await writeFile("data/processed/interchange_stations.geojson", fc(interchangeFeatures));
+await writeFile("data/processed/station_transfers.geojson", fc(transferFeatures));
 await writeFile("data/processed/metro_under_construction.geojson", fc(constructionFeatures));
 
 const generatedAt = new Date().toISOString();
@@ -566,6 +596,12 @@ await writeFile(
           usedFor: "track geometry, track type (bridge/tunnel/layer tags), stops, stations, station codes, interchanges",
         },
         {
+          id: "osm-regional", name: "OpenStreetMap regional networks via OSM API", url: regional.endpoint,
+          licence: "ODbL-1.0", attribution: "© OpenStreetMap contributors", snapshot: regional.fetchedAt, file: regionalPath,
+          usedFor: "Aqua Line, Namo Bharat and Meerut Metro tracks, stops, stations and colours",
+        },
+        { id: "regional-operators", urls: regionalCfgs.map(l => l.statusSource), usedFor: "operational status and station counts; see data/manual/transfers.json for connection evidence" },
+        {
           id: "wikipedia",
           name: "English Wikipedia line articles (station tables)",
           licence: "CC BY-SA 4.0",
@@ -575,7 +611,7 @@ await writeFile(
           usedFor: "cross-check of station layout; overrides only untagged OSM track",
         },
         { id: "wikidata", name: "Wikidata P465 (sRGB colour)", licence: "CC0-1.0", usedFor: "line colours (see colorSource per line)" },
-        { id: "manual", files: ["data/manual/lines.json", "data/manual/interchanges.json", "data/manual/station_overrides.json"], usedFor: "line config, interchange and station corrections" },
+        { id: "manual", files: ["data/manual/lines.json", "data/manual/regional-lines.json", "data/manual/transfers.json", "data/manual/interchanges.json", "data/manual/station_overrides.json"], usedFor: "line config, explicit walking links, interchange and station corrections" },
       ],
     },
     null,
@@ -586,12 +622,13 @@ await writeFile(
 const count = (code: string) => issues.filter((i) => i.code === code).length;
 const report = {
   generatedAt,
-  inputs: { osm: osmPath, osmSnapshot: osm.osm3s.timestamp_osm_base, wikipedia: wikiPath },
+  inputs: { osm: osmPath, osmSnapshot: osm.osm3s.timestamp_osm_base, regional: regionalPath, regionalFetchedAt: regional.fetchedAt, wikipedia: wikiPath },
   counts: {
     lines: lineFeatures.length,
     routes: routeFeatures.length,
     stations: stationFeatures.length,
     interchanges: interchangeFeatures.length,
+    walkingTransfers: transferFeatures.length,
     segments: segmentFeatures.length,
     underConstructionWays: constructionFeatures.length,
     stationsVerified: stationFeatures.filter((f) => f.properties.verified).length,

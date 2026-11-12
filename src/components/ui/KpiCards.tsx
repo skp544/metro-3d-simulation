@@ -14,8 +14,8 @@ export function KpiCards({ network, service }: { network: Network; service: Serv
 
   return (
     <div className="pointer-events-auto hidden gap-3 md:flex">
-      <Kpi label="Network" value={fixed.total.toFixed(0)} unit="km" note={`${fixed.elevated.toFixed(0)} elevated · ${fixed.underground.toFixed(0)} underground`} />
-      <Kpi label="Stations" value={String(network.stations.features.length)} note={`${fixed.interchanges} interchanges · 9 lines`} />
+      <Kpi label="Service routes" value={fixed.total.toFixed(0)} unit="km" note="Shared tracks counted per service" />
+      <Kpi label="Stations" value={String(network.stations.features.length)} note={`${fixed.interchanges} interchanges + ${network.transfers.features.length} walks · ${network.lines.features.length} lines`} />
       <Kpi label="Trains running" value={String(service.trains.length)} note={`${atStation} at a station now · simulated`} accent />
     </div>
   );

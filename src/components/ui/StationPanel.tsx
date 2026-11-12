@@ -15,13 +15,14 @@ export function StationPanel({ network, service }: { network: Network; service: 
   const station = useMemo(() => network.stations.features.find((f) => f.properties.id === id)?.properties, [network.stations, id]);
   if (!station) return null;
   const arrivals = service.nextArrivals(station.id, now).slice(0, 8);
+  const walks = network.transfers.features.filter(f => f.properties.fromStationId === station.id || f.properties.toStationId === station.id);
 
   return (
     <aside className="pointer-events-auto max-h-full w-[min(20rem,calc(100vw-1.5rem))] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 shadow-lg backdrop-blur" aria-label={`${station.name} details`}>
       <header className="flex items-start gap-3 px-4 pt-3 pb-2">
         <div className="min-w-0 flex-1">
           <div className="text-[10px] font-semibold tracking-wide text-blue-700 uppercase">
-            {station.isInterchange ? "Interchange" : "Station"}
+            {station.isInterchange ? "Interchange" : walks.length ? "Walking interchange" : "Station"}
             {station.refs.length > 0 && ` · ${station.refs.join(", ")}`}
           </div>
           <h2 className="truncate text-base font-semibold text-slate-900">{station.name}</h2>
@@ -54,6 +55,16 @@ export function StationPanel({ network, service }: { network: Network; service: 
       </div>
 
       <section className="border-t border-slate-100 px-4 py-3">
+        {walks.length > 0 && <div className="mb-3 space-y-2">
+          <h3 className="text-xs font-semibold text-slate-800">Walking connections</h3>
+          {walks.map(({ properties: t }) => {
+            const other = t.fromStationId === station.id ? t.toStationId : t.fromStationId;
+            return <div key={t.id} className="rounded-lg bg-amber-50 p-2 text-[11px] text-amber-900">
+              <button type="button" onClick={() => selectStation(other)} className="font-semibold underline">{names.get(other)}</button> · ≈ {Math.round(t.walkSeconds / 60)} min walk (estimated)
+              <p className="mt-1">{t.note}</p>
+            </div>;
+          })}
+        </div>}
         <h3 className="mb-1.5 text-xs font-semibold text-slate-800">
           Next trains <span className="font-normal text-slate-400">· simulated</span>
         </h3>

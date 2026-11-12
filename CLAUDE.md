@@ -1,6 +1,6 @@
-# Delhi Metro 2D/3D Visualization
+# NCR Rail 2D/3D Visualization
 
-Interactive Delhi Metro (DMRC) map: a Leaflet 2D view (the geographic validation layer) and a Three.js 3D view, both driven by the same GeoJSON.
+Interactive NCR rail map (DMRC, NMRC and NCRTC): a Leaflet 2D view (the geographic validation layer) and a Three.js 3D view, both driven by the same GeoJSON.
 
 **Priorities, in order:** geographic accuracy → 2D validation → 3D quality.
 
@@ -58,9 +58,9 @@ Phase 8 is finished, including a revision for realistic track, sleepers and stat
 
 ## Scope (see `docs/DECISIONS.md`)
 
-- In: DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
+- In: Noida Metro Aqua Line, Delhi?Meerut Namo Bharat RRTS, Meerut Metro, and DMRC's 9 lines (Red, Yellow, Blue with its Vaishali branch, Green, Violet, Pink, Magenta, Grey, Airport Express).
 - Phase 4 corridors: a separate "under construction" layer, off by default.
-- Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram, Noida Aqua Line, Namo Bharat/RapidX.
+- Out (shown in the UI only as "work in progress"): Rapid Metro Gurugram.
 
 ## Stack and commands
 
@@ -73,9 +73,10 @@ npm run lint         # oxlint
 npm run data:fetch   # new OSM + Wikipedia snapshots → data/raw/ (network; Overpass may be busy)
 npm run data:build   # data/raw + data/manual → data/processed + data/metadata, then validates (offline; exit 1 on errors)
 npm run data:validate  # validation only → data/metadata/validation_report.json
+npm run data:fetch-regional # new regional OSM API snapshot (preserves DMRC baseline)
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:city    # data/raw/osm-city → data/processed/city_*.geojson + data/metadata/city_report.json
-npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (40)
+npm test             # validator, projection + view scale, height profile, 3D geometry, city, train-simulation and route-planner tests (47)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.

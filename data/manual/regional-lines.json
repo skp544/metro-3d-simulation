@@ -1,0 +1,68 @@
+{
+  "_doc": "Regional expansion authorized 2026-11-12. Operational passenger routes only; colours from OSM, not official HEX values. Separate snapshots preserve the validated DMRC baseline.",
+  "lines": [
+    {
+      "id": "aqua",
+      "name": "Noida Metro Aqua Line",
+      "system": "nmrc",
+      "osmRouteMaster": 9268569,
+      "color": "#00FFFF",
+      "colorSource": "osm:relation/9268569#colour=aqua (CSS colour)",
+      "official": false,
+      "wikipedia": "Aqua_Line_(Noida_Metro)",
+      "statusSource": "https://www.nmrcnoida.com/",
+      "expectedStations": 21,
+      "branches": [
+        {
+          "id": "aqua_main",
+          "osmRoute": 9268569,
+          "osmReverse": 9268568
+        }
+      ]
+    },
+    {
+      "id": "rrts",
+      "name": "Namo Bharat · Delhi–Meerut RRTS",
+      "system": "ncrtc",
+      "osmRouteMaster": 17337287,
+      "color": "#F0631E",
+      "colorSource": "osm:relation/17337287#colour",
+      "official": false,
+      "wikipedia": "Delhi–Meerut_Regional_Rapid_Transit_System",
+      "statusSource": "https://ncrtc.in/honble-pm-inaugurated-balance-sections-of-namo-bharat-corridor-meerut-metro/",
+      "expectedStations": 15,
+      "branches": [
+        {
+          "id": "rrts_main",
+          "osmRoute": 17337287,
+          "osmReverse": 17337288
+        },
+        {
+          "id": "rrts_duhai_depot",
+          "osmRoute": 20268499,
+          "osmReverse": 20268500
+        }
+      ],
+      "stationSuffix": " (Namo Bharat)"
+    },
+    {
+      "id": "meerut_metro",
+      "name": "Meerut Metro",
+      "system": "ncrtc",
+      "osmRouteMaster": 16661918,
+      "color": "#D8514D",
+      "colorSource": "osm:relation/16661918#colour",
+      "official": false,
+      "wikipedia": "Meerut_Metro",
+      "statusSource": "https://www.alstom.com/sites/alstom.com/files/2026/02/23/20260223_PR_RRTS_Meerut_Metro_EN.pdf",
+      "expectedStations": 12,
+      "branches": [
+        {
+          "id": "meerut_metro_main",
+          "osmRoute": 16661918,
+          "osmReverse": 20268334
+        }
+      ]
+    }
+  ]
+}

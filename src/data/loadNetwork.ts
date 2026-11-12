@@ -5,6 +5,7 @@ import routesUrl from "../../data/processed/metro_routes.geojson?url";
 import segmentsUrl from "../../data/processed/metro_segments.geojson?url";
 import stationsUrl from "../../data/processed/metro_stations.geojson?url";
 import interchangesUrl from "../../data/processed/interchange_stations.geojson?url";
+import transfersUrl from "../../data/processed/station_transfers.geojson?url";
 import constructionUrl from "../../data/processed/metro_under_construction.geojson?url";
 import sourcesUrl from "../../data/metadata/sources.json?url";
 import validationUrl from "../../data/metadata/validation_report.json?url";
@@ -16,6 +17,7 @@ import type {
   SegmentsFC,
   StationsFC,
   ValidationReport,
+  TransfersFC,
 } from "./types";
 
 export interface Network {
@@ -24,6 +26,7 @@ export interface Network {
   segments: SegmentsFC;
   stations: StationsFC;
   interchanges: InterchangesFC;
+  transfers: TransfersFC;
   construction: ConstructionFC;
   validation: ValidationReport;
   osmSnapshot: string;
@@ -36,16 +39,17 @@ async function get<T>(url: string): Promise<T> {
 }
 
 export async function loadNetwork(): Promise<Network> {
-  const [lines, routes, segments, stations, interchanges, construction, validation, sources] = await Promise.all([
+  const [lines, routes, segments, stations, interchanges, transfers, construction, validation, sources] = await Promise.all([
     get<LinesFC>(linesUrl),
     get<RoutesFC>(routesUrl),
     get<SegmentsFC>(segmentsUrl),
     get<StationsFC>(stationsUrl),
     get<InterchangesFC>(interchangesUrl),
+    get<TransfersFC>(transfersUrl),
     get<ConstructionFC>(constructionUrl),
     get<ValidationReport>(validationUrl),
     get<{ sources: { id: string; snapshot?: string }[] }>(sourcesUrl),
   ]);
   const osmSnapshot = sources.sources.find((s) => s.id === "osm")?.snapshot ?? "unknown";
-  return { lines, routes, segments, stations, interchanges, construction, validation, osmSnapshot };
+  return { lines, routes, segments, stations, interchanges, transfers, construction, validation, osmSnapshot };
 }
