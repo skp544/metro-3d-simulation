@@ -244,6 +244,116 @@
         8
       ],
       "bytes": 201360
+    },
+    {
+      "id": "dlf-mall-of-india",
+      "triangles": 7156,
+      "sizeM": [
+        234.75431853191645,
+        136.73725807377622,
+        30
+      ],
+      "bytes": 479872
+    },
+    {
+      "id": "great-india-place",
+      "triangles": 3664,
+      "sizeM": [
+        242.50429962272108,
+        78.96877451574596,
+        24
+      ],
+      "bytes": 216464
+    },
+    {
+      "id": "india-expo-mart",
+      "triangles": 1204,
+      "sizeM": [
+        233.27278735560452,
+        201.95784153000537,
+        18
+      ],
+      "bytes": 87600
+    },
+    {
+      "id": "mahagun-metro-mall",
+      "triangles": 6492,
+      "sizeM": [
+        153.2770721994267,
+        95.97407666546046,
+        26
+      ],
+      "bytes": 418376
+    },
+    {
+      "id": "pacific-sahibabad",
+      "triangles": 48,
+      "sizeM": [
+        160.86853367265718,
+        121.74172276075308,
+        0.4
+      ],
+      "bytes": 4600
+    },
+    {
+      "id": "shopprix-meerut",
+      "triangles": 4904,
+      "sizeM": [
+        133.18325953704561,
+        87.02991458856391,
+        24
+      ],
+      "bytes": 304420
+    },
+    {
+      "id": "gandhi-bagh",
+      "triangles": 216,
+      "sizeM": [
+        455.31504691228616,
+        358.3337665625297,
+        0.4
+      ],
+      "bytes": 16364
+    },
+    {
+      "id": "okhla-bird-sanctuary",
+      "triangles": 180,
+      "sizeM": [
+        2825.626160337567,
+        1556.0237498148585,
+        0.4
+      ],
+      "bytes": 13844
+    },
+    {
+      "id": "city-forest-ghaziabad",
+      "triangles": 1392,
+      "sizeM": [
+        1611.9424773802266,
+        906.0396065353555,
+        0.4
+      ],
+      "bytes": 98700
+    },
+    {
+      "id": "augharnath-temple",
+      "triangles": 48,
+      "sizeM": [
+        106.5967312158445,
+        64.91630615283904,
+        0.4
+      ],
+      "bytes": 4604
+    },
+    {
+      "id": "iskcon-ghaziabad",
+      "triangles": 3390,
+      "sizeM": [
+        37.14634342330678,
+        33.65557570549986,
+        24
+      ],
+      "bytes": 195136
     }
   ]
 }

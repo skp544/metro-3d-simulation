@@ -2,6 +2,12 @@
 
 Every third-party asset in `public/models/`, with its source and licence. Add a row before adding a file.
 
+## NCR corridor Places · 2026-11-14
+
+Eleven original procedural Blender assets extend the library to 35 places. Six source-footprint building interpretations and five open site contours add **28,694 triangles / 1,839,980 GLB bytes**; the complete library totals **238,434 triangles / 13,905,604 bytes**. Assets, source script/library and the CC0 model licence remain under `public/models/landmarks/`, `scripts/model-landmarks.py` and `assets/landmarks/landmarks.blend`. Geographic source outlines separately remain OSM-derived ODbL. No third-party mesh or photographic texture is distributed.
+
+Noida/Greater Noida: DLF Mall of India, Great India Place, India Expo Mart, Okhla Bird Sanctuary. Ghaziabad: Mahagun Metro Mall, Pacific Sahibabad, City Forest, ISKCON. Meerut: Shopprix Mall, Gandhi Bagh, Augharnath Temple. All new building heights and details are nominal. Pacific Sahibabad, Augharnath and the parks/sanctuary are open mapped site highlights, preserving city context. See `docs/phase8-ncr-places.md` for per-asset figures, exact scope, source references and limitations.
+
 ## Delhi malls, zoo and monument models (2026-11-12)
 
 17 additional original procedural models bring the library to **24 GLBs**. Source: `scripts/model-landmarks.py`; source library: `assets/landmarks/landmarks.blend`; sizes/triangle counts: `public/models/landmarks/manifest.json`. They cover eight Delhi malls, the zoo and eight monuments/religious sites. The zoo, Vegas and Pacific Tagore Garden assets are open source-derived site contours, not invented buildings/habitats. Mall model silhouettes use every source polygon part and preserve courtyard holes. Facades, lettering and all other architectural details are original nominal interpretations. No reference photographs, textures or third-party models are distributed. CC0 applies to original authoring; geographic geometry separately remains OSM-derived ODbL. See `docs/phase8-delhi-places.md` for the complete scope, sources, figures and browser checks.

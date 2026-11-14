@@ -11,6 +11,8 @@ Track progress in `docs/CODE_SUMMARY.md`.
 
 ## Next session: start here (handoff, 2026-11-12)
 
+**Latest NCR Places batch (2026-11-14):** 35 places: Delhi 24, Noida/Greater Noida 4, Ghaziabad 4, Meerut 3. Read `docs/phase8-ncr-places.md`, Code Summary and decisions #85–#87. Area/category filters, Parks and area/alias search share the processed GeoJSON. Six new approximate building models and five site outlines add 28,694 triangles / 1,839,980 GLB bytes. Pacific Sahibabad and Augharnath remain site boundaries; never invent building footprints/internal layouts from them. Heights/details are nominal. Per-place snapshot dates retain older captures; seven preserved extracts keep original-file provenance, four new API snapshots are dated 2026-11-14. Existing city mapping is sparse around Shopprix Meerut. TypeScript, lint, data/production builds and 81 tests pass; rail validation remains 0 / 2 / 73. Owner review/commit follows; no further phase or expansion without direction.
+
 **Latest Delhi Places batch:** 24 places, including eight malls, Delhi Zoo and eight newly added monuments/religious sites. Read `docs/phase8-delhi-places.md`, Code Summary and decisions #82–#84. Search aliases/category filters and multi-part footprints are shared by both views. Mall models preserve source polygons/courtyards; zoo, Vegas and Pacific Tagore Garden are mapped site outlines that retain surrounding city context. Purana Qila is Bara Darwaza only; Jantar Mantar is Samrat Yantra only; Agrasen is a labelled raised cutaway. Preserve nominal labels and source conflicts. TypeScript, lint, data/production builds and 80 tests pass; rail validation remains 0 / 2 / 73. Stop for owner review/commit before another batch.
 
 **Latest walking-pathway repair:** The five nearby separate-station pairs have outlined amber schematic walking paths and nearby estimated-time labels in both views. Click for station connection details. Validation now records valid links as `WALKING_TRANSFER` info; missing/invalid links keep proximity warnings and cannot join connectivity. No surveyed walkway geometry or station merging is implied. See `docs/phase8-walking-pathways.md` and decision #81. TypeScript, lint, data build, production build and 77 tests pass; validation is 0 errors / 2 warnings / 73 info.
@@ -95,7 +97,7 @@ npm run data:fetch-regional # new regional OSM API snapshot (preserves DMRC base
 npm run data:fetch-city  # OSM buildings/roads/green within 300 m of stations → data/raw/osm-city/ (network)
 npm run data:fetch-environment # immutable OSM city/roads/landscape/water snapshots; reuses completed requests
 npm run data:city    # baseline + environment snapshots → combined GeoJSON, context, hashed city tiles + report
-npm test             # data, geometry, city, fleet/motion, routing, landmarks and circulation tests (63)
+npm test             # data, geometry, city, fleet/motion, routing, landmarks and circulation tests (81)
 ```
 
 After any change to the data or the pipeline, run `npm run data:build && npm test`. Never ship data with validation errors.

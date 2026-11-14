@@ -2,6 +2,14 @@
 
 Newest first. Each entry: date, decision, reason.
 
+## 2026-11-14: Noida, Ghaziabad and Meerut Places
+
+| # | Topic | Decision | Reason |
+| --- | --- | --- | --- |
+| 85 | Regional Places (user) | Extend the existing Places phase with 11 curated sites: four Noida/Greater Noida, four Ghaziabad and three Meerut; retain all 24 Delhi places. Add an Area selector, area-aware category counts/search and a Parks category. | Owner requested the same Places experience for these corridors. No subsequent phase or rail expansion is started. |
+| 86 | Regional source identity and dates | Reuse seven unchanged preserved elements with original-file provenance; capture four new OSM way/full snapshots dated 2026-11-14. Allow per-place dates while preserving existing source dates. DLF Noida is way 351621425; City Forest is nature-reserve way 780474305, not a similarly named Gurugram development or the Gopi Sarover pond. | Names alone can identify the wrong area or geometry. Exact names/tags, category/role and source history remain auditable. |
+| 87 | Model and environment limits | Author six original approximate building models and five open site highlights. Keep Pacific Sahibabad as a retail parcel and Augharnath as a worship-site boundary; retain their city context. All new heights/details are nominal. Reuse current city tiles and document sparse mapped surroundings at Shopprix Meerut. | Captured site boundaries do not establish building footprints, entrances or internal layouts. Existing mapping gaps cannot be filled with invented geographic buildings. Distances remain straight line to station points. |
+
 ## 2026-11-12: Delhi malls, zoo and additional monuments
 
 | # | Topic | Decision | Reason |

@@ -44,7 +44,7 @@ function StationSearch({ network }: { network: Network }) {
       .filter((f) => [f.properties.name, ...f.properties.aliases, ...f.properties.refs, ...f.properties.lines.map(id => lines.get(id)?.name ?? "")].some((n) => norm(n).includes(k)))
       .sort((a, b) => Number(!norm(a.properties.name).startsWith(k)) - Number(!norm(b.properties.name).startsWith(k)))
       .slice(0, 8).map(f => ({ id: f.properties.id, name: f.properties.name, lines: f.properties.lines, ref: f.properties.refs[0], pick: () => { selectStation(f.properties.id); focusOn(f.geometry.coordinates as [number, number]); } }));
-    const places = network.landmarks.features.filter(f => [f.properties.name, ...f.properties.aliases, PLACE_CATEGORIES[f.properties.category].plural].some(n => norm(n).includes(k))).map(f => ({ id: f.properties.id, name: f.properties.name, lines: [] as string[], ref: PLACE_CATEGORIES[f.properties.category].label, pick: () => showLandmark(f) }));
+    const places = network.landmarks.features.filter(f => [f.properties.name, f.properties.region, ...f.properties.aliases, PLACE_CATEGORIES[f.properties.category].plural].some(n => norm(n).includes(k))).map(f => ({ id: f.properties.id, name: f.properties.name, lines: [] as string[], ref: PLACE_CATEGORIES[f.properties.category].label, pick: () => showLandmark(f) }));
     return [...places, ...stations].slice(0, 8);
   }, [q, network.stations, network.landmarks, lines, selectStation, focusOn]);
   // Searching for a system that is not on the map yet says so instead of finding nothing.

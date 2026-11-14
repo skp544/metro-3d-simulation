@@ -1,6 +1,14 @@
-# Handoff: Delhi malls, zoo and monuments added
+# Handoff: Noida, Ghaziabad and Meerut Places added
 
-Updated 2026-11-12. Workspace: `D:\self-practice\metro-3d-simulation` (Windows / PowerShell).
+Updated 2026-11-14. Current workspace: `/Users/skp/Development/metro-route` (macOS / zsh).
+
+## Latest: NCR corridor Places expansion (2026-11-14)
+
+**35 places** now share search, Places, 2D and 3D: the 24 Delhi entries plus **four Noida/Greater Noida, four Ghaziabad and three Meerut** places. Read `docs/phase8-ncr-places.md` and decisions #85–#87. Places adds an Area selector with category counts and a Parks category; search accepts areas and aliases. Six new approximate building models and five mapped site highlights add **28,694 triangles / 1,839,980 GLB bytes**. Original Blender source/GLBs are included.
+
+Seven preserved-source extracts retain original-file provenance. Four new OSM API snapshots are dated 2026-11-14; build/fetch use per-place dates, retaining the older Delhi captures. Exact identities distinguish DLF Noida from the similarly named Gurugram development and City Forest from its pond. Pacific Sahibabad and Augharnath remain **site outlines**, as do the parks/sanctuary. All new heights/details are **nominal**. Existing city tiles are reused; Shopprix Meerut's surrounding mapped buildings are sparse (30 in the selected 48 tiles). Do not invent context or internal building layouts.
+
+TypeScript, lint, production/data builds and **81 tests** pass; rail validation remains **0 errors, 2 warnings, 73 info**. Browser artifacts are in `docs/review/ncr-places/`. Owner review/commit follows; no commit/push was made. Further places, city capture and later phases await owner direction.
 
 ## Latest: Delhi Places expansion (2026-11-12)
 

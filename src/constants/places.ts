@@ -6,4 +6,5 @@ export const PLACE_CATEGORIES: Record<PlaceCategory, { label: string; plural: st
   zoo: { label: "Zoo", plural: "Zoo", color: "#166534", fill: "#dcfce7" },
   religious: { label: "Religious site", plural: "Religious", color: "#9f1239", fill: "#ffe4e6" },
   civic: { label: "Civic landmark", plural: "Civic", color: "#334155", fill: "#e2e8f0" },
+  park: { label: "Park / sanctuary", plural: "Parks", color: "#166534", fill: "#dcfce7" },
 };

@@ -1,16 +1,17 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { area, centerOfMass, distance, point, polygon } from "@turf/turf";
-import type { LandmarksFC, PlaceCategory, StationsFC } from "../src/data/types.ts";
+import type { LandmarksFC, PlaceCategory, PlaceRegion, StationsFC } from "../src/data/types.ts";
 import { createProjection } from "../src/utils/projection.ts";
 import { joinRings, pointInRing } from "./environmentGeometry.ts";
 
 const read = (p: string) => JSON.parse(readFileSync(new URL(p, import.meta.url), "utf8"));
-const config = read("../data/manual/landmarks.json") as { snapshot: string; landmarks: { id: string; name: string; category?: PlaceCategory; aliases?: string[]; geometryRole?: "building" | "site"; wayId?: number; relationId?: number; wikidata?: string; osmName?: string; osmTags?: Record<string, string>; pointSnapshot?: string; widthM?: number; depthM?: number; oriented?: boolean; heightM: number; heightEstimated: boolean; reference: string; scope: string; conflicts?: string[] }[] };
+const config = read("../data/manual/landmarks.json") as { snapshot: string; landmarks: { id: string; name: string; category?: PlaceCategory; region?: PlaceRegion; snapshot?: string; aliases?: string[]; geometryRole?: "building" | "site"; wayId?: number; relationId?: number; wikidata?: string; osmName?: string; osmTags?: Record<string, string>; pointSnapshot?: string; widthM?: number; depthM?: number; oriented?: boolean; heightM: number; heightEstimated: boolean; reference: string; scope: string; conflicts?: string[] }[] };
 const stations = read("../data/processed/metro_stations.geojson") as StationsFC;
 const fc: LandmarksFC = { type: "FeatureCollection", features: config.landmarks.map((l) => {
+  const snapshot = l.snapshot ?? config.snapshot;
   const type = l.relationId ? "relation" : "way", id = l.relationId ?? l.wayId;
-  const pointSource = l.pointSnapshot ? read(`../data/raw/landmarks/${config.snapshot}/${l.pointSnapshot}`) as { coordinates: [number, number]; source: string; coordinateAccuracy: string } : null;
-  const raw = (pointSource ? { elements: [] } : read(`../data/raw/landmarks/${config.snapshot}/${type}-${id}.json`)) as { sourceSnapshot?: string; elements: { id: number; type: string; lon?: number; lat?: number; nodes?: number[]; geometry?: { lon: number; lat: number }[]; members?: { type: string; ref: number; role: string }[]; tags?: Record<string, string>; version?: number }[] };
+  const pointSource = l.pointSnapshot ? read(`../data/raw/landmarks/${snapshot}/${l.pointSnapshot}`) as { coordinates: [number, number]; source: string; coordinateAccuracy: string } : null;
+  const raw = (pointSource ? { elements: [] } : read(`../data/raw/landmarks/${snapshot}/${type}-${id}.json`)) as { sourceSnapshot?: string; elements: { id: number; type: string; lon?: number; lat?: number; nodes?: number[]; geometry?: { lon: number; lat: number }[]; members?: { type: string; ref: number; role: string }[]; tags?: Record<string, string>; version?: number }[] };
   const entity = raw.elements.find(e => e.type === type && e.id === id);
   if (!pointSource && (!entity || (!l.wikidata && !l.osmName)
     || (l.wikidata && entity.tags?.wikidata !== l.wikidata)
@@ -58,13 +59,13 @@ const fc: LandmarksFC = { type: "FeatureCollection", features: config.landmarks.
   const modelFootprints = footprintParts.map(p => ({ outer: localRing(p.outer), holes: p.holes.map(localRing) }));
   const nearest = stations.features.map(s => ({ stationId: s.properties.id, name: s.properties.name, distanceM: Math.round(distance(point(center), s) * 1000) })).sort((a, b) => a.distanceM - b.distanceM)[0];
   return { type: "Feature", geometry: { type: "Point", coordinates: center }, properties: {
-    id: l.id, name: l.name, category: l.category ?? "monument", aliases: l.aliases ?? [], geometryRole: l.geometryRole ?? "building", footprint: ring, footprintParts, modelFootprints, footprintHoles: rings.slice(1), model: `/models/landmarks/${l.id}.glb`,
+    id: l.id, name: l.name, category: l.category ?? "monument", region: l.region ?? "Delhi", aliases: l.aliases ?? [], geometryRole: l.geometryRole ?? "building", footprint: ring, footprintParts, modelFootprints, footprintHoles: rings.slice(1), model: `/models/landmarks/${l.id}.glb`,
     widthM: box.width, depthM: box.depth, heightM: l.heightM, heightEstimated: l.heightEstimated,
     yaw,
     orientationSource: oriented ? "OSM footprint long axis; facade details approximate" : pointSource ? "nominal; statue heading not surveyed" : "nominal; radial model",
-    positionSource: pointSource ? `Directory point captured ${config.snapshot}; ${pointSource.coordinateAccuracy}` : `OSM position and footprint snapshot ${config.snapshot}`,
-    scope: l.scope, nearestStation: nearest, reference: l.reference, snapshot: config.snapshot,
-    source: [pointSource ? `data/raw/landmarks/${config.snapshot}/${l.pointSnapshot}` : `osm:${type}/${id}@${entity!.version ?? `snapshot-${config.snapshot}`}`, pointSource?.source ?? l.reference, ...(raw.sourceSnapshot ? [raw.sourceSnapshot] : [])], verified: false, estimated: true, conflicts: l.conflicts ?? [],
+    positionSource: pointSource ? `Directory point captured ${snapshot}; ${pointSource.coordinateAccuracy}` : `OSM position and footprint snapshot ${snapshot}`,
+    scope: l.scope, nearestStation: nearest, reference: l.reference, snapshot,
+    source: [pointSource ? `data/raw/landmarks/${snapshot}/${l.pointSnapshot}` : `osm:${type}/${id}@${entity!.version ?? `snapshot-${snapshot}`}`, pointSource?.source ?? l.reference, ...(raw.sourceSnapshot ? [raw.sourceSnapshot] : [])], verified: false, estimated: true, conflicts: l.conflicts ?? [],
   } };
 }) };
 writeFileSync(new URL("../data/processed/landmarks.geojson", import.meta.url), JSON.stringify(fc, null, 2) + "\n");

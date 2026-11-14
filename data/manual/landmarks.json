@@ -404,6 +404,255 @@
       "scope": "Raised cutaway illustration of the mapped stepwell, showing descending steps and side arcades. The real well is sunken; this 8 m display height, step count, depth and masonry details are nominal. This model does not represent a surveyed excavation or visitor route.",
       "heightEstimated": true,
       "oriented": true
+    },
+    {
+      "id": "dlf-mall-of-india",
+      "name": "DLF Mall of India · Noida",
+      "region": "Noida",
+      "category": "mall",
+      "wayId": 351621425,
+      "osmName": "DLF Mall Of India",
+      "osmTags": {
+        "building": "yes",
+        "shop": "mall"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-04.json",
+      "heightM": 30,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://www.dlfmallofindia.com/",
+      "aliases": [
+        "Mall of India",
+        "Sector 18 mall"
+      ],
+      "scope": "Mapped Noida mall building. Facades, glazing, signage and 30 m height are nominal; underground floors and shop interiors are not reconstructed. Separate from the similarly named Gurugram development."
+    },
+    {
+      "id": "great-india-place",
+      "name": "The Great India Place · Noida",
+      "region": "Noida",
+      "category": "mall",
+      "wayId": 44819871,
+      "osmName": "The Great India Place",
+      "osmTags": {
+        "building": "yes",
+        "shop": "mall"
+      },
+      "snapshotSource": "data/raw/osm-city/2026-11-04.json",
+      "heightM": 24,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://www.thegreatindiaplace.in/",
+      "aliases": [
+        "GIP",
+        "Great India Place",
+        "Sector 38A"
+      ],
+      "scope": "Mapped main mall building only. Facade details and 24 m height are nominal; Gardens Galleria, Worlds of Wonder and the wider Entertainment City campus are not reconstructed.",
+      "snapshot": "2026-11-04"
+    },
+    {
+      "id": "india-expo-mart",
+      "name": "India Expo Mart · Greater Noida",
+      "region": "Noida",
+      "category": "civic",
+      "wayId": 87176871,
+      "osmName": "India Expo Mart",
+      "osmTags": {
+        "building": "retail"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-04.json",
+      "heightM": 18,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://indiaexpomart.in/",
+      "aliases": [
+        "India Expo Centre",
+        "IEML",
+        "Knowledge Park II"
+      ],
+      "scope": "Mapped mart building only, with nominal exhibition-building facade and 18 m height. The complete exhibition campus, halls, interiors and visitor access are not reconstructed."
+    },
+    {
+      "id": "mahagun-metro-mall",
+      "name": "Mahagun Metro Mall · Vaishali",
+      "region": "Ghaziabad",
+      "category": "mall",
+      "wayId": 633286040,
+      "osmName": "Mahagun Metro Mall",
+      "osmTags": {
+        "building": "commercial"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-07.json",
+      "heightM": 26,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://www.mahagunindia.com/project/mahagun-metro-mall/",
+      "aliases": [
+        "Vaishali mall"
+      ],
+      "scope": "Mapped mall building. Facades, glazing and 26 m height are nominal; adjacent hotel, shop interiors and the wider retail parcel are not reconstructed."
+    },
+    {
+      "id": "pacific-sahibabad",
+      "name": "Pacific Mall · Sahibabad",
+      "region": "Ghaziabad",
+      "category": "mall",
+      "wayId": 196622332,
+      "osmName": "Pacific Mall",
+      "osmTags": {
+        "landuse": "retail"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/land-water.json",
+      "heightM": 0.4,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://www.pacificmalls.in/ghaziabad",
+      "aliases": [
+        "Pacific Ghaziabad",
+        "Pacific Kaushambi"
+      ],
+      "scope": "Mapped retail parcel shown as an open site outline. This is not a verified building footprint; no mall building, entrances or shop layout are invented. Existing city context remains visible. Highlight thickness 0.4 m is nominal.",
+      "geometryRole": "site"
+    },
+    {
+      "id": "shopprix-meerut",
+      "name": "Shopprix Mall · Meerut",
+      "region": "Meerut",
+      "category": "mall",
+      "wayId": 1304497999,
+      "osmName": "Shopprix Mall",
+      "osmTags": {
+        "building": "commercial",
+        "shop": "mall"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/neighbourhood-03.json",
+      "heightM": 24,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://www.supertechlimited.com/public-announcements/",
+      "aliases": [
+        "Shopprix Meerut",
+        "Surya Palace Colony"
+      ],
+      "scope": "Mapped Meerut mall building. Facades, glazing and 24 m height are nominal; neighbouring hotels and shop interiors are not reconstructed. Separate from Shopprix malls in Noida and Ghaziabad."
+    },
+    {
+      "id": "gandhi-bagh",
+      "name": "Gandhi Bagh · Meerut",
+      "region": "Meerut",
+      "category": "park",
+      "wayId": 323804157,
+      "osmName": "Gandhi Bagh",
+      "osmTags": {
+        "leisure": "park"
+      },
+      "snapshotSource": "data/raw/environment/2026-11-12/land-water.json",
+      "heightM": 0.4,
+      "heightEstimated": true,
+      "oriented": true,
+      "reference": "https://meerut.nic.in/tourist-places/",
+      "aliases": [
+        "Company Garden",
+        "Company Gardens",
+        "Gandhi Bagh Meerut"
+      ],
+      "scope": "Mapped park boundary shown as an open site outline. Existing city trees/buildings remain visible; gardens, fountains, entrances and visitor paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "geometryRole": "site"
+    },
+    {
+      "id": "okhla-bird-sanctuary",
+      "name": "Okhla Bird Sanctuary",
+      "region": "Noida",
+      "category": "park",
+      "wayId": 28208892,
+      "osmName": "Okhla Bird Sanctuary",
+      "wikidata": "Q7081968",
+      "osmTags": {
+        "leisure": "nature_reserve",
+        "boundary": "protected_area"
+      },
+      "reference": "https://upecoboard.up.gov.in/en/article/okhla-bird-sanctuary",
+      "aliases": [
+        "Okhla Sanctuary",
+        "Bird sanctuary Noida"
+      ],
+      "scope": "Mapped sanctuary boundary shown as an open site outline across the Yamuna wetland. Existing water and city context remain visible. Habitats, birds, watchtowers, entrances and visitor paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "snapshot": "2026-11-14",
+      "heightM": 0.4,
+      "heightEstimated": true,
+      "oriented": true,
+      "geometryRole": "site"
+    },
+    {
+      "id": "city-forest-ghaziabad",
+      "name": "City Forest · Ghaziabad",
+      "region": "Ghaziabad",
+      "category": "park",
+      "wayId": 780474305,
+      "osmName": "City Forest",
+      "osmTags": {
+        "leisure": "nature_reserve"
+      },
+      "reference": "https://gdaghaziabad.in/city-forest/",
+      "aliases": [
+        "Hindon City Forest",
+        "City Forest Park"
+      ],
+      "scope": "Mapped nature-reserve boundary shown as an open site outline, distinct from the Gopi Sarover pond inside it. Existing city context remains visible; internal gardens, rides, buildings, entrances and paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "snapshot": "2026-11-14",
+      "heightM": 0.4,
+      "heightEstimated": true,
+      "oriented": true,
+      "geometryRole": "site"
+    },
+    {
+      "id": "augharnath-temple",
+      "name": "Augharnath Temple · Meerut",
+      "region": "Meerut",
+      "category": "religious",
+      "wayId": 1214457825,
+      "osmName": "Baba Augharnath Shiva Temple",
+      "wikidata": "Q118383264",
+      "osmTags": {
+        "amenity": "place_of_worship",
+        "religion": "hindu"
+      },
+      "reference": "https://heritagemeerut.in/Eng/AugurnathTemple.html",
+      "aliases": [
+        "Kali Paltan Mandir",
+        "Augarnath",
+        "Augharnath Mandir"
+      ],
+      "scope": "Mapped worship-site boundary shown as an open site outline. The source does not verify a temple-building footprint; shrines, spires, entrances and internal layout are not reconstructed. Existing city context remains visible. Highlight thickness 0.4 m is nominal.",
+      "snapshot": "2026-11-14",
+      "heightM": 0.4,
+      "heightEstimated": true,
+      "oriented": true,
+      "geometryRole": "site"
+    },
+    {
+      "id": "iskcon-ghaziabad",
+      "name": "ISKCON Temple · Ghaziabad",
+      "region": "Ghaziabad",
+      "category": "religious",
+      "wayId": 352767307,
+      "osmName": "ISKCON Temple, Ghaziabad",
+      "osmTags": {
+        "building": "yes",
+        "amenity": "place_of_worship",
+        "denomination": "hare_krishna"
+      },
+      "reference": "https://iskconghaziabad.com/contact",
+      "aliases": [
+        "Sri Sri Radha Madan Mohan Temple",
+        "Raj Nagar temple"
+      ],
+      "scope": "Mapped Raj Nagar temple building. Original stylized temple massing, spires, colonnade and 24 m height are nominal; interiors and visitor access are not reconstructed. Separate from ISKCON Noida and Wave City.",
+      "snapshot": "2026-11-14",
+      "heightM": 24,
+      "heightEstimated": true,
+      "oriented": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "checked": "2026-11-12",
+  "checked": "2026-11-14",
   "references": [
     {
       "url": "https://www.delhitourism.gov.in/tourist_place/india_gate.html",
@@ -145,6 +145,61 @@
       "url": "https://www.delhitourism.gov.in/dt/explore-the-city.html",
       "facts": "Raised cutaway illustration of the mapped stepwell, showing descending steps and side arcades. The real well is sunken; this 8 m display height, step count, depth and masonry details are nominal. This model does not represent a surveyed excavation or visitor route.",
       "distributedImages": false
+    },
+    {
+      "url": "https://www.dlfmallofindia.com/",
+      "facts": "DLF Mall of India · Noida: identity and site context only; no surveyed height or facade dimensions inferred. Mapped Noida mall building. Facades, glazing, signage and 30 m height are nominal; underground floors and shop interiors are not reconstructed. Separate from the similarly named Gurugram development.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.thegreatindiaplace.in/",
+      "facts": "The Great India Place · Noida: identity and site context only; no surveyed height or facade dimensions inferred. Mapped main mall building only. Facade details and 24 m height are nominal; Gardens Galleria, Worlds of Wonder and the wider Entertainment City campus are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://indiaexpomart.in/",
+      "facts": "India Expo Mart · Greater Noida: identity and site context only; no surveyed height or facade dimensions inferred. Mapped mart building only, with nominal exhibition-building facade and 18 m height. The complete exhibition campus, halls, interiors and visitor access are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.mahagunindia.com/project/mahagun-metro-mall/",
+      "facts": "Mahagun Metro Mall · Vaishali: identity and site context only; no surveyed height or facade dimensions inferred. Mapped mall building. Facades, glazing and 26 m height are nominal; adjacent hotel, shop interiors and the wider retail parcel are not reconstructed.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.pacificmalls.in/ghaziabad",
+      "facts": "Pacific Mall · Sahibabad: identity and site context only; no surveyed height or facade dimensions inferred. Mapped retail parcel shown as an open site outline. This is not a verified building footprint; no mall building, entrances or shop layout are invented. Existing city context remains visible. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://www.supertechlimited.com/public-announcements/",
+      "facts": "Shopprix Mall · Meerut: identity and site context only; no surveyed height or facade dimensions inferred. Mapped Meerut mall building. Facades, glazing and 24 m height are nominal; neighbouring hotels and shop interiors are not reconstructed. Separate from Shopprix malls in Noida and Ghaziabad.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://meerut.nic.in/tourist-places/",
+      "facts": "Gandhi Bagh · Meerut: identity and site context only; no surveyed height or facade dimensions inferred. Mapped park boundary shown as an open site outline. Existing city trees/buildings remain visible; gardens, fountains, entrances and visitor paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://upecoboard.up.gov.in/en/article/okhla-bird-sanctuary",
+      "facts": "Okhla Bird Sanctuary: identity and site context only; no surveyed height or facade dimensions inferred. Mapped sanctuary boundary shown as an open site outline across the Yamuna wetland. Existing water and city context remain visible. Habitats, birds, watchtowers, entrances and visitor paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://gdaghaziabad.in/city-forest/",
+      "facts": "City Forest · Ghaziabad: identity and site context only; no surveyed height or facade dimensions inferred. Mapped nature-reserve boundary shown as an open site outline, distinct from the Gopi Sarover pond inside it. Existing city context remains visible; internal gardens, rides, buildings, entrances and paths are not reconstructed. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://heritagemeerut.in/Eng/AugurnathTemple.html",
+      "facts": "Augharnath Temple · Meerut: identity and site context only; no surveyed height or facade dimensions inferred. Mapped worship-site boundary shown as an open site outline. The source does not verify a temple-building footprint; shrines, spires, entrances and internal layout are not reconstructed. Existing city context remains visible. Highlight thickness 0.4 m is nominal.",
+      "distributedImages": false
+    },
+    {
+      "url": "https://iskconghaziabad.com/contact",
+      "facts": "ISKCON Temple · Ghaziabad: identity and site context only; no surveyed height or facade dimensions inferred. Mapped Raj Nagar temple building. Original stylized temple massing, spires, colonnade and 24 m height are nominal; interiors and visitor access are not reconstructed. Separate from ISKCON Noida and Wave City.",
+      "distributedImages": false
     }
   ],
   "assetSearch": [
@@ -176,5 +231,14 @@
     "Purana Qila scope is Bara Darwaza only. Jantar Mantar scope is Samrat Yantra only. Agrasen ki Baoli is an explicitly labelled raised cutaway of a real sunken well; display height, depth, steps and arcades are nominal.",
     "Footprint-derived mall and site model XY coordinates pass through projection.ts during the data build. No direct latitude/longitude interpretation is added to Blender or frontend model code.",
     "Akshardham’s mapped footprint is smaller than its officially published plan dimensions; keep the OSM outline and log the mismatch instead of expanding it without surveyed geometry."
+  ],
+  "regionalLimitations": [
+    "This curated batch covers four Noida/Greater Noida, four Ghaziabad and three Meerut places, not every attraction.",
+    "Noida DLF uses way 351621425, not the similarly named Gurugram relation 16164905.",
+    "City Forest uses nature-reserve way 780474305, not Gopi Sarover pond way 780474299.",
+    "Augharnath uses a worship-site boundary without building tags; no invented temple footprint.",
+    "Pacific Sahibabad uses a retail parcel; no invented building footprint.",
+    "Okhla Sanctuary is an OSM protected-area outline; its centre and nearest-station distance do not describe an entrance.",
+    "Gardens Galleria, Shipra Mall and additional Meerut memorials/churches are outside this captured geometry batch."
   ]
 }

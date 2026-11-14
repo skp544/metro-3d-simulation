@@ -2,9 +2,9 @@
 // Directory-only statue coordinates are captured separately with their source HTML; never infer a footprint.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 const config = JSON.parse(await readFile(new URL('../data/manual/landmarks.json', import.meta.url), 'utf8'));
-const dir = new URL(`../data/raw/landmarks/${config.snapshot}/`, import.meta.url);
-await mkdir(dir, { recursive: true });
 for (const landmark of config.landmarks) {
+  const dir = new URL(`../data/raw/landmarks/${landmark.snapshot ?? config.snapshot}/`, import.meta.url);
+  await mkdir(dir, { recursive: true });
   if (landmark.pointSnapshot) {
     await readFile(new URL(landmark.pointSnapshot, dir), 'utf8');
     continue;

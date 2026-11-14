@@ -22,11 +22,12 @@ const edges=(rings:XY[][])=>{
 };
 
 test("landmarks: all configured identities, exact source edges, polygon parts and nearest stations",()=>{
-  assert.equal(landmarks.features.length,24);
+  assert.equal(landmarks.features.length,35);
   assert.deepEqual(new Set(landmarks.features.map(f=>f.properties.id)),new Set(config.landmarks.map((p:{id:string})=>p.id)));
   for(const f of landmarks.features){
     const p=f.properties, osm=/^osm:(way|relation)\/(\d+)@/.exec(p.source[0]);
     const cfg=config.landmarks.find((l:{id:string})=>l.id===p.id);
+    assert.equal(p.snapshot,cfg.snapshot??config.snapshot,"per-place source dates do not relabel existing snapshots");
     if(osm){
       const raw=read(`../data/raw/landmarks/${p.snapshot}/${osm[1]}-${osm[2]}.json`);
       const entity=raw.elements.find((e:{type:string;id:number})=>e.type===osm[1]&&e.id===Number(osm[2]));
@@ -81,7 +82,7 @@ test("landmarks: all configured identities, exact source edges, polygon parts an
 });
 
 test("places: Delhi categories, separate mall branches and honest site-only scope",()=>{
-  const count=(category:string)=>landmarks.features.filter(f=>f.properties.category===category).length;
+  const count=(category:string)=>landmarks.features.filter(f=>f.properties.region==="Delhi"&&f.properties.category===category).length;
   assert.equal(count("mall"),8);assert.equal(count("zoo"),1);assert.equal(count("monument"),9);assert.equal(count("religious"),4);assert.equal(count("civic"),2);
   for(const id of ["delhi-zoo","vegas-dwarka","pacific-tagore-garden"]){
     const p=landmarks.features.find(f=>f.properties.id===id)!.properties;
@@ -91,6 +92,28 @@ test("places: Delhi categories, separate mall branches and honest site-only scop
   for(const id of ["select-citywalk","dlf-avenue"])assert.equal(landmarks.features.find(f=>f.properties.id===id)!.properties.footprintParts.length,2);
   assert.ok(landmarks.features.find(f=>f.properties.id==="ambience-vasant-kunj")!.properties.footprintParts[0].holes.length>0);
   assert.match(landmarks.features.find(f=>f.properties.id==="agrasen-ki-baoli")!.properties.scope,/Raised cutaway/);
+});
+
+test("places: regional identities, site scopes and nearby corridor stations",()=>{
+  for(const [region,count] of [["Delhi",24],["Noida",4],["Ghaziabad",4],["Meerut",3]] as const){
+    assert.equal(landmarks.features.filter(f=>f.properties.region===region).length,count);
+  }
+  const place=(id:string)=>landmarks.features.find(f=>f.properties.id===id)!.properties;
+  assert.match(place("dlf-mall-of-india").source[0],/^osm:way\/351621425@/);
+  assert.match(place("city-forest-ghaziabad").source[0],/^osm:way\/780474305@/);
+  assert.match(place("okhla-bird-sanctuary").source[0],/^osm:way\/28208892@/);
+  assert.equal(place("india-expo-mart").nearestStation.name,"Knowledge Park II");
+  assert.equal(place("shopprix-meerut").nearestStation.name,"Shatabdi Nagar");
+  assert.equal(place("mahagun-metro-mall").nearestStation.name,"Vaishali");
+  for(const id of ["pacific-sahibabad","gandhi-bagh","okhla-bird-sanctuary","city-forest-ghaziabad","augharnath-temple"]){
+    const p=place(id);
+    assert.equal(p.geometryRole,"site");assert.equal(p.heightM,.4);assert.ok(p.heightEstimated);
+    assert.match(p.scope,/not reconstructed|not a verified/i);
+  }
+  for(const f of landmarks.features.filter(f=>f.properties.region!=="Delhi")){
+    assert.ok(f.properties.aliases.length>0);
+    assert.ok(f.properties.heightEstimated,"no unsourced building heights");
+  }
 });
 
 test("landmarks: exported GLBs have metre scale, ground origins and a bounded triangle budget",()=>{
@@ -111,7 +134,7 @@ test("landmarks: exported GLBs have metre scale, ground origins and a bounded tr
 });
 
 test("place models: source polygon parts are present and mapped courtyards remain open",async()=>{
-  for(const id of ["select-citywalk","dlf-avenue","ambience-vasant-kunj","jama-masjid"]){
+  for(const id of ["select-citywalk","dlf-avenue","ambience-vasant-kunj","jama-masjid","dlf-mall-of-india","great-india-place","mahagun-metro-mall","shopprix-meerut","india-expo-mart","iskcon-ghaziabad"]){
     const f=landmarks.features.find(f=>f.properties.id===id)!;
     const bytes=readFileSync(new URL(`../public${f.properties.model}`,import.meta.url));
     const {scene}=await new GLTFLoader().parseAsync(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),"");

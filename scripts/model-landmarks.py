@@ -416,14 +416,17 @@ def perimeter(name,points,z,height,width,material):
         ob.rotation_euler.z=math.atan2(b[1]-a[1],b[0]-a[0])
 
 def site_outline(p):
-    material=mat('ZooSiteHighlight',(.22,.51,.28)) if p['category']=='zoo' else mat('RetailSiteHighlight',(.48,.30,.66))
+    colors={'zoo':(.22,.51,.28),'park':(.22,.51,.28),'religious':(.62,.07,.22),'mall':(.48,.30,.66)}
+    names={'zoo':'ZooSiteHighlight','mall':'RetailSiteHighlight','park':'SiteHighlight_park','religious':'SiteHighlight_religious'}
+    material=mat(names[p['category']],colors[p['category']])
     for part in p['modelFootprints']:
         # Open contour, not an invented wall, building or habitat plan.
         perimeter('Mapped site outline (nominal highlight)',part['outer'],0,p['heightM'],2.0,material)
 
 def mall(p):
     colors={'select-citywalk':(.78,.68,.52),'dlf-avenue':(.67,.56,.45),'dlf-promenade':(.79,.73,.64),'dlf-emporio':(.89,.84,.73),'ambience-vasant-kunj':(.65,.65,.60),'pacific-nsp':(.72,.68,.59)}
-    facade=mat('Retail_'+p['id'],colors[p['id']]);roof=mat('RetailRoof',(.42,.44,.45));glazing=mat('RetailGlazing',(.20,.36,.42),.25)
+    colors.update({'dlf-mall-of-india':(.74,.68,.56),'great-india-place':(.83,.74,.57),'mahagun-metro-mall':(.73,.67,.60),'shopprix-meerut':(.73,.65,.52)})
+    facade=mat('Retail_'+p['id'],colors[p['id']]);glazing=mat('RetailGlazing',(.20,.36,.42),.25)
     height=p['heightM'];footprint_solid('Source mall silhouette',p['modelFootprints'],height-.6,facade)
     for part in p['modelFootprints']:
         for points in [part['outer']]+part['holes']:
@@ -592,9 +595,45 @@ def baoli():
         box('Step worn nosing',(x+.55,0,h),( .15,11.5,.08),light)
     box('Well end wall',(35.8,0,4),(.9,14,8),masonry)
 
+def expo_mart(p):
+    # Exact source building silhouette; facade treatments are explicitly nominal.
+    facade=mat('ExpoCream',(.79,.76,.67))
+    glazing=mat('ExpoGlass',(.23,.38,.42),.2)
+    height=p['heightM']
+    footprint_solid('Mapped mart building',p['modelFootprints'],height-.6,facade)
+    for part in p['modelFootprints']:
+        for points in [part['outer']]+part['holes']:
+            perimeter('Mart roof cornice',points,height-.6,.6,.5,light)
+            for z in [3,8,13]:perimeter('Nominal mart glazing band',points,z,2.2,.16,glazing)
+            for a,b in zip(points,points[1:]):
+                count=int(math.dist(a,b)/12)
+                for i in range(1,count+1):
+                    t=i/(count+1)
+                    box('Nominal mart facade column',(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,height*.48),(.5,.5,height*.9),marble)
+
+def iskcon_temple(p):
+    # Original stylized massing, not a survey of the shrine or its spires.
+    height=p['heightM'];parts=p['modelFootprints']
+    footprint_solid('Mapped temple building',parts,height*.42,marble)
+    points=parts[0]['outer']
+    minx,maxx=min(v[0] for v in points),max(v[0] for v in points)
+    miny,maxy=min(v[1] for v in points),max(v[1] for v in points)
+    radius=min(maxx-minx,maxy-miny)*.14
+    for fraction,spire_height in [(.25,height*.34),(.5,height*.58),(.75,height*.34)]:
+        x=minx+(maxx-minx)*fraction;y=(miny+maxy)/2
+        cylinder('Nominal shrine drum',x,y,height*.42,radius,height*.07,light,24)
+        for tier in range(7):
+            t=tier/7
+            cylinder('Nominal tiered shikhara',x,y,height*.49+t*spire_height,radius*(1-t*.85),spire_height/7,marble,32,r2=radius*(1-(t+1/7)*.85))
+        cylinder('Nominal spire finial',x,y,height*.49+spire_height,radius*.13,height*.035,light,12,r2=0)
+    for part in parts:
+        perimeter('Temple cornice',part['outer'],height*.40,height*.02,.35,light)
+
 def new_place(p):
     if p['geometryRole']=='site':site_outline(p)
     elif p['category']=='mall':mall(p)
+    elif p['id']=='india-expo-mart':expo_mart(p)
+    elif p['id']=='iskcon-ghaziabad':iskcon_temple(p)
     elif p['id']=='humayuns-tomb':tomb()
     elif p['id']=='safdarjung-tomb':tomb(True)
     elif p['id']=='purana-qila':purana_gate()
@@ -621,7 +660,7 @@ for f in data['features']:
     mn=Vector(tuple(min(v[i] for v in corners) for i in range(3)))
     mx=Vector(tuple(max(v[i] for v in corners) for i in range(3)))
     target=(p['widthM'],p['depthM'],p['heightM']) if p['id']!='qutb-minar' else (14.32,14.32,72.5)
-    geographic=p['id'] not in builders and (p['category']=='mall' or p['geometryRole']=='site' or p['id']=='jama-masjid')
+    geographic=p['id'] not in builders and (p['category']=='mall' or p['geometryRole']=='site' or p['id'] in ['jama-masjid','india-expo-mart','iskcon-ghaziabad'])
     scale=Vector((1,1,target[2]/(mx.z-mn.z))) if geographic else Vector(tuple(target[i]/(mx[i]-mn[i]) for i in range(3)))
     centre=Vector((0,0,mn.z)) if geographic else Vector(((mx.x+mn.x)/2,(mx.y+mn.y)/2,mn.z))
     for ob in objs:
